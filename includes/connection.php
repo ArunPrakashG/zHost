@@ -2,6 +2,10 @@
 require_once('../zHost/config.php');
 require_once('../zHost/includes/connection.php');
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 class LoggedInUserResult
 {
     public $UserName;
@@ -34,16 +38,16 @@ class Database
     private function Connect()
     {
         // ERROR -> Failed to connect to database
-        $Connection = mysqli_connect($this->Config->Host, $this->Config->DBUserName, $this->Config->DBUserPassword) or die("Failed to connect with database");
-        mysqli_select_db($this->Config->DBName, $Connection);
+        $this->Connection = mysqli_connect(Config::HOST, Config::DB_USER_NAME, Config::DB_USER_PASSWORD) or die("Failed to connect with database");
+        mysqli_select_db($this->Connection, Config::DB_NAME);
     }
 
     private function ExecuteQuery($query)
     {
-        if (empty($query)) {
+        if (!isset($query)) {
             throw new Exception("query is empty!");
         }
-
+        
         if (!mysqli_ping($this->Connection)) {
             throw new Exception("Connection lost with database.");
         }
@@ -56,8 +60,8 @@ class Database
         if (empty($userName) || empty($email) || empty($encryptedPasswordHash)) {
             return false;
         }
-
-        $sqlQuery = "INSERT INTO " . $isAdmin ? "admin" : "users" . " (`MailID`, `UserName`, `PASSWORD`) VALUES (" . $email . "," . $userName . ", " . $encryptedPasswordHash . ");";
+        
+        $sqlQuery = "INSERT INTO " . ($isAdmin ? "admin" : "users") . " (`MailID`, `UserName`, `PASSWORD`) VALUES ('" . $email . "','" . $userName . "','" . $encryptedPasswordHash . "');";              
         return $this->ExecuteQuery($sqlQuery);
     }
 
@@ -74,7 +78,7 @@ class Database
             return false;
         }
 
-        $sqlQuery = "SELECT * FROM admin WHERE MailID=" . $email . ";";        
+        $sqlQuery = "SELECT * FROM admin WHERE MailID='" . $email . "';";        
         if($exeResult = $this -> ExecuteQuery($sqlQuery)){
             $rowsCount = mysqli_num_rows($exeResult);
             mysqli_free_result($exeResult);
@@ -92,7 +96,7 @@ class Database
             return false;
         }
 
-        $sqlQuery = "SELECT * FROM users WHERE MailID=" . $email . ";";    
+        $sqlQuery = "SELECT * FROM users WHERE MailID='" . $email . "';";    
         if($exeResult = $this -> ExecuteQuery($sqlQuery)){
             $rowsCount = mysqli_num_rows($exeResult);
             mysqli_free_result($exeResult);
@@ -115,7 +119,7 @@ class Database
             return $resultArray;
         }
 
-        $sqlQuery = "SELECT * FROM " . $isAdminLogin ? "admin" : "users" . " WHERE MailID=" . $email . " AND PASSWORD=" . $encryptedPasswordHash . ";";
+        $sqlQuery = "SELECT * FROM " . ($isAdminLogin ? "admin" : "users") . " WHERE MailID='" . $email . "' AND PASSWORD='" . $encryptedPasswordHash . "';";
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $resultArray["isExist"] = mysqli_num_rows($exeResult) > 0;
 

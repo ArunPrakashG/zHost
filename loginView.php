@@ -1,5 +1,7 @@
 <?php
-session_start();
+if(!isset($_SESSION)){
+	session_start();
+}
 $_SESSION['PageTitle'] = "Login";
 ?>
 
@@ -18,7 +20,7 @@ $_SESSION['PageTitle'] = "Login";
 					<a href="#"><i class="fab fa-google"></i></a>
 					<a href="#"><i class="fab fa-twitter"></i></a>
 				</div>
-				<input type="text" name="username" value="" placeholder="Username" required>
+				<input type="text" name="email" value="" placeholder="Email" required>
 				<input type="password" name="password" value="" placeholder="Password" required>
 				<button type="submit" name="button">Login</button>
 				<p class="options">Not Registered? <a href="#">Create an Account</a></p>

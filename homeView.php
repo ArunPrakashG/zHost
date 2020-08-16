@@ -1,5 +1,10 @@
-<?php session_start(); ?>
-<?php $_SESSION['PageTitle'] = "Home" ?>
+<?php 
+if(!isset($_SESSION)){
+	session_start();
+}
+
+$_SESSION['PageTitle'] = "Home"
+?>
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">

@@ -2,8 +2,13 @@
 <?php require_once('../zHost/includes/connection.php') ?>
 
 <?php
-session_start();
+if(!isset($_SESSION)){
+	session_start();
+}
 $_SESSION['PageTitle'] = "Register";
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 ?>
 
 <!DOCTYPE html>
@@ -106,6 +111,10 @@ $_SESSION['PageTitle'] = "Register";
 
 				<p class="headTitle">By creating an account you agree to our <a href="#">Terms & Conditions</a>.</p>
 				<button type="submit" class="registerbtn">Register</button>
+
+				<?php if (isset($_SESSION["registerErrorMessage"]) || (isset($_SESSION["IsError"]) && $_SESSION["IsError"])) { ?>
+					<h1><?php echo $_SESSION["registerErrorMessage"] ?></h1>
+				<?php } ?>
 			</div>
 
 			<div class="container signin">
@@ -113,10 +122,6 @@ $_SESSION['PageTitle'] = "Register";
 			</div>
 		</form>
 
-		<?php if (isset($_SESSION["registerErrorMessage"])) { ?>		
-			<p><?php echo $_SESSION["registerErrorMessage"] ?></p>
-		<?php }?>
-		
 	</div>
 
 	<?php
@@ -163,12 +168,12 @@ $_SESSION['PageTitle'] = "Register";
 		return true;
 	}
 
-	if ($_SERVER["REQUEST_METHOD"] == "POST") {
+	if ($_SERVER["REQUEST_METHOD"] == "POST") {				
 		if (!validateRegisterForum()) {
 			if (!isset($_SESSION["registerErrorMessage"])) {
-				$_SESSION["registerErrorMessage"] = "Failed to register. try again.";
+				$_SESSION["registerErrorMessage"] = "Failed to register. try again.";				
 			}
-	
+
 			header("Location: registerView.php");
 			return;
 		}
@@ -183,7 +188,7 @@ $_SESSION['PageTitle'] = "Register";
 		}
 
 		$Password = password_hash($_POST["psw"], PASSWORD_DEFAULT);
-		if ($Db->RegisterUser($_POST['username'], $_POST['email'], $Password, false)) {
+		if ($Db->RegisterUser($_POST['username'], $_POST['email'], $Password, false)) {			
 			$_SESSION["IsError"] = false;
 			unset($_SESSION["registerErrorMessage"]);
 			$_SESSION["RegistrationMessage"] = "Registration successfull! Please login!";
