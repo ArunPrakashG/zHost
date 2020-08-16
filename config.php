@@ -1,11 +1,22 @@
 <?php
-    session_start();
-    $HOST="localhost";
-    $DB_USER="root";
-    $DB_PASS="root";
-    $DB_NAME="OnlineBlog";
-	$connection = mysqli_connect($HOST, $DB_USER, $DB_PASS, $DB_NAME) or die("Error connecting to database: " . mysqli_connect_error());
+session_start();
 
-	define ('ROOT_PATH', realpath(dirname(__FILE__)));
-    define('BASE_URL', 'http://localhost/onlineblog/');
+class Config
+{
+    public $Host;
+    public $DBUserName;
+    public $DBUserPassword;
+    public $DBName;
+
+    const BASE_URL = "http://localhost/zHost/";
+
+    public function _construct()
+    {
+        $Host = "localhost";
+        $DBUserName = "root";
+        $DBUserPassword = "root";
+        $DBName = "zhost";
+    }
+}
+
 ?>

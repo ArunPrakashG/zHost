@@ -32,12 +32,16 @@ function secureEscape($data) {
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
     return $data;
-  }
+}
 
-if (!validateLoginForum() && !empty($_SESSION["loginErrorMessage"])) {
-    header("Location: index.php");
+if (!validateLoginForum()) {
+    if(!isset($_SESSION["loginErrorMessage"])){
+        $_SESSION["loginErrorMessage"] = "Submition failed.";        
+    }
+    
+    header("Location: loginView.php");
     exit;
 }
 
-header("Location: home.php")
+header("Location: home.php");
 ?>

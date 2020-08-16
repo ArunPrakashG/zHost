@@ -1,5 +1,3 @@
-<?php require_once('config.php') ?>
-<?php require_once(ROOT_PATH . '/includes/functions.php') ?>
 <?php session_start(); ?>
 <?php $_SESSION['PageTitle'] = "Home" ?>
 
