@@ -165,3 +165,8 @@ label #sidebar_btn:hover{
   font-size: 14px;
   opacity: 0.8;
 }
+
+.dashboard-contents{
+  align-content: center;
+  align-items: center;
+}

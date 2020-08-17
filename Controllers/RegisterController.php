@@ -74,7 +74,7 @@ if (!isset($_SESSION)) {
 				$_SESSION["registerErrorMessage"] = "Failed to register. try again.";
 			}
 
-            Functions::Redirect("../Views/RegisterView.php");
+            Functions::Redirect("../Views/RegisterView.php?errorCode=1");
 			exit();
 		}
 
@@ -83,7 +83,7 @@ if (!isset($_SESSION)) {
 		if ($Db->IsExistingUser($_POST["email"])) {
 			$_SESSION["IsError"] = true;
 			$_SESSION["registerErrorMessage"] = "The specified email id already exists. Please choose another one.";
-			Functions::Redirect("../Views/RegisterView.php");
+			Functions::Redirect("../Views/RegisterView.php?errorCode=2");
 			exit();
 		}
 

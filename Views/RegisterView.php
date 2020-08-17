@@ -1,5 +1,4 @@
 <?php
-//ob_start();
 require_once '../Core/Config.php';
 
 if (Config::DEBUG) {
@@ -20,6 +19,8 @@ $_SESSION['PageTitle'] = "Register";
 
 <link rel="stylesheet" href="../includes/css/hover-bttn.css" />
 <link rel="stylesheet" href="../includes/css/register-view.css" />
+<link rel="stylesheet" href="../includes/css/model-box.css">
+<script src="../includes/js/model-box.js"></script>
 
 <body>
 	<div class="main">
@@ -43,8 +44,8 @@ $_SESSION['PageTitle'] = "Register";
 				<hr>
 
 				<div class="flex-container">
-					<div><input type="checkbox" checked="false" name="tocAgreement" value="Agree to Teams & Conditions" required></div>
 					<div>
+						<input type="checkbox" checked="false" name="tocAgreement" value="Agree to Teams & Conditions" required>
 						<p class="headTitle">By creating an account you agree to our <a href="#">Terms & Conditions</a>.</p>
 					</div>
 				</div>
@@ -56,9 +57,37 @@ $_SESSION['PageTitle'] = "Register";
 				<p class="headTitle">Already have an account ? <a href="../Views/LoginView.php">Log in</a>!</p>
 			</div>
 
-			<?php if (isset($_SESSION["registerErrorMessage"]) || (isset($_SESSION["IsError"]) && $_SESSION["IsError"])) { ?>
-				<p class="error-message"><?php echo $_SESSION["registerErrorMessage"] ?></p>
-			<?php } ?>
+			<div id="alert-model" class="modal">
+				<div class="modal-content">
+					<span class="close">&times;</span>
+					<p class="modal-text-content">error message placeholder</p>
+				</div>
+			</div>
+
+			<?php
+			if (isset($_SESSION["registerErrorMessage"]) || (isset($_SESSION["IsError"]) && $_SESSION["IsError"])) {
+				if (isset($_GET['errorCode'])) {
+					switch ($_GET['errorCode']) {
+						case 1:
+							// forum validation failed
+							echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["registerErrorMessage"]) ? $_SESSION["registerErrorMessage"] : "Forum validation failed." . ')</script>';
+							break;
+						case 2:
+							// user already exists with same email
+							echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["registerErrorMessage"]) ? $_SESSION["registerErrorMessage"] : "Another user already exists with same email." . ')</script>';
+							break;
+						default:
+							// unknown 
+							echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["registerErrorMessage"]) ? $_SESSION["registerErrorMessage"] : "Unknown error code." . ')</script>';
+							break;
+					}
+
+					return;
+				}
+
+				echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["registerErrorMessage"]) ? $_SESSION["registerErrorMessage"] : "Register failed (Unknown reason)" . ')</script>';
+			}
+			?>
 	</div>
 	</form>
 
@@ -67,7 +96,5 @@ $_SESSION['PageTitle'] = "Register";
 </body>
 
 <?php include_once '../Common/Footer.php'; ?>
-<?php //ob_end_flush() 
-?>
 
 </html>

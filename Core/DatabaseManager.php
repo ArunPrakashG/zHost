@@ -1,27 +1,11 @@
 <?php
 require_once 'Config.php';
+require_once 'UserModel.php';
 
 if(Config::DEBUG){
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
-}
-
-class LoggedInUserResult
-{
-    public $UserName;
-    public $MailID;
-    public $Password;
-    public $Id;
-    public $DateCreated;
-    public $IsAdmin;
-    public $ResultStatus;
-
-    public function __construct($executionResult, $isAdminQuery)
-    {
-        $IsAdmin = $isAdminQuery;
-        $ResultStatus = $executionResult;
-    }
 }
 
 class Database
@@ -56,13 +40,13 @@ class Database
         return mysqli_query($this->Connection, $query);
     }
 
-    public function RegisterUser($userName, $email, $encryptedPasswordHash, $isAdmin)
+    public function RegisterUser($userName, $email, $password, $isAdmin)
     {
-        if (empty($userName) || empty($email) || empty($encryptedPasswordHash)) {
+        if (empty($userName) || empty($email) || empty($password)) {
             return false;
         }
         
-        $sqlQuery = "INSERT INTO " . ($isAdmin ? "admin" : "users") . " (`MailID`, `UserName`, `PASSWORD`) VALUES ('" . $email . "','" . $userName . "','" . $encryptedPasswordHash . "');";              
+        $sqlQuery = "INSERT INTO " . ($isAdmin ? "admin" : "users") . " (`MailID`, `UserName`, `PASSWORD`) VALUES ('" . $email . "','" . $userName . "','" . $password . "');";              
         return $this->ExecuteQuery($sqlQuery);
     }
 
@@ -110,17 +94,17 @@ class Database
         return false;
     }
 
-    public function LoginUser($email, $encryptedPasswordHash, $isAdminLogin)
+    public function LoginUser($email, $password, $isAdminLogin)
     {
         $resultArray = array();
 
-        if (empty($email) || empty($encryptedPasswordHash)) {
+        if (empty($email) || empty($password)) {
             $resultArray["isError"] = true;
             $resultArray["errorMessage"] = "Email or Password is empty!";
             return $resultArray;
         }
 
-        $sqlQuery = "SELECT * FROM " . ($isAdminLogin ? "admin" : "users") . " WHERE MailID='" . $email . "' AND PASSWORD='" . $encryptedPasswordHash . "';";
+        $sqlQuery = "SELECT * FROM " . ($isAdminLogin ? "admin" : "users") . " WHERE MailID='" . $email . "';";
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $resultArray["isExist"] = mysqli_num_rows($exeResult) > 0;
 
@@ -135,8 +119,15 @@ class Database
                 if(isset($obj->MailID)){
                     $resultArray["resultObj"]->MailID = $obj->MailID;
                 }
+
                 if(isset($obj->PASSWORD)){
-                    $resultArray["resultObj"]->Password = $obj->PASSWORD;
+                    if(!password_verify($password, $obj->PASSWORD)){
+                        $resultArray["isError"] = true;
+                        $resultArray["errorMessage"] = "Password is incorrect";
+                        return $resultArray;
+                    }
+
+                    $resultArray["resultObj"]->Password = $obj->PASSWORD;                    
                 }
 
                 if(isset($obj->UserName)){
@@ -163,5 +154,3 @@ class Database
         return $resultArray;
     }
 }
-
-?>

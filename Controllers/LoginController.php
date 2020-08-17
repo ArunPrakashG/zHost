@@ -49,24 +49,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             $_SESSION["loginErrorMessage"] = "Failed to login. try again.";				
         }
 
-        Functions::Redirect("../Views/LoginView.php");
+        Functions::Redirect("../Views/LoginView.php?errorCode=1");
         exit();
     }
 
     $Db = new Database;
     $Email = secureEscape($_POST["email"]);
-    $EncryptedPassword = password_hash(secureEscape($_POST["password"]), PASSWORD_DEFAULT);
 
     if (!$Db->IsExistingUser($_POST["email"])) {
         $_SESSION["IsError"] = true;
         $_SESSION["loginErrorMessage"] = "Such a user doesn't exist! Please register yourself first.";
-        Functions::Redirect("../Views/LoginView.php");
+        Functions::Redirect("../Views/LoginView.php?errorCode=2");
         exit();
     }
 
-    if ($loginResult = $Db->LoginUser($Email, $Password, false)) {			
-        $_SESSION["IsError"] = $loginResult["isError"];
-        $_SESSION["loginErrorMessage"] = isset($loginResult["errorMessage"]) ? $loginResult["errorMessage"] : "Error: Login failed";
+    if ($loginResult = $Db->LoginUser($Email, secureEscape($_POST["password"]), false)) {
+        if(isset($loginResult['isError']) && $loginResult['isError']){
+            $_SESSION["IsError"] = $loginResult["isError"];       
+            $_SESSION["loginErrorMessage"] = isset($loginResult["errorMessage"]) ? $loginResult["errorMessage"] : "Error: Login failed";
+            Functions::Redirect("../Views/LoginView.php?errorCode=3");
+        }
+        
+        //throw new Exception(print_r($loginResult));
+        $_SESSION['userDetails'] = $loginResult['resultObj'];
+        $_SESSION['ID'] = $loginResult['resultObj']->Id;
         Functions::Redirect("../Views/HomeView.php");
         exit();
     }
