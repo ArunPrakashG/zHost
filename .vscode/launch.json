@@ -17,6 +17,10 @@
             "type": "pwa-msedge",
             "url": "http://localhost/${workspaceFolderBasename}",
             "webRoot": "${workspaceFolder}",
+            "includeDefaultArgs": true,
+            "runtimeArgs": [
+                "--explicitly-allowed-ports=80,22"
+            ]
         }
     ]
 }

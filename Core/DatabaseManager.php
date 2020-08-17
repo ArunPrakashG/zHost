@@ -1,10 +1,11 @@
 <?php
-require_once('../zHost/config.php');
-require_once('../zHost/includes/connection.php');
+require_once 'Config.php';
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+if(Config::DEBUG){
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
 
 class LoggedInUserResult
 {
@@ -37,7 +38,6 @@ class Database
 
     private function Connect()
     {
-        // ERROR -> Failed to connect to database
         $this->Connection = mysqli_connect(Config::HOST, Config::DB_USER_NAME, Config::DB_USER_PASSWORD) or die("Failed to connect with database");
         mysqli_select_db($this->Connection, Config::DB_NAME);
     }
@@ -49,9 +49,10 @@ class Database
         }
         
         if (!mysqli_ping($this->Connection)) {
-            throw new Exception("Connection lost with database.");
+            throw new Exception("Connection lost with database, Reconnection failed as well.");
         }
 
+        $this->QueriesExecutedCount++;
         return mysqli_query($this->Connection, $query);
     }
 
@@ -153,7 +154,7 @@ class Database
 
             mysqli_free_result($exeResult);
             $resultArray["isError"] = false;            
-            $resultArray["errorMessage"] = "Success!";
+            unset($resultArray["errorMessage"]);
             return $resultArray;
         }
 

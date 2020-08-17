@@ -1,6 +1,13 @@
 <?php
-require_once('../zHost/config.php');
-require_once('../zHost/includes/connection.php');
+require_once '../Common/Functions.php';
+require_once '../Core/Config.php';
+require_once '../Core/DatabaseManager.php';
+
+if(Config::DEBUG){
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
 
 if(!isset($_SESSION)){
 	session_start();
@@ -8,7 +15,7 @@ if(!isset($_SESSION)){
 
 function validateLoginForum(){
     if ($_SERVER["REQUEST_METHOD"] != "POST") {
-        $_SESSION["loginErrorMessage"] = "Invalid request.";
+        $_SESSION["loginErrorMessage"] = "Invalid request type.";
         return false;
     }
 
@@ -42,8 +49,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             $_SESSION["loginErrorMessage"] = "Failed to login. try again.";				
         }
 
-        header("Location: loginView.php");
-        return;
+        Functions::Redirect("../Views/LoginView.php");
+        exit();
     }
 
     $Db = new Database;
@@ -53,15 +60,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     if (!$Db->IsExistingUser($_POST["email"])) {
         $_SESSION["IsError"] = true;
         $_SESSION["loginErrorMessage"] = "Such a user doesn't exist! Please register yourself first.";
-        header("Location: loginView.php");
-        return;
+        Functions::Redirect("../Views/LoginView.php");
+        exit();
     }
 
-    if ($Db->LoginUser($Email, $Password, false)) {			
-        $_SESSION["IsError"] = false;
-        unset($_SESSION["registerErrorMessage"]);        
-        header("Location: homeView.php");
-        return;
+    if ($loginResult = $Db->LoginUser($Email, $Password, false)) {			
+        $_SESSION["IsError"] = $loginResult["isError"];
+        $_SESSION["loginErrorMessage"] = isset($loginResult["errorMessage"]) ? $loginResult["errorMessage"] : "Error: Login failed";
+        Functions::Redirect("../Views/HomeView.php");
+        exit();
     }
 }
 

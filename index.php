@@ -1,11 +1,11 @@
 <?php
 define('ROOT_PATH', realpath(dirname(__FILE__)));
 
-if(!isset($_SESSION)){
+if (!isset($_SESSION)) {
 	session_start();
 }
 
-$_SESSION['PageTitle'] = "Index";
+$_SESSION['PageTitle'] = "Welcome!";
 ?>
 
 <!DOCTYPE html>
@@ -20,24 +20,10 @@ $_SESSION['PageTitle'] = "Index";
 			college <span style="font-weight: bold;">mini project.</span></p>
 	</header>
 
-	<form method="post">
+	<form method="post" action="Controllers/IndexController.php">
 		<input type="submit" name="loginBttn" class="btn btn-primary" value="LOGIN" />
 		<input type="submit" name="registerBttn" class="btn btn-primary" value="REGISTER" />
 	</form>
-
-	<?php
-	if (array_key_exists('loginBttn', $_POST)) {
-		$_SESSION['rq'] = "login";
-		header("Location: loginView.php");
-		return;
-	}
-
-	if (array_key_exists('registerBttn', $_POST)) {
-		$_SESSION['rq'] = "register";
-		header("Location: registerView.php");
-		return;
-	}
-	?>
 
 	<footer id="footer">
 		<ul class="icons">
@@ -52,7 +38,6 @@ $_SESSION['PageTitle'] = "Index";
 
 	</footer>
 
-	<!-- Scripts -->
 	<script src="includes/js/main.js"></script>
 
 </body>
