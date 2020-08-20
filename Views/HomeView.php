@@ -1,6 +1,8 @@
 <?php
 require_once '../Core/Config.php';
 require_once '../Core/UserModel.php';
+require_once '../Common/Functions.php';
+require_once '../Core/SessionCheck.php';
 
 if (Config::DEBUG) {
     ini_set('display_errors', 1);
@@ -14,6 +16,7 @@ if (!isset($_SESSION)) {
 
 $_SESSION['PageTitle'] = "Home";
 
+// these variables are no longer required or checked at
 unset($_SESSION["loginErrorMessage"]);
 unset($_SESSION["IsError"]);
 unset($_SESSION["registerErrorMessage"]);
@@ -21,30 +24,74 @@ unset($_SESSION["IsError"]);
 unset($_SESSION["RegistrationMessage"]);
 unset($_SESSION["rq"]);
 
-$User = new LoggedInUserResult(false, false);
-if (!isset($_SESSION['userDetails'])) {
-    $User = NULL;
-    return;
+// check for user logged in because
+// if user tried to directly access this page via url, he should be redirected back to login and terminate this view
+$User;
+
+if (!IsUserLoggedIn()) {
+    Functions::Alert("Session expired!\nYou will be required to login again.");
+    Functions::Redirect("../Views/LoginRedirectView.php");
+    exit();
 }
 
-$User = $_SESSION["userDetails"];
+$User = unserialize($_SESSION["userDetails"]);
 ?>
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <link rel="stylesheet" type="text/css" href="../includes/css/dashboard-style.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" charset="utf-8"></script>
-<link rel="stylesheet" href="../includes/css/model-box.css">
-<script src="../includes/js/model-box.js"></script>
-
-<div id="alert-model" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <p class="modal-text-content">error message placeholder</p>
-    </div>
-</div>
 
 <header>
+    <?php require_once '../Common/Header.php' ?>
+
+    <script type="text/javascript">
+        function logoutRequested() {
+            swal({
+                title: "Are you sure?",
+                text: "You will logged out and redirected to Index page.",
+                type: "warning",
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Confirm Logout",
+                cancelButtonText: "Cancel",
+                buttons: true
+            }).then((isConfirmed) => {
+                if (isConfirmed) {
+                    $.ajax({
+                        method: "POST",
+                        url: "../Controllers/UserController.php",
+                        data: {
+                            requestType: 'logout'
+                        },
+                        success: function(result) {
+                            switch (result) {
+                                case "-1":
+                                    console.log("Invalid request type.");
+                                    return;
+                                case "0":
+                                    // logout done
+                                    swal("You are logged out!", "Click OK for redirect to Index page.", "success").then((value) => {
+                                        document.location = "../";
+                                    });
+                                    break;
+                                case "1":
+                                    // not logged in
+                                    swal("Session expired?!", "Couldn't logout as you are not logged in. Press Ok to login.", "warning").then((value) => {
+                                        if (value) {
+                                            document.location = "../Views/RedirectView.php?path=../Views/LoginView.php&name=Login Page&header=Login";
+                                            return;
+                                        }
+
+                                        document.location = "../";
+                                    });
+                                    break;
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
     <label for="check">
         <i class="fas fa-bars" id="sidebar_btn"></i>
     </label>
@@ -52,7 +99,7 @@ $User = $_SESSION["userDetails"];
         <h3>z<span>Host</span></h3>
     </div>
     <div class="right_area">
-        <a href="#" class="logout_btn">Logout</a>
+        <a onclick="logoutRequested();" href="javascript:void(0);" class="logout_btn">Logout</a>
     </div>
 </header>
 
@@ -72,17 +119,8 @@ $User = $_SESSION["userDetails"];
             <a href="#" class="sidebar-item"><i class="fas fa-sliders-h"></i><span>Settings</span></a>
         </div>
     </div>
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('.nav_btn').click(function() {
-                $('.mobile_nav_items').toggleClass('active');
-            });
-        });
-    </script>
 </body>
 
-<?php include_once('../Common/Footer.php')
-?>
+<?php include_once('../Common/Footer.php') ?>
 
 </html>

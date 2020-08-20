@@ -84,8 +84,7 @@ class Database
         $sqlQuery = "SELECT * FROM users WHERE MailID='" . $email . "';";    
         if($exeResult = $this -> ExecuteQuery($sqlQuery)){
             $rowsCount = mysqli_num_rows($exeResult);
-            mysqli_free_result($exeResult);
-
+            mysqli_free_result($exeResult);            
             if($rowsCount > 0){
                 return true;
             }
@@ -98,13 +97,14 @@ class Database
     {
         $resultArray = array();
 
-        if (empty($email) || empty($password)) {
-            $resultArray["isError"] = true;
+        if (!isset($email) || !isset($password)) {
+            $resultArray["isError"] = true;            
             $resultArray["errorMessage"] = "Email or Password is empty!";
             return $resultArray;
         }
 
         $sqlQuery = "SELECT * FROM " . ($isAdminLogin ? "admin" : "users") . " WHERE MailID='" . $email . "';";
+        
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $resultArray["isExist"] = mysqli_num_rows($exeResult) > 0;
 
@@ -120,7 +120,7 @@ class Database
                     $resultArray["resultObj"]->MailID = $obj->MailID;
                 }
 
-                if(isset($obj->PASSWORD)){
+                if(isset($obj->PASSWORD)){                    
                     if(!password_verify($password, $obj->PASSWORD)){
                         $resultArray["isError"] = true;
                         $resultArray["errorMessage"] = "Password is incorrect";

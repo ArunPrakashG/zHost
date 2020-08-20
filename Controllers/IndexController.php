@@ -1,3 +1,7 @@
+<html>
+    <body></body>
+</html>
+
 <?php
 
 require_once '../Common/Functions.php';
@@ -15,13 +19,13 @@ require_once '../Core/Config.php';
 	
 	if (array_key_exists('loginBttn', $_POST)) {
 		$_SESSION['rq'] = "login";
-		Functions::Redirect("../Views/LoginView.php");
+		Functions::Redirect("../Views/LoginView.php?refer=index");
 		die();
 	}
 
 	if (array_key_exists('registerBttn', $_POST)) {
 		$_SESSION['rq'] = "register";
-		Functions::Redirect("../Views/RegisterView.php");
+		Functions::Redirect("../Views/RegisterView.php?refer=index");
 		die();
 	}
 ?>

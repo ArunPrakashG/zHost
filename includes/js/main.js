@@ -107,8 +107,8 @@
       images: {
         "includes/images/bg01.jpg": "center",
         "includes/images/bg02.jpg": "center",
-		"includes/images/bg03.jpg": "center",
-		"includes/images/homepage-bg.png": "center",
+        "includes/images/bg03.jpg": "center",
+        "includes/images/homepage-bg.png": "center",
       },
 
       // Delay.
@@ -145,18 +145,18 @@
     $bgs[pos].classList.add("top");
 
     // Bail if we only have a single BG or the client doesn't support transitions.
-    if ($bgs.length == 1 || !canUse("transition")){
-		return;
-	}
+    if ($bgs.length == 1 || !canUse("transition")) {
+      return;
+    }
 
     window.setInterval(function () {
       lastPos = pos;
       pos++;
 
       // Wrap to beginning if necessary.
-      if (pos >= $bgs.length){
-		pos = 0;
-	  }
+      if (pos >= $bgs.length) {
+        pos = 0;
+      }
 
       // Swap top images.
       $bgs[lastPos].classList.remove("top");

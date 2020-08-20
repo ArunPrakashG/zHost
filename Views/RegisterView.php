@@ -1,5 +1,6 @@
 <?php
 require_once '../Core/Config.php';
+require_once '../Core/SessionCheck.php';
 
 if (Config::DEBUG) {
 	ini_set('display_errors', 1);
@@ -12,15 +13,24 @@ if (!isset($_SESSION)) {
 }
 
 $_SESSION['PageTitle'] = "Register";
+
+if (isset($_GET['refer']) && strcmp($_GET['refer'], "index")) {
+	unset($_SESSION["userDetails"]);
+	unset($_SESSION["ID"]);
+} else {
+	if (IsSessionActive(true, false)) {
+		exit();
+	}
+}
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 
+<?php require_once '../Common/Header.php' ?>
 <link rel="stylesheet" href="../includes/css/hover-bttn.css" />
 <link rel="stylesheet" href="../includes/css/register-view.css" />
-<link rel="stylesheet" href="../includes/css/model-box.css">
-<script src="../includes/js/model-box.js"></script>
 
 <body>
 	<div class="main">
@@ -56,38 +66,6 @@ $_SESSION['PageTitle'] = "Register";
 			<div class="container signin">
 				<p class="headTitle">Already have an account ? <a href="../Views/LoginView.php">Log in</a>!</p>
 			</div>
-
-			<div id="alert-model" class="modal">
-				<div class="modal-content">
-					<span class="close">&times;</span>
-					<p class="modal-text-content">error message placeholder</p>
-				</div>
-			</div>
-
-			<?php
-			if (isset($_SESSION["registerErrorMessage"]) || (isset($_SESSION["IsError"]) && $_SESSION["IsError"])) {
-				if (isset($_GET['errorCode'])) {
-					switch ($_GET['errorCode']) {
-						case 1:
-							// forum validation failed
-							echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["registerErrorMessage"]) ? $_SESSION["registerErrorMessage"] : "Forum validation failed." . ')</script>';
-							break;
-						case 2:
-							// user already exists with same email
-							echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["registerErrorMessage"]) ? $_SESSION["registerErrorMessage"] : "Another user already exists with same email." . ')</script>';
-							break;
-						default:
-							// unknown 
-							echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["registerErrorMessage"]) ? $_SESSION["registerErrorMessage"] : "Unknown error code." . ')</script>';
-							break;
-					}
-
-					return;
-				}
-
-				echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["registerErrorMessage"]) ? $_SESSION["registerErrorMessage"] : "Register failed (Unknown reason)" . ')</script>';
-			}
-			?>
 	</div>
 	</form>
 

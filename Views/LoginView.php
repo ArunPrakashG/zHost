@@ -1,18 +1,28 @@
 <?php
 require_once '../Core/Config.php';
 require_once '../Common/Functions.php';
+require_once '../Core/SessionCheck.php';
 
 if (Config::DEBUG) {
-	ini_set('display_errors', 1);
-	ini_set('display_startup_errors', 1);
-	error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
 }
 
 if (!isset($_SESSION)) {
-	session_start();
+    session_start();
 }
 
 $_SESSION['PageTitle'] = "Login";
+
+if (isset($_GET['refer']) && strcmp($_GET['refer'], "index")) {
+    unset($_SESSION['userDetails']);
+    unset($_SESSION['ID']);
+} else {
+    if (IsSessionActive(true, false)) {
+        exit();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -20,71 +30,80 @@ $_SESSION['PageTitle'] = "Login";
 
 <?php require_once '../Common/Header.php'; ?>
 
-<link rel="stylesheet" href="../includes/css/login-style.css">
-<link rel="stylesheet" href="../includes/css/model-box.css">
-<script src="../includes/js/model-box.js"></script>
+<script type="text/javascript">
+    function loginRequested() {
+        console.log("login request received");
+        var data = $('.login-form').serializeArray();
+        console.log(data);
+        $.ajax({
+            method: "POST",
+            url: "../Controllers/UserController.php",
+            data: {
+                requestType: 'login',
+                postData: data
+            },
+            success: function(result) {
+                console.log(result);                
+                switch (result) {
+                    case "-1":
+                        console.log("Invalid request type.");
+                        return;
+                    case "0":
+                        // success                        
+                        swal("Welcome to zHost!", "You will be redirected to your inbox.", "success").then((value) => {
+                            document.location = "../Views/RedirectView.php?path=../Views/HomeView.php&name=Home Page&header=Home";
+                        });
+                        break;
+                    case "2":
+                        // account doesnt exist
+                        swal("Account doesn't exist!", "Consider registering yourself.", "warning").then((value) => {
+                            document.location = "../Views/LoginView.php";
+                        });
+                        break;
+                    case "3":
+                        // email and pass doesnt match                        
+                        swal("Email/Password missmatch.", "Entered email and password doesn't match.", "warning").then((value) => {
+                            document.location = "../Views/LoginView.php";
+                        });
+                        break;
+                    case "10":
+                        // email invalid                        
+                        swal("Entered email is empty/invalid.", "All email ids should have @zhost.com appended at end.", "warning").then((value) => {
+                            document.location = "../Views/LoginView.php";
+                        })
+                        break;
+                    case "11":
+                        // password invalid
+                        swal("Entered password is empty/invalid.", "Passwords should not contain whitespaces or empty charecters (ASCII included)", "warning").then((value) => {
+                            document.location = "../Views/LoginView.php";
+                        })
+                        break;
+                }
+            }
+        });
+    }
+</script>
 
-<div id="alert-model" class="modal">
-	<div class="modal-content">
-		<span class="close">&times;</span>
-		<p class="modal-text-content">error message placeholder</p>
-	</div>
-</div>
+<link rel="stylesheet" href="../includes/css/login-style.css">
 
 <body>
-	<div class="container">
-		<div class="form">
-			<form class="login-form" action="../Controllers/LoginController.php" method="post">
-				<h2>Login</h2>
-				<div class="icons">
-					<a href="#"><i class="fab fa-facebook"></i></a>
-					<a href="#"><i class="fab fa-google"></i></a>
-					<a href="#"><i class="fab fa-twitter"></i></a>
-				</div>
-				<input type="text" name="email" value="" placeholder="Email" required>
-				<input type="password" name="password" value="" placeholder="Password" required>
-				<button type="submit" name="button">Login</button>
-				<p class="options">Not Registered? <a href="../Views/RegisterView.php">Register here</a>!</p>
-			</form>
-
-			<?php
-
-			if (isset($_SESSION["loginErrorMessage"]) || (isset($_SESSION["IsError"]) && $_SESSION["IsError"])) {
-				if (isset($_GET['errorCode'])) {
-					switch ($_GET['errorCode']) {
-						case 1:
-							// forum validation failure
-							echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["loginErrorMessage"]) ? $_SESSION["loginErrorMessage"] : "Forum validation failed." . ')</script>';
-							//echo '<p class="login-error-msg">⚠️ ' . isset($_SESSION["loginErrorMessage"]) ? $_SESSION["loginErrorMessage"] : "Forum validation failed." . '</p>';
-							break;
-						case 2:
-							// user doesnt exist | should register
-							echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["loginErrorMessage"]) ? $_SESSION["loginErrorMessage"] : "Such a user doesn't exist." . ')</script>';
-							//echo '<p class="login-error-msg">⚠️ ' . isset($_SESSION["loginErrorMessage"]) ? $_SESSION["loginErrorMessage"] : "Such a user doesnt exist." . '</p>';
-							break;
-						case 3:
-							// invalid details
-							echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["loginErrorMessage"]) ? $_SESSION["loginErrorMessage"] : "Invalid details." . ')</script>';
-							//echo '<p class="login-error-msg">⚠️ ' . isset($_SESSION["loginErrorMessage"]) ? $_SESSION["loginErrorMessage"] : "Invalid details." . '</p>';
-							break;
-						default:
-							echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["loginErrorMessage"]) ? $_SESSION["loginErrorMessage"] : "Unknown error code." . ')</script>';
-							//echo '<p class="login-error-msg">⚠️ ' . isset($_SESSION["loginErrorMessage"]) ? $_SESSION["loginErrorMessage"] : "Unknown error code." . '</p>';
-							break;
-					}
-
-					return;
-				}
-
-				// no error code
-				// not aware of what happened
-				echo '<script type="text/javascript">showAlertWindow(' . isset($_SESSION["loginErrorMessage"]) ? $_SESSION["loginErrorMessage"] : "Login failed (Unknown reason)" . ')</script>';
-				//echo '<p class="login-error-msg">⚠️ ' . isset($_SESSION["loginErrorMessage"]) ? $_SESSION["loginErrorMessage"] : "Login failed (Unknown reason)." . '</p>';
-				return;
-			}
-			?>
-		</div>
-	</div>
+    <div class="container">
+        <div class="form">
+            <form class="login-form" method="post" action="javascript:loginRequested();">
+                <h2>zHost Login</h2>
+                <div class="icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-google"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <input type="text" name="email" value="" placeholder="Email" required>
+                <input type="password" name="password" value="" placeholder="Password" required>
+                <button type="submit" name="button">Login</button>
+                <br />
+                <p class="options">Not Registered ? <a href="../Views/RegisterView.php">Register here</a>!</p>
+            </form>
+        </div>
+    </div>
 
 </body>
 

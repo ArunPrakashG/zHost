@@ -13,88 +13,78 @@ if (!isset($_SESSION)) {
 	session_start();
 }
 
-	function validateRegisterForum()
-	{
-		if ($_SERVER["REQUEST_METHOD"] != "POST") {
-			$_SESSION["IsError"] = true;
-			$_SESSION["registerErrorMessage"] = "Invalid request type.";
-			return false;
-		}
-
-		if (!isset($_POST["email"])) {
-			$_SESSION["IsError"] = true;
-			$_SESSION["registerErrorMessage"]  = "Email cannot be empty!";
-			return false;
-		}
-
-		if (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
-			$_SESSION["IsError"] = true;
-			$_SESSION["registerErrorMessage"]  = "Email is invalid.";
-			return false;
-		}
-
-		if (!isset($_POST["username"])) {
-			$_SESSION["IsError"] = true;
-			$_SESSION["registerErrorMessage"]  = "Username cannot be empty!";
-			return false;
-		}
-
-		if (!isset($_POST["psw"])) {
-			$_SESSION["IsError"] = true;
-			$_SESSION["registerErrorMessage"]  = "Password cannot be empty!";
-			return false;
-		}
-
-		if (preg_match('/\s/', $_POST["psw"])) {
-			$_SESSION["IsError"] = true;
-			$_SESSION["registerErrorMessage"]  = "Password should not contain white spaces.";
-			return false;
-		}
-
-		if (!isset($_POST['psw-repeat'])) {
-			$_SESSION["IsError"] = true;
-			$_SESSION["registerErrorMessage"]  = "Please repeat the password.";
-			return false;
-		}
-
-		if (strcmp($_POST["psw"] , $_POST["psw-repeat"]) != 0) {
-			$_SESSION["registerErrorMessage"] = "Passwords doesn't match.";
-			$_SESSION["IsError"] = true;
-			return false;
-		}
-
-		$_SESSION["IsError"] = false;
-		unset($_SESSION["registerErrorMessage"]);
-		return true;
+function validateRegisterForum()
+{
+	if ($_SERVER["REQUEST_METHOD"] != "POST") {
+		Functions::Alert("Invalid request type.");
+		Functions::Redirect("../Views/RegisterView.php");
+		return false;
 	}
 
-	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		if (!validateRegisterForum()) {
-			if (!isset($_SESSION["registerErrorMessage"])) {
-				$_SESSION["registerErrorMessage"] = "Failed to register. try again.";
-			}
-
-            Functions::Redirect("../Views/RegisterView.php?errorCode=1");
-			exit();
-		}
-
-		$Db = new Database;
-
-		if ($Db->IsExistingUser($_POST["email"])) {
-			$_SESSION["IsError"] = true;
-			$_SESSION["registerErrorMessage"] = "The specified email id already exists. Please choose another one.";
-			Functions::Redirect("../Views/RegisterView.php?errorCode=2");
-			exit();
-		}
-
-		$Password = password_hash($_POST["psw"], PASSWORD_DEFAULT);
-		if ($Db->RegisterUser($_POST['username'], $_POST['email'], $Password, false)) {
-			$_SESSION["IsError"] = false;
-			unset($_SESSION["registerErrorMessage"]);
-			$_SESSION["RegistrationMessage"] = "Registration successfull! Please login!";
-            Functions::Redirect("../Views/LoginRedirectView.php");       
-			exit();
-		}
+	if (!isset($_POST["email"])) {
+		Functions::Alert("Email is invalid or empty.");
+		Functions::Redirect("../Views/RegisterView.php");
+		return false;
 	}
+
+	if (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
+		Functions::Alert("Invalid email. Email must end with @zhost.com domain.");
+		Functions::Redirect("../Views/RegisterView.php");
+		return false;
+	}
+
+	if (!isset($_POST["username"])) {
+		Functions::Alert("Username is invalid or empty.");
+		Functions::Redirect("../Views/RegisterView.php");
+		return false;
+	}
+
+	if (!isset($_POST["psw"])) {
+		Functions::Alert("Password is invalid or empty.");
+		Functions::Redirect("../Views/RegisterView.php");
+		return false;
+	}
+
+	if (preg_match('/\s/', $_POST["psw"])) {
+		Functions::Alert("Password should not contain whitespace charecters.");
+		Functions::Redirect("../Views/RegisterView.php");
+		return false;
+	}
+
+	if (!isset($_POST['psw-repeat'])) {
+		Functions::Alert("Please re-enter the password to confirm.");
+		Functions::Redirect("../Views/RegisterView.php");
+		return false;
+	}
+
+	if (strcmp($_POST["psw"], $_POST["psw-repeat"]) != 0) {
+		Functions::Alert("Passwords doesn't match.");
+		Functions::Redirect("../Views/RegisterView.php");
+		return false;
+	}
+
+	return true;
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+	if (!validateRegisterForum()) {
+		exit();
+	}
+
+	$Db = new Database;
+
+	if ($Db->IsExistingUser($_POST["email"])) {
+		Functions::Alert("An account with this email id already exist!\nTry again with different mail id.");
+		Functions::Redirect("../Views/RegisterView.php");
+		exit();
+	}
+
+	$Password = password_hash($_POST["psw"], PASSWORD_DEFAULT);
+	if ($Db->RegisterUser($_POST['username'], $_POST['email'], $Password, false)) {
+		Functions::Alert("Registeration successfull!\nYou will be redirected to login page now...");
+		Functions::Redirect("../Views/RedirectView.php?path=../Views/LoginView.php&name=Login Page&header=Login");
+		exit();
+	}
+}
 
 ?>

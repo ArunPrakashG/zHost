@@ -8,7 +8,6 @@ if (!isset($_SESSION)) {
     <?php return; ?>
 <?php } else { ?>
     <link rel="stylesheet" type="text/css" href="../includes/css/footer.css" />
-    
     <div class="footer">
         <div id="button"></div>
         <div id="container">

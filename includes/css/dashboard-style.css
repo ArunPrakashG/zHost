@@ -1,20 +1,20 @@
-body{
+body {
   margin: 0;
   padding: 0;
   font-family: "Roboto", sans-serif;
 }
 
-header{
+header {
   z-index: 1;
   position: fixed;
-  background: #22242A;
+  background: #22242a;
   padding: 20px;
   width: calc(100% - 0%);
   top: 0;
   height: 30px;
 }
 
-.left_area h3{
+.left_area h3 {
   color: #fff;
   margin: 0;
   text-transform: uppercase;
@@ -22,13 +22,13 @@ header{
   font-weight: 900;
 }
 
-.left_area span{
-  color: #19B3D3;
+.left_area span {
+  color: #19b3d3;
 }
 
-.logout_btn{
+.logout_btn {
   padding: 5px;
-  background: #19B3D3;
+  background: #19b3d3;
   text-decoration: none;
   float: right;
   margin-top: -30px;
@@ -41,15 +41,15 @@ header{
   transition-property: background;
 }
 
-.logout_btn:hover{
-  background: #0B87A6;
+.logout_btn:hover {
+  background: #0b87a6;
 }
 
-.fas{
+.fas {
   align-self: center;
 }
 
-.sidebar{
+.sidebar {
   z-index: 1;
   top: 0;
   background: #2f323a;
@@ -64,27 +64,27 @@ header{
   overflow-y: auto;
 }
 
-.profile_info{
+.profile_info {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.sidebar .profile_info .profile_image{
+.sidebar .profile_info .profile_image {
   width: 100px;
   height: 100px;
   border-radius: 100px;
   margin-bottom: 10px;
 }
 
-.sidebar .profile_info h4{
+.sidebar .profile_info h4 {
   color: #ccc;
   margin-top: 0;
   margin-bottom: 20px;
 }
 
-.sidebar a{
+.sidebar a {
   color: #fff;
   display: block;
   width: 100%;
@@ -96,15 +96,15 @@ header{
   transition-property: background;
 }
 
-.sidebar a:hover{
-  background: #19B3D3;
+.sidebar a:hover {
+  background: #19b3d3;
 }
 
-.sidebar i{
+.sidebar i {
   padding-right: 10px;
 }
 
-label #sidebar_btn{
+label #sidebar_btn {
   z-index: 1;
   color: #fff;
   position: fixed;
@@ -116,49 +116,49 @@ label #sidebar_btn{
   transition-property: color;
 }
 
-label #sidebar_btn:hover{
-  color: #19B3D3;
+label #sidebar_btn:hover {
+  color: #19b3d3;
 }
 
-#check:checked ~ .sidebar{
+#check:checked ~ .sidebar {
   left: -185px;
 }
 
-#check:checked ~ .sidebar a span{
+#check:checked ~ .sidebar a span {
   display: none;
 }
 
-#check:checked ~ .sidebar a{
+#check:checked ~ .sidebar a {
   font-size: 20px;
   margin-left: 165px;
   width: 100%;
 }
 
-.content{
+.content {
   width: (100% - 250px);
   margin-top: 60px;
   padding: 20px;
   margin-left: 250px;
-  background: url(../images/dashboard-background.png) no-repeat;
+  background: url(../images/dashboard-background.jpg) no-repeat;
   background-position: center;
   background-size: cover;
   height: 100vh;
   transition: 0.5s;
 }
 
-#check:checked ~ .content{
+#check:checked ~ .content {
   margin-left: 60px;
 }
 
-#check:checked ~ .sidebar .profile_info{
+#check:checked ~ .sidebar .profile_info {
   display: none;
 }
 
-#check{
+#check {
   display: none;
 }
 
-.content .card p{
+.content .card p {
   background: #fff;
   padding: 15px;
   margin-bottom: 10px;
@@ -166,7 +166,7 @@ label #sidebar_btn:hover{
   opacity: 0.8;
 }
 
-.dashboard-contents{
+.dashboard-contents {
   align-content: center;
   align-items: center;
 }
