@@ -1,4 +1,4 @@
-body {
+.body {
   margin: 0;
   padding: 0;
   height: 100vh;
@@ -11,27 +11,51 @@ body {
 .btn {
   color: #fff;
   border: none;
-  margin: 20px;  
+  margin: 20px;
   font-size: 15px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 4px;
   cursor: pointer;
   width: 200px;
-  height: 80px;
+  height: 50px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   border-radius: 5px;
   transition: 0.8s;
   transition-property: box-shadow;
+  -webkit-animation-name: fadeIn;
+  -webkit-animation-duration: 1s;
+  animation-name: fadeIn;
+  animation-duration: 1s;
+}
+
+@-webkit-keyframes fadeIn { 
+  0% { opacity: 0; }
+  20% { opacity: 0; }
+  40% { opacity: 0.3; }
+  60% { opacity: 0.5; }
+  80% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  20% { opacity: 0; }
+  40% { opacity: 0.3; }
+  60% { opacity: 0.5; }
+  80% { opacity: 0.9; }
+  100% { opacity: 1; }
 }
 
 .btn-primary {
-  background: #50a7ff;
-  box-shadow: 0 0 25px #50a7ff;
+  background: #252525;
+  box-shadow: 0 0 15px #a3a1a1;
 }
 
 .btn-primary:hover {
-  box-shadow: 0 0 5px #50a7ff, 0 0 25px #50a7ff, 0 0 50px #50a7ff,
-    0 0 100px #50a7ff;
+  box-shadow: 0 0 5px #96ffa7, 0 0 25px #eec494, 0 0 50px #f87f7f,
+  0 0 100px #61ee5d;
+  opacity: 1;  
 }
 
 .btn-success {

@@ -29,42 +29,45 @@ if (isset($_GET['refer']) && strcmp($_GET['refer'], "index")) {
 <html lang="en" dir="ltr">
 
 <?php require_once '../Common/Header.php' ?>
-<link rel="stylesheet" href="../includes/css/hover-bttn.css" />
 <link rel="stylesheet" href="../includes/css/register-view.css" />
+<link rel="stylesheet" href="../includes/css/scroll-bttn.css" />
+<script src="../includes/js/RegisterViewScript.js"></script>
 
 <body>
-	<div class="main">
-		<form method="POST" action="../Controllers/RegisterController.php">
-			<div class="container">
-				<h1 class="headTitle">Register</h1>
-				<p class="headTitle">Please fill in this form to create an account.</p>
+	<div class="container">
+		<form class="login-form" method="POST" action="javascript:registerRequested();">
+			<div>
+				<h1 class="title">Register</h1>
+				<p class="subheading">Please fill in this form to create an account.</p>
 				<hr>
 
-				<label class="headTitle" for="email"><b>Email</b></label>
+				<label class="heading" for="email"><b>Email</b></label>
 				<input type="text" placeholder="Enter Email" name="email" id="email" required>
 
-				<label class="headTitle" for="username"><b>Username</b></label>
+				<label class="heading" for="username"><b>Username</b></label>
 				<input type="text" placeholder="Enter Username" name="username" id="username" required>
 
-				<label class="headTitle" for="psw headTitle"><b>Password</b></label>
+				<label class="heading" for="psw headTitle"><b>Password</b></label>
 				<input type="password" placeholder="Enter Password" name="psw" id="psw" required>
 
-				<label class="headTitle" for="psw-repeat headTitle"><b>Repeat Password</b></label>
+				<label class="heading" for="psw-repeat headTitle"><b>Repeat Password</b></label>
 				<input type="password" placeholder="Repeat Password" name="psw-repeat" id="psw-repeat" required>
+
+				<label class="heading" for="psw-repeat"><b>Phone Number <span style="color:grey">(without code)</span></b></label>
+				<input type="text" placeholder="Enter Phone Number" name="pnumber" id="p-number" required>
+
+				<label class="heading" for="sec-quest"><b>Security Question</b></label>
+				<input type="text" placeholder="Enter Security Question" name="secquest" id="sec-quest">
+				<input type="text" style="margin: 0px" placeholder="Answer" name="secans" id="sec-ans">
+
+				<p class="headTitle">By registering you agree to our <a href="#">Terms & Conditions</a>.</p>
 				<hr>
 
-				<div class="flex-container">
-					<div>
-						<input type="checkbox" checked="false" name="tocAgreement" value="Agree to Teams & Conditions" required>
-						<p class="headTitle">By creating an account you agree to our <a href="#">Terms & Conditions</a>.</p>
-					</div>
-				</div>
-
-				<button type="submit" class="registerbtn">Register</button>
+				<button type="submit" class="scroll-bttn">Register</button>
 			</div>
 
 			<div class="container signin">
-				<p class="headTitle">Already have an account ? <a href="../Views/LoginView.php">Log in</a>!</p>
+				<p>Already have an account ? <a href="../Views/LoginView.php">Log in</a>!</p>
 			</div>
 	</div>
 	</form>
@@ -73,6 +76,7 @@ if (isset($_GET['refer']) && strcmp($_GET['refer'], "index")) {
 
 </body>
 
-<?php include_once '../Common/Footer.php'; ?>
+<?php //include_once '../Common/Footer.php'; 
+?>
 
 </html>

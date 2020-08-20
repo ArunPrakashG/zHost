@@ -80,7 +80,8 @@ function OnLoginRequestReceived()
 }
 
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    return exit(-1);
+    echo "-1";
+    exit();
 }
 
 switch ($_POST['requestType']) {

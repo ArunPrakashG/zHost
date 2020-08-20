@@ -1,19 +1,11 @@
-// vendor.scss v1.0 | @ajlkn | MIT licensed */
 
-// Vars.
-
-	/// Vendor prefixes.
-	/// @var {list}
 	$vendor-prefixes: (
 		'-moz-',
 		'-webkit-',
 		'-ms-',
 		''
 	);
-
-	/// Properties that should be vendorized.
-	/// Data via caniuse.com, github.com/postcss/autoprefixer, and developer.mozilla.org
-	/// @var {list}
+	
 	$vendor-properties: (
 
 		// Animation.

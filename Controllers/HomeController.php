@@ -33,8 +33,9 @@ function Logout()
 switch ($_POST['requestType']) {
     case "logout":
         echo Logout();
+        break;
     default:
         echo 2;
+        break;
 }
-
 ?>

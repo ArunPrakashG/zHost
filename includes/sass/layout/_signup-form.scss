@@ -1,50 +1,42 @@
-///
-/// Eventually by HTML5 UP
-/// html5up.net | @ajlkn
-/// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-///
+#signup-form {
+  @include vendor("display", "flex");
+  position: relative;
 
-/* Signup Form */
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+    width: 18em;
+  }
 
-	#signup-form {
-		@include vendor('display', 'flex');
-		position: relative;
+  > * {
+    margin: 0 0 0 1em;
+  }
 
-		input[type="text"],
-		input[type="password"],
-		input[type="email"] {
-			width: 18em;
-		}
+  > :first-child {
+    margin: 0 0 0 0;
+  }
 
-		> * {
-			margin: 0 0 0 1em;
-		}
+  @include breakpoint("<=xsmall") {
+    @include vendor("flex-direction", "column");
 
-		> :first-child {
-			margin: 0 0 0 0;
-		}
+    input[type="type"],
+    input[type="password"],
+    input[type="email"] {
+      width: 100%;
+    }
 
-		@include breakpoint('<=xsmall') {
-			@include vendor('flex-direction', 'column');
+    > * {
+      margin: 1.25em 0 0 0;
+    }
 
-			input[type="type"],
-			input[type="password"],
-			input[type="email"] {
-				width: 100%;
-			}
-
-			> * {
-				margin: 1.25em 0 0 0;
-			}
-
-			.message {
-				bottom: -1.5em;
-				font-size: 0.9em;
-				height: 1em;
-				left: 0;
-				line-height: inherit;
-				margin-top: 0;
-				position: absolute;
-			}
-		}
-	}
+    .message {
+      bottom: -1.5em;
+      font-size: 0.9em;
+      height: 1em;
+      left: 0;
+      line-height: inherit;
+      margin-top: 0;
+      position: absolute;
+    }
+  }
+}

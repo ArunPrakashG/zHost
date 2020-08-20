@@ -1,21 +1,9 @@
-// breakpoints.scss v1.0 | @ajlkn | MIT licensed */
-
-// Vars.
-
-	/// Breakpoints.
-	/// @var {list}
 	$breakpoints: () !global;
-
-// Mixins.
-
-	/// Sets breakpoints.
-	/// @param {map} $x Breakpoints.
+	
 	@mixin breakpoints($x: ()) {
 		$breakpoints: $x !global;
 	}
-
-	/// Wraps @content in a @media block targeting a specific orientation.
-	/// @param {string} $orientation Orientation.
+	
 	@mixin orientation($orientation) {
 		@media screen and (orientation: #{$orientation}) {
 			@content;

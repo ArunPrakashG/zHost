@@ -93,6 +93,76 @@ video {
   vertical-align: baseline;
 }
 
+h1,
+p,
+span{
+  transition-property: box-shadow;
+  -webkit-animation-name: fadeIn;
+  -webkit-animation-duration: 0.5s;
+  animation-name: fadeIn;
+  animation-duration: 0.5s;
+}
+
+@-webkit-keyframes fadeIn { 
+  0% { opacity: 0; }
+  20% { opacity: 0; }
+  40% { opacity: 0.3; }
+  60% { opacity: 0.5; }
+  80% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  20% { opacity: 0; }
+  40% { opacity: 0.3; }
+  60% { opacity: 0.5; }
+  80% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+.host-span{
+  color: #fff;
+  font-weight: 800;
+  font-style: normal;
+  text-transform: uppercase;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;  
+  transition: 0.8s;
+  transition-property: box-shadow;
+  -webkit-animation-name: fadeIn;
+  -webkit-animation-duration: 1s;
+  animation-name: fadeIn;
+  animation-duration: 1s;
+}
+
+.host-span { 
+  text-shadow: 0 0 15px #ff9900;
+}
+
+.host-span:hover {
+  text-shadow: 0 0 5px #e6ff58, 0 0 25px #eec494, 0 0 50px #f87f7f,
+  0 0 100px #61ee5d;
+  opacity: 1;  
+}
+
+@-webkit-keyframes fadeIn { 
+  0% { opacity: 0; }
+  20% { opacity: 0; }
+  40% { opacity: 0.3; }
+  60% { opacity: 0.5; }
+  80% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  20% { opacity: 0; }
+  40% { opacity: 0.3; }
+  60% { opacity: 0.5; }
+  80% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
 article,
 aside,
 details,
@@ -900,249 +970,6 @@ textarea {
   padding: 0.75em 1em;
 }
 
-input[type="checkbox"],
-input[type="radio"] {
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  -ms-appearance: none;
-  appearance: none;
-  display: block;
-  float: left;
-  margin-right: -2em;
-  opacity: 0;
-  width: 1em;
-  z-index: -1;
-}
-input[type="checkbox"] + label,
-input[type="radio"] + label {
-  text-decoration: none;
-  color: rgba(255, 255, 255, 0.75);
-  cursor: pointer;
-  display: inline-block;
-  font-size: 1em;
-  font-weight: 400;
-  padding-left: 2.4em;
-  padding-right: 0.75em;
-  position: relative;
-}
-input[type="checkbox"] + label:before,
-input[type="radio"] + label:before {
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  display: inline-block;
-  font-style: normal;
-  font-variant: normal;
-  text-rendering: auto;
-  line-height: 1;
-  text-transform: none !important;
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
-}
-input[type="checkbox"] + label:before,
-input[type="radio"] + label:before {
-  background: rgba(255, 255, 255, 0.125);
-  border-radius: 6px;
-  border: solid 2px rgba(255, 255, 255, 0.35);
-  content: "";
-  display: inline-block;
-  font-size: 0.8em;
-  height: 1.65em;
-  left: 0;
-  line-height: 1.65em;
-  position: absolute;
-  text-align: center;
-  top: 0;
-  width: 1.65em;
-}
-input[type="checkbox"]:checked + label:before,
-input[type="radio"]:checked + label:before {
-  background: #1cb495;
-  border-color: #1cb495;
-  color: #ffffff;
-  content: "\f00c";
-}
-input[type="checkbox"]:focus + label:before,
-input[type="radio"]:focus + label:before {
-  border-color: #1cb495;
-  box-shadow: 0 0 0 2px #1cb495;
-}
-
-input[type="checkbox"] + label:before {
-  border-radius: 6px;
-}
-
-input[type="radio"] + label:before {
-  border-radius: 100%;
-}
-
-::-webkit-input-placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-  opacity: 1;
-}
-
-:-moz-placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-  opacity: 1;
-}
-
-::-moz-placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-  opacity: 1;
-}
-
-:-ms-input-placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-  opacity: 1;
-}
-
-.formerize-placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-  opacity: 1;
-}
-
-/* Button */
-input[type="submit"],
-input[type="reset"],
-input[type="button"],
-button,
-.button {
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  -ms-appearance: none;
-  appearance: none;
-  -moz-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out,
-    opacity 0.2s ease-in-out;
-  -webkit-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out,
-    opacity 0.2s ease-in-out;
-  -ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out,
-    opacity 0.2s ease-in-out;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out,
-    opacity 0.2s ease-in-out;
-  background-color: #1cb495;
-  border-radius: 6px;
-  border: 0;
-  color: #ffffff !important;
-  cursor: pointer;
-  display: inline-block;
-  font-weight: 700;
-  height: 2.75em;
-  line-height: 2.75em;
-  padding: 0 1.125em;
-  text-align: center;
-  text-decoration: none;
-  white-space: nowrap;
-}
-input[type="submit"]:hover,
-input[type="reset"]:hover,
-input[type="button"]:hover,
-button:hover,
-.button:hover {
-  background-color: #1fcaa7;
-}
-input[type="submit"]:active,
-input[type="reset"]:active,
-input[type="button"]:active,
-button:active,
-.button:active {
-  background-color: #199e83;
-}
-input[type="submit"].disabled,
-input[type="submit"]:disabled,
-input[type="reset"].disabled,
-input[type="reset"]:disabled,
-input[type="button"].disabled,
-input[type="button"]:disabled,
-button.disabled,
-button:disabled,
-.button.disabled,
-.button:disabled {
-  opacity: 0.5;
-}
-@media screen and (max-width: 480px) {
-  input[type="submit"],
-  input[type="reset"],
-  input[type="button"],
-  button,
-  .button {
-    padding: 0;
-  }
-}
-
-/* Header */
-#header h1 {
-  font-size: 3.25em;
-  margin: 0 0 0.55em 0;
-}
-
-#header p {
-  font-size: 1.35em;
-  line-height: 1.65em;
-}
-
-#header a {
-  color: inherit;
-}
-
-@media screen and (max-width: 736px) {
-  #header h1 {
-    font-size: 2em;
-  }
-  #header p {
-    font-size: 1em;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  #header {
-    margin: 0 0 1em 0;
-  }
-}
-
-/* Signup Form */
-#signup-form {
-  display: -moz-flex;
-  display: -webkit-flex;
-  display: -ms-flex;
-  display: flex;
-  position: relative;
-}
-#signup-form input[type="text"],
-#signup-form input[type="password"],
-#signup-form input[type="email"] {
-  width: 18em;
-}
-#signup-form > * {
-  margin: 0 0 0 1em;
-}
-#signup-form > :first-child {
-  margin: 0 0 0 0;
-}
-@media screen and (max-width: 480px) {
-  #signup-form {
-    -moz-flex-direction: column;
-    -webkit-flex-direction: column;
-    -ms-flex-direction: column;
-    flex-direction: column;
-  }
-  #signup-form input[type="type"],
-  #signup-form input[type="password"],
-  #signup-form input[type="email"] {
-    width: 100%;
-  }
-  #signup-form > * {
-    margin: 1.25em 0 0 0;
-  }
-  #signup-form .message {
-    bottom: -1.5em;
-    font-size: 0.9em;
-    height: 1em;
-    left: 0;
-    line-height: inherit;
-    margin-top: 0;
-    position: absolute;
-  }
-}
-
 /* Footer */
 #footer {
   -moz-transition: opacity 0.5s ease-in-out;
@@ -1195,31 +1022,4 @@ button:disabled,
   content: "";
   clear: both;
   display: table;
-}
-
-@media screen and (max-width: 1680px) {
-  #footer {
-    bottom: 3.5em;
-    left: 3.5em;
-  }
-}
-@media screen and (max-width: 736px) {
-  #footer {
-    bottom: 2em;
-    left: 2em;
-  }
-}
-@media screen and (max-width: 360px) {
-  #footer {
-    bottom: 1.25em;
-    left: 1.25em;
-  }
-}
-@media screen and (max-height: 640px) {
-  #footer {
-    bottom: auto;
-    left: auto;
-    margin: 1em 0 0 0;
-    position: relative;
-  }
 }

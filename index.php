@@ -17,9 +17,9 @@ $_SESSION['PageTitle'] = "Welcome!";
 
 <?php include_once $_SERVER['ZHOST_ROOT'] . '/Common/Header.php'; ?>
 
-<body class="is-preload">
+<body class="is-preload body">
 	<header id="header">
-		<h1>zHost</h1>
+		<h1>z<span class="host-span">Host</span></h1>
 		<p>An online mail server system developed as a part of <br />
 			college <span style="font-weight: bold;">mini project.</span></p>
 	</header>
@@ -28,8 +28,6 @@ $_SESSION['PageTitle'] = "Welcome!";
 		<input type="submit" name="loginBttn" class="btn btn-primary" value="LOGIN" />
 		<input type="submit" name="registerBttn" class="btn btn-primary" value="REGISTER" />
 	</form>
-
-
 
 	<footer id="footer">
 		<ul class="icons">
