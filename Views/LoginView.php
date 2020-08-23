@@ -49,6 +49,7 @@ if (isset($_GET['refer']) && strcmp($_GET['refer'], "index")) {
                 <button type="submit" name="button">Login</button>
                 <br />
                 <p class="options">Not Registered ? <a href="../Views/RegisterView.php">Register here</a>!</p>
+                <p class="options">Wanted Home page ? <a href="../Index.php">Home page</a>!</p>
             </form>
         </div>
     </div>

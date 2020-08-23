@@ -1,7 +1,3 @@
-<html>
-    <body></body>
-</html>
-
 <?php
 
 require_once '../Common/Functions.php';

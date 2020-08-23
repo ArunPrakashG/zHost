@@ -14,82 +14,98 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
+header("Content-Type", "application/json");
+$Result = array(
+	'ShortReason' => 'NA',
+	'Reason' => 'NA',
+	'Status' => '-1',
+	'Level' => 'warning'
+);
+
+function SetResult($message, $reason, $status, $level)
+{	
+	global $Result;
+	$Result['ShortReason'] = $message;
+	$Result['Reason'] = $reason;
+	$Result['Status'] = $status;
+	$Result['Level'] = $level;
+}
+
 function ValidateLoginForum()
 {
-    if (!isset($_POST["email"])) {
-        //Functions::Alert("Username is invalid or empty.");
-        //Functions::Redirect("../Views/LoginView.php");
-        return "10";
-    }
+    if (!isset($_POST["email"]) || !filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {		
+        SetResult("Email is invalid.", "Emails must not contain whitespace charecters and they should be under @zhost.com domain.", "-1", "warning");
+        return false;
+	}
 
     if (!isset($_POST["password"])) {
-        //Functions::Alert("Password is invalid or empty.");
-        //Functions::Redirect("../Views/LoginView.php");
-        return "11";
+        SetResult("Password is empty.", "Password must not be an empty charecter.", "-1", "warning");
+        return false;
     }
 
-    return "0";
+    SetResult("Validation success", "Success", "0", "success");
+    return true;
 }
 
 function OnLogoutRequestReceived()
 {
     if (!IsUserLoggedIn()) {
-        //Functions::Alert("Session expired!\nYou will be required to login again.");
-        //Functions::Redirect("../Views/RedirectView.php?path=../Views/LoginView.php&name=Login Page&header=Login");
-        return "1";
+        SetResult("You are not logged in!", "Unauthorized.", "-1", "error");
+        return false;
     }
 
     unset($_SESSION['userDetails']);
     unset($_SESSION['USER_NAME']);
     unset($_SESSION['ID']);
-    // handling redirection and alert in client side for the animated alert to display.
-    return "0";
+    // handling redirection and alert in client side for the animated alert to display
+    SetResult("Success!", "You will be redirected to Home page.", "-1", "success");
+    return true;
 }
 
 function OnLoginRequestReceived()
 {
     $_POST['email'] = $_POST['postData'][0]['value'];
     $_POST['password'] = $_POST['postData'][1]['value'];
-    $validationReturnCode = ValidateLoginForum();
 
-    if ($validationReturnCode != 0) {
-        return $validationReturnCode;
+    if (!ValidateLoginForum()) {
+        return;
     }
 
     $Db = new Database;
 
     if (!$Db->IsExistingUser($_POST["email"])) {
-        //Functions::Alert("Entered user account doesnt exist.\nConsider registering yourself!");       
-        //Functions::Redirect("../Views/LoginView.php");
-        return "2";
+        SetResult("User doesn't exist!", "Such a user doesn't exist.", "-1", "error");
+        return false;
     }
 
     if ($loginResult = $Db->LoginUser($_POST["email"], $_POST["password"], false)) {
         if (isset($loginResult['isError']) && $loginResult['isError']) {
-            //Functions::Alert("Email and Password doesnt match.");
-            //Functions::Redirect("../Views/LoginView.php");
-            return "3";
+            SetResult("Error!", "Database isn't connected ?!", "-1", "error");
+            return false;
         }
 
         $_SESSION['userDetails'] = serialize($loginResult['resultObj']);
         $_SESSION['ID'] = $loginResult['resultObj']->Id;
         $_SESSION['USER_NAME'] = $loginResult['resultObj']->UserName;
-        //Functions::Redirect("../Views/RedirectView.php?path=../Views/HomeView.php&name=Home Page&header=Home");
-        return "0";
+        SetResult("Welcome to zHost!", "You are successfully logged in!", "0", "success");
+        return true;
     }
 }
 
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    echo "-1";
-    exit();
+    SetResult("Invalid request type.", "Expected: POST", "-1", "error");
+	echo $Result;
+	exit();
 }
 
 switch ($_POST['requestType']) {
     case "logout":
-        echo OnLogoutRequestReceived();
+        OnLogoutRequestReceived();
+        echo json_encode($Result);
         break;
     case "login":
-        echo OnLoginRequestReceived();
+        OnLoginRequestReceived();
+        echo json_encode($Result);
         break;
 }
 ?>

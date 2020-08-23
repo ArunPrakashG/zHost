@@ -27,36 +27,27 @@ function logoutRequested() {
         data: {
           requestType: "logout",
         },
+        processData: false,
+        contentType: false,
+        dataType: "json",
         success: function (result) {
           switch (result) {
             case "-1":
-              console.log("Invalid request type.");
+              swal(result.ShortReason, result.Reason, result.Level).then(
+                (value) => {
+                  document.location =
+                    "../Views/RedirectView.php?path=../Views/HomeView.php&name=Home Page&header=Home";
+                }
+              );
               return;
             case "0":
               // logout done
-              swal(
-                "You are logged out!",
-                "Click OK for redirect to Index page.",
-                "success"
-              ).then((value) => {
-                document.location = "../";
-              });
-              break;
-            case "1":
-              // not logged in
-              swal(
-                "Session expired?!",
-                "Couldn't logout as you are not logged in. Press Ok to login.",
-                "warning"
-              ).then((value) => {
-                if (value) {
+              swal(result.ShortReason, result.Reason, result.Level).then(
+                (value) => {
                   document.location =
                     "../Views/RedirectView.php?path=../Views/LoginView.php&name=Login Page&header=Login";
-                  return;
                 }
-
-                document.location = "../";
-              });
+              );
               break;
           }
         },

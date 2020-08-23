@@ -45,35 +45,36 @@ $User = unserialize($_SESSION["userDetails"]);
 <header>
     <?php require_once '../Common/Header.php' ?>
 
-    <label for="check">
-        <i class="fas fa-bars" id="sidebar_btn"></i>
-    </label>
-    <div class="left_area">
-        <h3>z<span>Host</span></h3>
+    <div class="header-container">
+        <label for="check">
+            <i class="fas fa-bars" id="sidebar_btn"></i>
+        </label>
+        <div class="left_area">
+            <h3>z<span>Host</span></h3>
+        </div>
+        <div class="right_area">
+            <a onclick="logoutRequested();" href="javascript:void(0);" class="logout_btn">Logout</a>
+        </div>
     </div>
-    <div class="right_area">
-        <a onclick="logoutRequested();" href="javascript:void(0);" class="logout_btn">Logout</a>
-    </div>
+
 </header>
 
 <body>
     <div class="sidebar">
         <div class="profile_info">
-            <img src="" class="profile_image" alt="place_holder">
+            <img src=<?php echo $User->AvatarPath ?> class="profile_image" alt="place_holder">
             <h4><?php echo $User->UserName ?></h4>
-            <h6><?php echo $User->MailID ?></h6>
+            <h4><?php echo $User->Email ?></h4>
         </div>
-        <div class="dashboard-contents">
-            <a href="#" class="sidebar-item"><i class="fas fa-desktop"></i><span>Dashboard</span></a>
-            <a href="#" class="sidebar-item"><i class="fas fa-cogs"></i><span>Components</span></a>
-            <a href="#" class="sidebar-item"><i class="fas fa-table"></i><span>Tables</span></a>
-            <a href="#" class="sidebar-item"><i class="fas fa-th"></i><span>Forms</span></a>
-            <a href="#" class="sidebar-item"><i class="fas fa-info-circle"></i><span>About</span></a>
-            <a href="#" class="sidebar-item"><i class="fas fa-sliders-h"></i><span>Settings</span></a>
+        <hr class="breaker" />
+        <div class="dashboard-contents item-container">
+            <a href="#" class="item"><span style="font-weight: bold;">Inbox</span></a>
+            <a href="#" class="item"><span style="font-weight: bold;">Compose</span></a>
+            <a href="#" class="item"><span style="font-weight: bold;">Draft</span></a>
+            <a href="#" class="item"><span style="font-weight: bold;">Trash</span></a>
+            <a href="#" class="item"><span style="font-weight: bold;">Settings</span></a>
         </div>
     </div>
 </body>
-
-<?php include_once('../Common/Footer.php') ?>
 
 </html>

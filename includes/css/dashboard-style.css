@@ -1,13 +1,18 @@
+@font-face {
+  font-family: assistant-regular;
+  src: url("../webfonts/assistant-v4-latin-regular.ttf");
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: "Roboto", sans-serif;
+  font-family: "assistant-regular";
 }
 
 header {
   z-index: 1;
   position: fixed;
-  background: #22242a;
+  background: rgb(37, 37, 37);
   padding: 20px;
   width: calc(100% - 0%);
   top: 0;
@@ -31,6 +36,7 @@ header {
   background: #19b3d3;
   text-decoration: none;
   float: right;
+  text-transform: uppercase;
   margin-top: -30px;
   margin-right: 40px;
   border-radius: 2px;
@@ -45,14 +51,9 @@ header {
   background: #0b87a6;
 }
 
-.fas {
-  align-self: center;
-}
-
 .sidebar {
   z-index: 1;
   top: 0;
-  background: #2f323a;
   margin-top: 70px;
   padding-top: 30px;
   position: fixed;
@@ -61,7 +62,29 @@ header {
   height: calc(100% - 9%);
   transition: 0.5s;
   transition-property: left;
+  border-width: 1px;
+  box-shadow: 1 1px #000000;
   overflow-y: auto;
+  background: rgb(0, 168, 255);
+  background: -moz-linear-gradient(
+    22deg,
+    rgba(0, 168, 255, 1) 0%,
+    rgba(62, 224, 237, 1) 60%,
+    rgba(230, 251, 255, 1) 100%
+  );
+  background: -webkit-linear-gradient(
+    22deg,
+    rgba(0, 168, 255, 1) 0%,
+    rgba(62, 224, 237, 1) 60%,
+    rgba(230, 251, 255, 1) 100%
+  );
+  background: linear-gradient(
+    22deg,
+    rgba(0, 168, 255, 1) 0%,
+    rgba(62, 224, 237, 1) 60%,
+    rgba(230, 251, 255, 1) 100%
+  );
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00a8ff",endColorstr="#e6fbff",GradientType=1);
 }
 
 .profile_info {
@@ -79,12 +102,47 @@ header {
 }
 
 .sidebar .profile_info h4 {
-  color: #ccc;
+  color: rgb(0, 0, 0);
   margin-top: 0;
+  text-shadow: 0 0px #000000;
   margin-bottom: 20px;
 }
 
-.sidebar a {
+.sidebar .item {
+  color: rgb(119, 0, 60);
+  width: 100%;
+  line-height: 60px;
+  text-decoration: none;
+  transition: 0.5s;
+  transition-property: background;
+}
+
+.breaker {
+  width: 70%;
+  background-color: rgb(71, 71, 71);
+  transition: 0.5s;
+  transition-property: background-color;
+}
+
+.breaker:hover {
+  background-color: purple;
+}
+
+.sidebar .item:hover {
+  background: #41a4f5;
+}
+
+.sidebar .item-container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+
+.sidebar .side-item {
   color: #fff;
   display: block;
   width: 100%;
@@ -92,12 +150,12 @@ header {
   text-decoration: none;
   padding-left: 40px;
   box-sizing: border-box;
-  transition: 0.5s;
+  transition: 0.8s;
   transition-property: background;
 }
 
-.sidebar a:hover {
-  background: #19b3d3;
+.sidebar .side-item:hover {
+  background: #f5b62f;
 }
 
 .sidebar i {
@@ -139,7 +197,6 @@ label #sidebar_btn:hover {
   margin-top: 60px;
   padding: 20px;
   margin-left: 250px;
-  background: url(../images/dashboard-background.jpg) no-repeat;
   background-position: center;
   background-size: cover;
   height: 100vh;
@@ -164,9 +221,4 @@ label #sidebar_btn:hover {
   margin-bottom: 10px;
   font-size: 14px;
   opacity: 0.8;
-}
-
-.dashboard-contents {
-  align-content: center;
-  align-items: center;
 }

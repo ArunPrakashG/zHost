@@ -19,7 +19,8 @@ $Name = $_GET['name'];
 
 <head>
     <?php require_once '../Common/Header.php' ?>
-    <link rel="stylesheet" type="text/css" href="../includes/css/spinning-loader.css" />
+    <link rel="stylesheet" type="text/css" href="../includes/css/redirect-view-style.css" />
+    <link rel="stylesheet" type="text/css" href="../includes/css/three-dots.css" />
     <script src="../includes/js/redirect.js"></script>
     <script type="text/javascript">
         setRedirectPath('<?php echo $RedirectPath ?>', '<?php echo $Name ?>');
@@ -28,9 +29,9 @@ $Name = $_GET['name'];
 
 <body>
     <div class="container">
-        <div class="loader"></div>
-        <h2><?php echo $Header ?></h2>
-        <h2>Please wait...</h2>
+    <h2>Please wait...</h2>
+        <div class="dot-elastic"></div>
+        
         <h4 id="countdownElement">Redirecting you to <?php echo $Name ?> in 3 seconds...</h4>
         <br />
         <div>
