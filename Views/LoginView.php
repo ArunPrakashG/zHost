@@ -37,7 +37,7 @@ if (isset($_GET['refer']) && strcmp($_GET['refer'], "index")) {
 <body>
     <div class="container">
         <div class="form">
-            <form class="login-form" method="post" action="javascript:loginRequested();">
+            <form id="login-form" class="login-form" method="post" action="javascript:loginRequested();">
                 <h2>zHost Login</h2>
                 <div class="icons">
                     <a href="#"><i class="fab fa-facebook"></i></a>

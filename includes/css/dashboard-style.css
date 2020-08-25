@@ -3,10 +3,32 @@
   src: url("../webfonts/assistant-v4-latin-regular.ttf");
 }
 
+.container {
+  width: 600px;
+  height: 200px;
+}
+
+.sel-body {
+  float: right;
+  padding-top: 45px;
+}
+
 body {
   margin: 0;
   padding: 0;
   font-family: "assistant-regular";
+}
+
+.left {
+  width: auto;
+  height: 200px;
+  overflow: hidden;
+}
+
+.right {
+  height: 200px;
+  width: 200px;
+  float: left;
 }
 
 header {
@@ -54,6 +76,7 @@ header {
 .sidebar {
   z-index: 1;
   top: 0;
+  float: left;
   margin-top: 70px;
   padding-top: 30px;
   position: fixed;
@@ -63,7 +86,7 @@ header {
   transition: 0.5s;
   transition-property: left;
   border-width: 1px;
-  box-shadow: 1 1px #000000;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   overflow-y: auto;
   background: rgb(0, 168, 255);
   background: -moz-linear-gradient(
@@ -221,4 +244,41 @@ label #sidebar_btn:hover {
   margin-bottom: 10px;
   font-size: 14px;
   opacity: 0.8;
+}
+
+.styled-table {
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  min-width: 100%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+  border-bottom: 2px solid #009879;
+}
+
+.styled-table tbody tr.active-row {
+  font-weight: bold;
+  color: #009879;
 }

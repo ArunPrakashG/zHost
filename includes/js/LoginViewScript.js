@@ -10,16 +10,15 @@ function loginRequested() {
       requestType: "login",
       postData: data,
     },
-    
+
     dataType: "json",
     success: function (result) {
-      console.log(result.ShortReason);
+      console.log(result);
       switch (result.Status) {
         case "-1":
           swal(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
-              document.location =
-                "../Views/LoginView.php";
+              document.location = "../Views/LoginView.php";
             }
           );
           return;

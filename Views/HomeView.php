@@ -60,19 +60,43 @@ $User = unserialize($_SESSION["userDetails"]);
 </header>
 
 <body>
-    <div class="sidebar">
-        <div class="profile_info">
-            <img src=<?php echo $User->AvatarPath ?> class="profile_image" alt="place_holder">
-            <h4><?php echo $User->UserName ?></h4>
-            <h4><?php echo $User->Email ?></h4>
+    <div class="container">
+        <div class="sidebar">
+            <div class="profile_info">
+                <img src=<?php echo $User->AvatarPath ?> class="profile_image" alt="place_holder">
+                <h4><?php echo $User->UserName ?></h4>
+                <h4><?php echo $User->Email ?></h4>
+            </div>
+            <hr class="breaker" />
+            <div class="dashboard-contents item-container">
+                <a href="#" class="item"><span style="font-weight: bold;">Inbox</span></a>
+                <a href="#" class="item"><span style="font-weight: bold;">Compose</span></a>
+                <a href="#" class="item"><span style="font-weight: bold;">Draft</span></a>
+                <a href="#" class="item"><span style="font-weight: bold;">Trash</span></a>
+                <a href="#" class="item"><span style="font-weight: bold;">Settings</span></a>
+            </div>
         </div>
-        <hr class="breaker" />
-        <div class="dashboard-contents item-container">
-            <a href="#" class="item"><span style="font-weight: bold;">Inbox</span></a>
-            <a href="#" class="item"><span style="font-weight: bold;">Compose</span></a>
-            <a href="#" class="item"><span style="font-weight: bold;">Draft</span></a>
-            <a href="#" class="item"><span style="font-weight: bold;">Trash</span></a>
-            <a href="#" class="item"><span style="font-weight: bold;">Settings</span></a>
+
+        <div class="sel-body">
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Dom</td>
+                        <td>6000</td>
+                    </tr>
+                    <tr class="active-row">
+                        <td>Melissa</td>
+                        <td>5150</td>
+                    </tr>
+                    <!-- and so on... -->
+                </tbody>
+            </table>
         </div>
     </div>
 </body>

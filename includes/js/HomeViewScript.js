@@ -25,13 +25,13 @@ function logoutRequested() {
         method: "POST",
         url: "../Controllers/UserController.php",
         data: {
-          requestType: "logout",
+          requestType: "logout"
         },
-        processData: false,
-        contentType: false,
+        cache: false,
         dataType: "json",
         success: function (result) {
-          switch (result) {
+          console.log(result);
+          switch (result.Status) {
             case "-1":
               swal(result.ShortReason, result.Reason, result.Level).then(
                 (value) => {
@@ -51,6 +51,9 @@ function logoutRequested() {
               break;
           }
         },
+        error: function(e){
+          console.log(e);
+        }
       });
     }
   });

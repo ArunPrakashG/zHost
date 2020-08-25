@@ -16,27 +16,27 @@ if (!isset($_SESSION)) {
 
 header("Content-Type", "application/json");
 $Result = array(
-	'ShortReason' => 'NA',
-	'Reason' => 'NA',
-	'Status' => '-1',
-	'Level' => 'warning'
+    'ShortReason' => 'NA',
+    'Reason' => 'NA',
+    'Status' => '-1',
+    'Level' => 'warning'
 );
 
 function SetResult($message, $reason, $status, $level)
-{	
-	global $Result;
-	$Result['ShortReason'] = $message;
-	$Result['Reason'] = $reason;
-	$Result['Status'] = $status;
-	$Result['Level'] = $level;
+{
+    global $Result;
+    $Result['ShortReason'] = $message;
+    $Result['Reason'] = $reason;
+    $Result['Status'] = $status;
+    $Result['Level'] = $level;
 }
 
 function ValidateLoginForum()
 {
-    if (!isset($_POST["email"]) || !filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {		
+    if (!isset($_POST["email"]) || !filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
         SetResult("Email is invalid.", "Emails must not contain whitespace charecters and they should be under @zhost.com domain.", "-1", "warning");
         return false;
-	}
+    }
 
     if (!isset($_POST["password"])) {
         SetResult("Password is empty.", "Password must not be an empty charecter.", "-1", "warning");
@@ -58,7 +58,7 @@ function OnLogoutRequestReceived()
     unset($_SESSION['USER_NAME']);
     unset($_SESSION['ID']);
     // handling redirection and alert in client side for the animated alert to display
-    SetResult("Success!", "You will be redirected to Home page.", "-1", "success");
+    SetResult("Success!", "You will be redirected to Home page.", "0", "success");
     return true;
 }
 
@@ -80,7 +80,7 @@ function OnLoginRequestReceived()
 
     if ($loginResult = $Db->LoginUser($_POST["email"], $_POST["password"], false)) {
         if (isset($loginResult['isError']) && $loginResult['isError']) {
-            SetResult("Error!", "Database isn't connected ?!", "-1", "error");
+            SetResult("Error!", "Password is wrong.", "-1", "error");
             return false;
         }
 
@@ -94,17 +94,19 @@ function OnLoginRequestReceived()
 
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
     SetResult("Invalid request type.", "Expected: POST", "-1", "error");
-	echo $Result;
-	exit();
+    echo $Result;
+    exit();
 }
 
 switch ($_POST['requestType']) {
     case "logout":
         OnLogoutRequestReceived();
+        error_log(json_encode($Result));
         echo json_encode($Result);
         break;
     case "login":
         OnLoginRequestReceived();
+        error_log(json_encode($Result));
         echo json_encode($Result);
         break;
 }
