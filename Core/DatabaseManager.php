@@ -1,6 +1,7 @@
 <?php
 require_once 'Config.php';
 require_once 'UserModel.php';
+require_once 'SessionCheck.php';
 
 if (Config::DEBUG) {
     ini_set('display_errors', 1);
@@ -79,11 +80,9 @@ class Database
             return false;
         }
 
-        $sqlQuery = "SELECT * FROM " . Config::ADMIN_TABLE_NAME . " WHERE Email='" . $email . "';";
-        error_log($sqlQuery);
+        $sqlQuery = "SELECT * FROM " . Config::ADMIN_TABLE_NAME . " WHERE Email='" . $email . "';";        
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $rowsCount = mysqli_num_rows($exeResult);
-            error_log("Admin Rows exist:" . $rowsCount);
             mysqli_free_result($exeResult);
 
             if ($rowsCount > 0) {
@@ -101,10 +100,9 @@ class Database
         }
 
         $sqlQuery = "SELECT * FROM " . Config::USER_TABLE_NAME . " WHERE Email='" . $email . "';";
-        error_log($sqlQuery);
+       
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $rowsCount = mysqli_num_rows($exeResult);
-            error_log("User Rows exist:" . $rowsCount);
             mysqli_free_result($exeResult);
             if ($rowsCount > 0) {
                 return true;
@@ -112,6 +110,111 @@ class Database
         }
 
         return false;
+    }
+
+    public function DeleteUserMail($userEmail, $emailTitle){
+        if(!isset($userEmail) || !isset($emailTitle)){
+            return false;
+        }
+
+        $sqlQuery = "DELETE FROM emails WHERE SendTo='$userEmail' AND Title='$emailTitle';";
+        if ($exeResult = $this->ExecuteQuery($sqlQuery)) {            
+            mysqli_free_result($exeResult);
+            return true;
+        }
+
+        return false;
+    }
+
+    public function ComposeEmail($userEmail, $mailObj){
+        if(!isset($userEmail) || !isset($mailObj)){
+            return false;
+        }
+
+        $sqlQuery = "INSERT INTO emails (SendTo, ReceivedFrom, IsDraft, IsTrash, Title, Subject, Body, Attachment, EmailId) VALUES ('" . $mailObj['To'] . "','" . $mailObj['From'] . "','" . $mailObj['IsDraft'] . "','" . $mailObj['IsTrash'] . "','" . $mailObj['Title'] . "','" . $mailObj['Subject'] . "','" . $mailObj['Body'] . "','" .$mailObj['Attachment'] . "','" . $mailObj['MailID'] . "');";
+        if ($exeResult = $this->ExecuteQuery($sqlQuery)) {            
+            mysqli_free_result($exeResult);
+            return true;
+        }
+
+        return false;
+    }
+
+    public function GetUserDraftEmails($userEmail){
+        return $this->GetUserEmails($userEmail, true, false);
+    }
+
+    public function GetUserTrashEmails($userEmail){
+        return $this->GetUserEmails($userEmail, false, true);
+    }
+
+    public function GetUserInbox($userEmail){
+        return $this->GetUserEmails($userEmail, false, false);
+    }
+
+    public function GetUserEmails($userEmail, $onlyDraft, $onlyTrash){
+        $response = array(
+            'Status' => '-1',
+            'Message' => 'Invalid',
+            'Count' => 0,
+            'Emails' => array()
+        );
+
+        if(!isset($userEmail)){
+            return $response;
+        }
+
+        if(!IsUserLoggedIn()){
+            return $response;
+        }
+
+        $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail';";
+
+        if($onlyDraft){
+            $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND IsDraft=1;";
+        }
+
+        if($onlyTrash){
+            $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND IsTrash=1;";
+        }
+
+        if(!$onlyDraft && !$onlyTrash){
+            $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND IsTrash=0 AND IsDraft=0;";
+        }
+
+        if($exeResult = $this->ExecuteQuery($sqlQuery)){
+            $response['Count'] = mysqli_num_rows($exeResult);
+            $response['Status'] = '0';
+            $response['Message'] = 'Success';
+
+            if($response['Count'] <= 0){
+                $response['Status'] = '-1';
+                $response['Message'] = 'No emails exist.';
+                return $response;
+            }
+
+            while($row = mysqli_fetch_object($exeResult)){                
+                $emailObj = array();
+                $emailObj['Id'] = $row->Id;
+                $emailObj['To'] = $row->SendTo ?? "";
+                $emailObj['From'] = $row->ReceivedFrom ?? "";
+                $emailObj['At'] = $row->ReceivedTime ?? "";
+                $emailObj['IsDraft'] = $row->IsDraft ?? "";
+                $emailObj['IsTrash'] = $row->IsTrash ?? "";
+                $emailObj['Title'] = $row->Title ?? "";
+                $emailObj['Subject'] = $row->Subject ?? "";
+                $emailObj['Body'] = $row->Body ?? "";
+                $emailObj['Attachment'] = $row->Attachment ?? "";
+                array_push($response['Emails'], $emailObj);
+            }
+
+            mysqli_free_result($exeResult);
+            return $response;
+        }
+
+        $response['Status'] = '-1';
+        $response['Message'] = 'Database connection failed.';
+        return $response;
     }
 
     public function LoginUser($email, $password, $isAdminLogin)
@@ -191,3 +294,5 @@ class Database
         return $resultArray;
     }
 }
+
+?>

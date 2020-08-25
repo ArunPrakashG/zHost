@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch Chrome",
+            "request": "launch",
+            "type": "pwa-chrome",
+            "url": "http://localhost/${workspaceFolderBaseName}",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
             "name": "Attach to Edge",
             "port": 9222,
             "request": "attach",

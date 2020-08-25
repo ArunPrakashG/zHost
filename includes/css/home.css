@@ -3,32 +3,18 @@
   src: url("../webfonts/assistant-v4-latin-regular.ttf");
 }
 
-.container {
-  width: 600px;
-  height: 200px;
-}
-
-.sel-body {
-  float: right;
-  padding-top: 45px;
-}
-
 body {
   margin: 0;
   padding: 0;
   font-family: "assistant-regular";
 }
 
-.left {
-  width: auto;
-  height: 200px;
-  overflow: hidden;
+.container{
+    display:flex;
 }
 
-.right {
-  height: 200px;
-  width: 200px;
-  float: left;
+.sel-body{
+    flex-grow: 1;
 }
 
 header {
@@ -246,23 +232,37 @@ label #sidebar_btn:hover {
   opacity: 0.8;
 }
 
+.deletebttn {
+  width: 80px;
+  height: 35px;
+}
+
 .styled-table {
   border-collapse: collapse;
   margin: 25px 0;
   font-size: 0.9em;
+  width: 85%;
+  z-index: 2;
   font-family: sans-serif;
-  min-width: 100%;
+  margin-top: 70px;
+  margin-left: 250px;
+  border-spacing: 0;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.table-row-field {
+  margin: 0px;
+  padding: 15px;  
+  text-align: center;
 }
 
 .styled-table thead tr {
   background-color: #009879;
   color: #ffffff;
-  text-align: left;
+  text-align: center;
 }
 
-.styled-table th,
-.styled-table td {
+.styled-table th {
   padding: 12px 15px;
 }
 
@@ -275,7 +275,7 @@ label #sidebar_btn:hover {
 }
 
 .styled-table tbody tr:last-of-type {
-  border-bottom: 2px solid #009879;
+  border-bottom: thin solid #009879;
 }
 
 .styled-table tbody tr.active-row {

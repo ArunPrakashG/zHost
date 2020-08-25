@@ -39,7 +39,7 @@ $User = unserialize($_SESSION["userDetails"]);
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-<link rel="stylesheet" type="text/css" href="../includes/css/dashboard-style.css" />
+<link rel="stylesheet" type="text/css" href="../includes/css/home.css" />
 <script src="../includes/js/HomeViewScript.js"></script>
 
 <header>
@@ -78,21 +78,37 @@ $User = unserialize($_SESSION["userDetails"]);
         </div>
 
         <div class="sel-body">
-            <table class="styled-table">
+            <table class="styled-table" cellspacing="0" cellpadding="0">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Points</th>
+                        <th>S.No</th>
+                        <th>Sender</th>
+                        <th>Subject</th>
+                        <th>Received Time</th>
+                        <th>Option</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php 
+
+                    ?>
                     <tr>
-                        <td>Dom</td>
-                        <td>6000</td>
+                        <td class="table-row-field">1</td>
+                        <td class="table-row-field">Jobin</td>
+                        <td class="table-row-field">ghfghhgfhgfghasdasd</td>
+                        <td class="table-row-field">235615</td>
+                        <td class="table-row-field">
+                            <a class="deletebttn">test</a>
+                        </td>
                     </tr>
                     <tr class="active-row">
-                        <td>Melissa</td>
-                        <td>5150</td>
+                        <td class="table-row-field">1</td>
+                        <td class="table-row-field">Shijo</td>
+                        <td class="table-row-field">asdasdasdadasdasd</td>
+                        <td class="table-row-field">235615</td>
+                        <td class="table-row-field">
+                            <a class="deletebttn">test</a>
+                        </td>
                     </tr>
                     <!-- and so on... -->
                 </tbody>
