@@ -148,7 +148,7 @@ class Database
         return $this->GetUserEmails($userEmail, false, true);
     }
 
-    public function GetUserInbox($userEmail){
+    public function GetUserInboxEmails($userEmail){
         return $this->GetUserEmails($userEmail, false, false);
     }
 

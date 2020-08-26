@@ -20,22 +20,21 @@ $Result = array(
     'ShortReason' => 'NA',
     'Reason' => 'NA',
     'Status' => '-1',
-    'Level' => 'warning'
+    'Level' => 'warning',
+    'Emails' => ''
 );
 
-function SetResult($message, $reason, $status, $level)
+function SetResult($message, $reason, $status, $level, $emailArray = null)
 {
     global $Result;
     $Result['ShortReason'] = $message;
     $Result['Reason'] = $reason;
     $Result['Status'] = $status;
     $Result['Level'] = $level;
-}
 
-if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    SetResult("Invalid request type.", "Expected: POST", "-1", "error");
-    echo $Result;
-    exit();
+    if (isset($emailArray)) {
+        $Result['Emails'] = $emailArray;
+    }
 }
 
 function OnDraftViewRequestReceived()
@@ -46,23 +45,106 @@ function OnTrashViewRequestReceived()
 {
 }
 
-function OnTrashMailRequestReceived(){
-
+function OnTrashMailRequestReceived()
+{
 }
 
-function OnDraftMailRequestReceived(){
-
+function OnDraftMailRequestReceived()
+{
 }
 
 function OnComposeRequestReceived()
 {
+    if (!isset($_POST['mailObject'])) {
+        SetResult("Mail object is empty.", "Incompleted request: 'mailObject'", "-1", "error");
+        return;
+    }
+
+    if (!IsUserLoggedIn() || !isset($_SESSION['userDetails']->Email)) {
+        SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
+        return;
+    }
+
+    $attachmentFilePath = "";
+    if (isset($_POST['mailObject']) && $_POST['mailObject']['HasAttachment']) {
+        $serverAssignedPath = GetAndProcessFile('attachment');        
+        if (isset($_FILES) && isset($_FILES['attachment'])) {
+            if (isset($serverAssignedPath) && !empty($serverAssignedPath)) {
+                $moveResult = move_uploaded_file(
+                    $_FILES['attachment']['tmp_name'],
+                    $serverAssignedPath
+                );
+
+                $attachmentFilePath = $moveResult ? $serverAssignedPath : "";
+            }
+        }
+    }
+
+    
+
+    $Db = new Database;
+    $response = $Db->ComposeEmail($_SESSION['userDetails']->Email, $_POST['mailObject']);
+}
+
+function OnInboxRequestReceived()
+{
+    if (!IsUserLoggedIn() || !isset($_SESSION['userDetails']->Email)) {
+        SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
+        return;
+    }
+
+    $Db = new Database;
+    $response = $Db->GetUserInboxEmails($_SESSION['userDetails']->Email);
+
+    if ($response['Status'] == '0') {
+        SetResult("Database request failed!", "Try logging in again.", "-1", "error");
+        return;
+    }
+
+    if ($response['Count'] <= 0) {
+        SetResult("No emails exist for you!", "Can't find any emails in your inbox.", "0", "success");
+        return;
+    }
+
+    SetResult("You have pending Mails!", "", "0", "success", $response['Emails']);
+}
+
+function GetAndProcessFile($requestFileName)
+{
+    if (!isset($requestFileName)) {
+        return "";
+    }
+
+    if (isset($_FILES) && isset($_FILES[$requestFileName])) {
+        if ($_FILES[$requestFileName]['error'] == 0 && $_FILES[$requestFileName]['size'] > 0) {
+            if (file_exists('../includes/images/Attachments/' . $_FILES[$requestFileName]['name'])) {
+                $split = explode('.', $_FILES[$requestFileName]['name']);
+                if (count($split) != 2) {
+                    // not possible
+                    return '../includes/images/Attachments/' . $_FILES[$requestFileName]['name'];
+                }
+
+                return '../includes/images/Attachments/' . $split[0] . ' (' . rand(1, 500) . ')' . '.' . $split[1];
+            }
+
+            return '../includes/images/Attachments/' . $_FILES[$requestFileName]['name'];
+        }
+    }
+
+    return "";
+}
+
+if ($_SERVER["REQUEST_METHOD"] != "POST") {
+    SetResult("Invalid request type.", "Expected: POST", "-1", "error");
+    echo $Result;
+    exit();
 }
 
 // since its ajax, we should 'print' the return value as its an http request and there is no concept of datatype in these requests
 // only plain raw string formate, so return as string of the respective type and parse on client side
 switch ($_POST['requestType']) {
     case "draft_view":
-        OnDraftViewRequestReceived();        
+        OnDraftViewRequestReceived();
         break;
     case "trash_view":
         OnTrashViewRequestReceived();
@@ -74,7 +156,7 @@ switch ($_POST['requestType']) {
         OnDraftMailRequestReceived();
         break;
     case "inbox":
-        OnDraftViewRequestReceived();
+        OnInboxRequestReceived();
         break;
     case "compose":
         OnComposeRequestReceived();
@@ -84,5 +166,4 @@ switch ($_POST['requestType']) {
 }
 
 echo json_encode($Result);
-
 ?>
