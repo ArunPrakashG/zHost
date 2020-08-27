@@ -39,18 +39,68 @@ function SetResult($message, $reason, $status, $level, $emailArray = null)
 
 function OnDraftViewRequestReceived()
 {
+    if (!IsUserLoggedIn() || !isset($_SESSION['userDetails']->Email)) {
+        SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
+        return;
+    }
+
+    $Db = new Database;
+    $response = $Db->GetUserDraftEmails($_SESSION['userDetails']->Email);
+
+    if ($response['Status'] == '0') {
+        SetResult("Database request failed!", "Try logging in again.", "-1", "error");
+        return;
+    }
+
+    if ($response['Count'] <= 0) {
+        SetResult("No draft emails exist for you!", "Can't find any emails in your draft box.", "0", "success");
+        return;
+    }
+
+    SetResult("You have pending drafts!", "", "0", "success", $response['Emails']);
 }
 
 function OnTrashViewRequestReceived()
 {
+    if (!IsUserLoggedIn() || !isset($_SESSION['userDetails']->Email)) {
+        SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
+        return;
+    }
+
+    $Db = new Database;
+    $response = $Db->GetUserTrashEmails($_SESSION['userDetails']->Email);
+
+    if ($response['Status'] == '0') {
+        SetResult("Database request failed!", "Try logging in again.", "-1", "error");
+        return;
+    }
+
+    if ($response['Count'] <= 0) {
+        SetResult("No trash emails exist for you!", "Can't find any emails in your trash box.", "0", "success");
+        return;
+    }
+
+    SetResult("You have pending trashs!", "", "0", "success", $response['Emails']);
 }
 
 function OnTrashMailRequestReceived()
 {
+    if (!IsUserLoggedIn() || !isset($_SESSION['userDetails']->Email)) {
+        SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
+        return;
+    }
+
+    if(!isset($_POST['emailUuid'])){
+        SetResult("UUID isn't set!", "Please specify the mail UUID.", "-1", "error");
+        return;
+    }
+
+    
 }
 
 function OnDraftMailRequestReceived()
 {
+    
 }
 
 function OnComposeRequestReceived()
@@ -80,10 +130,15 @@ function OnComposeRequestReceived()
         }
     }
 
-    
+    $_POST['mailObject']['AttachmentFilePath'] = $attachmentFilePath;
 
     $Db = new Database;
-    $response = $Db->ComposeEmail($_SESSION['userDetails']->Email, $_POST['mailObject']);
+    if($Db->ComposeEmail($_SESSION['userDetails']->Email, $_POST['mailObject'])){
+        SetResult("Success!", "Mail composed.", "0", "success");
+        return;
+    }
+
+    SetResult("Failed!", "Failed to compose.", "-1", "error");
 }
 
 function OnInboxRequestReceived()

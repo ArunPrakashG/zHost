@@ -112,7 +112,7 @@ class Database
         return false;
     }
 
-    public function DeleteUserMail($userEmail, $emailTitle){
+    public function DeleteUserMailWithTitle($userEmail, $emailTitle){
         if(!isset($userEmail) || !isset($emailTitle)){
             return false;
         }
@@ -126,12 +126,83 @@ class Database
         return false;
     }
 
+    public function DoesMailWithUuidExist($userEmail, $uuid){
+        if(!isset($uuid) || !isset($userEmail)){
+            return false;
+        }
+
+        $sqlQuery = $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND EmailId='$uuid'";
+        if($exeResult = $this->ExecuteQuery($sqlQuery)){
+            $rowCount = mysqli_num_rows($exeResult);
+            mysqli_free_result($exeResult);
+            return $rowCount >= 1;
+        }
+
+        return false;
+    }
+
+    public function DeleteUserMailWithUuid($userEmail, $uuid){
+        if(!isset($uuid) || !isset($userEmail)){
+            return false;
+        }
+
+        if(!$this->DoesMailWithUuidExist($userEmail, $uuid)){
+            return false;
+        }
+
+        $sqlQuery = $sqlQuery = "DELETE FROM emails WHERE SendTo='$userEmail' AND EmailId='$uuid'";
+        return $this->ExecuteQuery($sqlQuery);
+    }
+
+    public function FetchMailWithUuid($userEmail, $uuid){
+        $result = array(
+            'Status'=> '-1',
+            'Message'=> 'NA',
+            'Count' => 0,
+            'Emails' => array()
+        );
+
+        if(!isset($uuid) || !isset($userEmail)){
+            return $result;
+        }
+
+        $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND EmailId='$uuid'";
+        if($exeResult = $this->ExecuteQuery($sqlQuery)){
+            $result['Count'] = mysqli_num_rows($exeResult);
+            $result['Status'] = '0';
+            $result['Message'] = 'Success';
+
+            if($result['Count'] <= 0){
+                $result['Status'] = '-1';
+                $result['Message'] = 'No emails exist.';
+                return $result;
+            }
+
+            while($row = mysqli_fetch_object($exeResult)){                
+                $emailObj = array();
+                $emailObj['Id'] = $row->Id;
+                $emailObj['To'] = $row->SendTo ?? "";
+                $emailObj['From'] = $row->ReceivedFrom ?? "";
+                $emailObj['At'] = $row->ReceivedTime ?? "";
+                $emailObj['IsDraft'] = $row->IsDraft ?? "";
+                $emailObj['IsTrash'] = $row->IsTrash ?? "";
+                $emailObj['Title'] = $row->Title ?? "";
+                $emailObj['Subject'] = $row->Subject ?? "";
+                $emailObj['Body'] = $row->Body ?? "";
+                $emailObj['AttachmentPath'] = $row->AttachmentPath ?? "";
+                array_push($result['Emails'], $emailObj);
+            }
+
+            mysqli_free_result($exeResult);
+        }
+    }
+
     public function ComposeEmail($userEmail, $mailObj){
         if(!isset($userEmail) || !isset($mailObj)){
             return false;
         }
 
-        $sqlQuery = "INSERT INTO emails (SendTo, ReceivedFrom, IsDraft, IsTrash, Title, Subject, Body, Attachment, EmailId) VALUES ('" . $mailObj['To'] . "','" . $mailObj['From'] . "','" . $mailObj['IsDraft'] . "','" . $mailObj['IsTrash'] . "','" . $mailObj['Title'] . "','" . $mailObj['Subject'] . "','" . $mailObj['Body'] . "','" .$mailObj['Attachment'] . "','" . $mailObj['MailID'] . "');";
+        $sqlQuery = "INSERT INTO emails (SendTo, ReceivedFrom, IsDraft, IsTrash, Title, Subject, Body, AttachmentPath, EmailId) VALUES ('" . $mailObj['To'] . "','" . $mailObj['From'] . "','" . $mailObj['IsDraft'] . "','" . $mailObj['IsTrash'] . "','" . $mailObj['Title'] . "','" . $mailObj['Subject'] . "','" . $mailObj['Body'] . "','" . $mailObj['AttachmentFilePath'] . "', UUID_SHORT());";
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {            
             mysqli_free_result($exeResult);
             return true;
@@ -204,7 +275,7 @@ class Database
                 $emailObj['Title'] = $row->Title ?? "";
                 $emailObj['Subject'] = $row->Subject ?? "";
                 $emailObj['Body'] = $row->Body ?? "";
-                $emailObj['Attachment'] = $row->Attachment ?? "";
+                $emailObj['AttachmentPath'] = $row->AttachmentPath ?? "";
                 array_push($response['Emails'], $emailObj);
             }
 
