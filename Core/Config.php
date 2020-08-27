@@ -9,7 +9,7 @@ class Config
     DB_NAME = "zhost",
     ERROR_LOG_PATH = "./log.log",
     ADMIN_TABLE_NAME = "admin",
-    USER_TABLE_NAME = "user",
+    USER_TABLE_NAME = "users",
     DEBUG = false;
 }
 

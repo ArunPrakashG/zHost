@@ -38,14 +38,14 @@ function SetResult($message, $reason, $status, $level, $emailArray = null)
 }
 
 function OnDraftViewRequestReceived()
-{
-    if (!IsUserLoggedIn() || !isset($_SESSION['userDetails']->Email)) {
+{    
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
         SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
         return;
     }
 
     $Db = new Database;
-    $response = $Db->GetUserDraftEmails($_SESSION['userDetails']->Email);
+    $response = $Db->GetUserDraftEmails(GetCurrentUserEmail());
 
     if ($response['Status'] == '0') {
         SetResult("Database request failed!", "Try logging in again.", "-1", "error");
@@ -57,18 +57,19 @@ function OnDraftViewRequestReceived()
         return;
     }
 
+    $_SESSION['Draft'] = $response['Emails'];
     SetResult("You have pending drafts!", "", "0", "success", $response['Emails']);
 }
 
 function OnTrashViewRequestReceived()
 {
-    if (!IsUserLoggedIn() || !isset($_SESSION['userDetails']->Email)) {
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
         SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
         return;
     }
 
     $Db = new Database;
-    $response = $Db->GetUserTrashEmails($_SESSION['userDetails']->Email);
+    $response = $Db->GetUserTrashEmails(GetCurrentUserEmail());
 
     if ($response['Status'] == '0') {
         SetResult("Database request failed!", "Try logging in again.", "-1", "error");
@@ -80,13 +81,14 @@ function OnTrashViewRequestReceived()
         return;
     }
 
-    SetResult("You have pending trashs!", "", "0", "success", $response['Emails']);
+    $_SESSION['Trash'] = $response['Emails'];
+    SetResult("You have pending trash emails!", "", "0", "success", $response['Emails']);
 }
 
 function OnTrashMailRequestReceived()
 {
-    if (!IsUserLoggedIn() || !isset($_SESSION['userDetails']->Email)) {
-        SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
+        SetResult("You are not logged in!", "Please login again in order delete emails.", "-1", "warning");
         return;
     }
 
@@ -95,12 +97,34 @@ function OnTrashMailRequestReceived()
         return;
     }
 
-    
+    $Db = new Database;
+    if(!$Db->TrashUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
+        SetResult("Success!", "Mail trashed.", "0", "success");
+        return;
+    }
+
+    SetResult("Failed!", "Failed to trash email.", "-1", "error");
 }
 
 function OnDraftMailRequestReceived()
 {
-    
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
+        SetResult("You are not logged in!", "Please login again in order to draft emails.", "-1", "warning");
+        return;
+    }
+
+    if(!isset($_POST['emailUuid'])){
+        SetResult("UUID isn't set!", "Please specify the mail UUID.", "-1", "error");
+        return;
+    }
+
+    $Db = new Database;
+    if(!$Db->DraftUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
+        SetResult("Success!", "Mail drafted.", "0", "success");
+        return;
+    }
+
+    SetResult("Failed!", "Failed to draft email.", "-1", "error");
 }
 
 function OnComposeRequestReceived()
@@ -110,7 +134,7 @@ function OnComposeRequestReceived()
         return;
     }
 
-    if (!IsUserLoggedIn() || !isset($_SESSION['userDetails']->Email)) {
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
         SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
         return;
     }
@@ -133,7 +157,7 @@ function OnComposeRequestReceived()
     $_POST['mailObject']['AttachmentFilePath'] = $attachmentFilePath;
 
     $Db = new Database;
-    if($Db->ComposeEmail($_SESSION['userDetails']->Email, $_POST['mailObject'])){
+    if($Db->ComposeEmail(GetCurrentUserEmail(), $_POST['mailObject'])){
         SetResult("Success!", "Mail composed.", "0", "success");
         return;
     }
@@ -143,15 +167,15 @@ function OnComposeRequestReceived()
 
 function OnInboxRequestReceived()
 {
-    if (!IsUserLoggedIn() || !isset($_SESSION['userDetails']->Email)) {
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
         SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
         return;
     }
 
     $Db = new Database;
-    $response = $Db->GetUserInboxEmails($_SESSION['userDetails']->Email);
+    $response = $Db->GetUserInboxEmails(GetCurrentUserEmail());
 
-    if ($response['Status'] == '0') {
+    if ($response['Status'] == '-1') {
         SetResult("Database request failed!", "Try logging in again.", "-1", "error");
         return;
     }
@@ -161,7 +185,28 @@ function OnInboxRequestReceived()
         return;
     }
 
+    $_SESSION['Inbox'] = $response['Emails'];
     SetResult("You have pending Mails!", "", "0", "success", $response['Emails']);
+}
+
+function OnTrashMailDeleteRequestReceived(){
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
+        SetResult("You are not logged in!", "Please login again in order delete emails.", "-1", "warning");
+        return;
+    }
+
+    if(!isset($_POST['emailUuid'])){
+        SetResult("UUID isn't set!", "Please specify the mail UUID.", "-1", "error");
+        return;
+    }
+
+    $Db = new Database;
+    if(!$Db->DeleteUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
+        SetResult("Success!", "Mail deleted.", "0", "success");
+        return;
+    }
+
+    SetResult("Failed!", "Failed to delete email.", "-1", "error");
 }
 
 function GetAndProcessFile($requestFileName)
@@ -206,6 +251,9 @@ switch ($_POST['requestType']) {
         break;
     case "trash_mail":
         OnTrashMailRequestReceived();
+        break;
+    case "delete_trash_mail":
+        OnTrashMailDeleteRequestReceived();
         break;
     case "draft_mail":
         OnDraftMailRequestReceived();

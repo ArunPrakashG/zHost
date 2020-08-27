@@ -1,5 +1,6 @@
 <?php
 require_once $_SERVER['ZHOST_ROOT'] . '/Common/Functions.php';
+require_once $_SERVER['ZHOST_ROOT'] . '/Core/UserModel.php';
 
 if (!isset($_SESSION)) {
     session_start();
@@ -35,6 +36,16 @@ function GetCurrentLoggedInUserName()
         return "NA";
     }
 
-    return $_SESSION["userDetails"]->UserName;
+    return unserialize($_SESSION["userDetails"])->UserName;
+}
+
+function GetCurrentUserEmail(){
+    if (!IsUserLoggedIn()) {
+        return "NA";
+    }
+
+    $details = unserialize($_SESSION["userDetails"]);
+    error_log(print_r($details, true));
+    return $details->Email;
 }
 ?>

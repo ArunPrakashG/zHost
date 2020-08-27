@@ -3,6 +3,7 @@ require_once '../Common/Functions.php';
 require_once '../Core/Config.php';
 require_once '../Core/DatabaseManager.php';
 require_once '../Core/SessionCheck.php';
+require_once '../Core/UserModel.php';
 
 if (Config::DEBUG) {
     ini_set('display_errors', 1);
@@ -80,13 +81,17 @@ function OnLoginRequestReceived()
 
     if ($loginResult = $Db->LoginUser($_POST["email"], $_POST["password"], false)) {
         if (isset($loginResult['isError']) && $loginResult['isError']) {
+            error_log($loginResult["errorMessage"]);
             SetResult("Error!", "Password is wrong.", "-1", "error");
             return false;
         }
 
-        $_SESSION['userDetails'] = serialize($loginResult['resultObj']);
-        $_SESSION['ID'] = $loginResult['resultObj']->Id;
-        $_SESSION['USER_NAME'] = $loginResult['resultObj']->UserName;
+        error_log(print_r($loginResult, true));
+        error_log(print_r($loginResult['resultObj'], true));
+        $loginResultObj = unserialize($loginResult['resultObj']);
+        $_SESSION['userDetails'] = $loginResult['resultObj'];
+        $_SESSION['ID'] = $loginResultObj->Id;
+        $_SESSION['USER_NAME'] = $loginResultObj->UserName;
         SetResult("Welcome to zHost!", "You are successfully logged in!", "0", "success");
         return true;
     }
@@ -101,13 +106,12 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
 switch ($_POST['requestType']) {
     case "logout":
         OnLogoutRequestReceived();
-        error_log(json_encode($Result));
-        echo json_encode($Result);
         break;
     case "login":
-        OnLoginRequestReceived();
-        error_log(json_encode($Result));
-        echo json_encode($Result);
+        OnLoginRequestReceived();        
         break;
 }
+
+error_log(json_encode($Result));
+echo json_encode($Result);
 ?>

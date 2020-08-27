@@ -37,6 +37,10 @@ class Database
     {        
         $this->Connection = mysqli_connect(Config::HOST, Config::DB_USER_NAME, Config::DB_USER_PASSWORD) or die("Failed to connect with database");
         mysqli_select_db($this->Connection, Config::DB_NAME);
+
+        // run initial setups
+        // create table
+        // insert sample data
     }
 
     private function ExecuteQuery($query)
@@ -60,7 +64,7 @@ class Database
         }
 
         error_log(json_encode($postArray));
-        $sqlQuery = "INSERT INTO " . ($isAdmin ? Config::ADMIN_TABLE_NAME : Config::USER_TABLE_NAME) . "(`Email`, `UserName`, `Password`, `SecurityQuestion`, `SecurityAnswer`, `AvatarPath`, `PhoneNumber`) VALUES ('" . $postArray['email'] . "','" . $postArray['username'] . "','" . $postArray['password'] . "','" . $postArray['secquest'] . "','" . $postArray['secans'] . "','" . $avatarPath . "','" . $postArray['pnumber'] . "');";
+        $sqlQuery = "INSERT INTO " . ($isAdmin ? Config::ADMIN_TABLE_NAME : Config::USER_TABLE_NAME) . "(`EmailID`, `UserName`, `Password`, `SecurityQuestion`, `SecurityAnswer`, `AvatarPath`, `PhoneNumber`) VALUES ('" . $postArray['email'] . "','" . $postArray['username'] . "','" . $postArray['password'] . "','" . $postArray['secquest'] . "','" . $postArray['secans'] . "','" . $avatarPath . "','" . $postArray['pnumber'] . "');";
         error_log($sqlQuery);
         return $this->ExecuteQuery($sqlQuery);
     }
@@ -80,7 +84,7 @@ class Database
             return false;
         }
 
-        $sqlQuery = "SELECT * FROM " . Config::ADMIN_TABLE_NAME . " WHERE Email='" . $email . "';";        
+        $sqlQuery = "SELECT * FROM " . Config::ADMIN_TABLE_NAME . " WHERE EmailID='" . $email . "';";        
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $rowsCount = mysqli_num_rows($exeResult);
             mysqli_free_result($exeResult);
@@ -99,7 +103,7 @@ class Database
             return false;
         }
 
-        $sqlQuery = "SELECT * FROM " . Config::USER_TABLE_NAME . " WHERE Email='" . $email . "';";
+        $sqlQuery = "SELECT * FROM " . Config::USER_TABLE_NAME . " WHERE EmailID='" . $email . "';";
        
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $rowsCount = mysqli_num_rows($exeResult);
@@ -131,7 +135,7 @@ class Database
             return false;
         }
 
-        $sqlQuery = $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND EmailId='$uuid'";
+        $sqlQuery = $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND MailID='$uuid';";
         if($exeResult = $this->ExecuteQuery($sqlQuery)){
             $rowCount = mysqli_num_rows($exeResult);
             mysqli_free_result($exeResult);
@@ -139,6 +143,19 @@ class Database
         }
 
         return false;
+    }
+
+    public function DraftUserMailWithUuid($userEmail, $uuid){
+        if(!isset($uuid) || !isset($userEmail)){
+            return false;
+        }
+
+        if(!$this->DoesMailWithUuidExist($userEmail, $uuid)){
+           return false;
+        }
+
+        $sqlQuery = "UPDATE mails SET IsDraft=1 WHERE SendTo='$userEmail' AND MailID='$uuid';";        
+        return $this->ExecuteQuery($sqlQuery);
     }
 
     public function DeleteUserMailWithUuid($userEmail, $uuid){
@@ -150,7 +167,20 @@ class Database
             return false;
         }
 
-        $sqlQuery = $sqlQuery = "DELETE FROM emails WHERE SendTo='$userEmail' AND EmailId='$uuid'";
+        $sqlQuery = $sqlQuery = "DELETE FROM emails WHERE SendTo='$userEmail' AND MailID='$uuid';";
+        return $this->ExecuteQuery($sqlQuery);
+    }
+
+    public function TrashUserMailWithUuid($userEmail, $uuid){
+        if(!isset($uuid) || !isset($userEmail)){
+            return false;
+        }
+
+        if(!$this->DoesMailWithUuidExist($userEmail, $uuid)){
+            return false;
+        }
+
+        $sqlQuery = "UPDATE emails SET IsTrash=1 WHERE SendTo='$userEmail' AND MailID='$uuid';";
         return $this->ExecuteQuery($sqlQuery);
     }
 
@@ -166,7 +196,7 @@ class Database
             return $result;
         }
 
-        $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND EmailId='$uuid'";
+        $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND MailID='$uuid';";
         if($exeResult = $this->ExecuteQuery($sqlQuery)){
             $result['Count'] = mysqli_num_rows($exeResult);
             $result['Status'] = '0';
@@ -180,15 +210,15 @@ class Database
 
             while($row = mysqli_fetch_object($exeResult)){                
                 $emailObj = array();
-                $emailObj['Id'] = $row->Id;
                 $emailObj['To'] = $row->SendTo ?? "";
-                $emailObj['From'] = $row->ReceivedFrom ?? "";
+                $emailObj['From'] = $row->ReceviedFrom ?? "";
                 $emailObj['At'] = $row->ReceivedTime ?? "";
                 $emailObj['IsDraft'] = $row->IsDraft ?? "";
                 $emailObj['IsTrash'] = $row->IsTrash ?? "";
                 $emailObj['Title'] = $row->Title ?? "";
                 $emailObj['Subject'] = $row->Subject ?? "";
                 $emailObj['Body'] = $row->Body ?? "";
+                $emailObj['MailID'] = $row->MailID ?? "";
                 $emailObj['AttachmentPath'] = $row->AttachmentPath ?? "";
                 array_push($result['Emails'], $emailObj);
             }
@@ -202,7 +232,7 @@ class Database
             return false;
         }
 
-        $sqlQuery = "INSERT INTO emails (SendTo, ReceivedFrom, IsDraft, IsTrash, Title, Subject, Body, AttachmentPath, EmailId) VALUES ('" . $mailObj['To'] . "','" . $mailObj['From'] . "','" . $mailObj['IsDraft'] . "','" . $mailObj['IsTrash'] . "','" . $mailObj['Title'] . "','" . $mailObj['Subject'] . "','" . $mailObj['Body'] . "','" . $mailObj['AttachmentFilePath'] . "', UUID_SHORT());";
+        $sqlQuery = "INSERT INTO emails (SendTo, ReceivedFrom, IsDraft, IsTrash, Title, Subject, Body, AttachmentPath, MailID) VALUES ('" . $mailObj['To'] . "','" . $mailObj['From'] . "','" . $mailObj['IsDraft'] . "','" . $mailObj['IsTrash'] . "','" . $mailObj['Title'] . "','" . $mailObj['Subject'] . "','" . $mailObj['Body'] . "','" . $mailObj['AttachmentFilePath'] . "', UUID_SHORT());";
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {            
             mysqli_free_result($exeResult);
             return true;
@@ -266,7 +296,6 @@ class Database
 
             while($row = mysqli_fetch_object($exeResult)){                
                 $emailObj = array();
-                $emailObj['Id'] = $row->Id;
                 $emailObj['To'] = $row->SendTo ?? "";
                 $emailObj['From'] = $row->ReceivedFrom ?? "";
                 $emailObj['At'] = $row->ReceivedTime ?? "";
@@ -276,6 +305,7 @@ class Database
                 $emailObj['Subject'] = $row->Subject ?? "";
                 $emailObj['Body'] = $row->Body ?? "";
                 $emailObj['AttachmentPath'] = $row->AttachmentPath ?? "";
+                $emailObj['MailID'] = $row->MailID ?? "";
                 array_push($response['Emails'], $emailObj);
             }
 
@@ -298,7 +328,7 @@ class Database
             return $resultArray;
         }
 
-        $sqlQuery = "SELECT * FROM " . ($isAdminLogin ? "admin" : "user") . " WHERE Email='" . $email . "';";
+        $sqlQuery = "SELECT * FROM " . ($isAdminLogin ? Config::ADMIN_TABLE_NAME : Config::USER_TABLE_NAME) . " WHERE EmailID='" . $email . "';";
 
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $resultArray["isExist"] = mysqli_num_rows($exeResult) > 0;
@@ -309,10 +339,11 @@ class Database
                 return $resultArray;
             }
 
-            $resultArray["resultObj"] = new LoggedInUserResult(true, $isAdminLogin);
+            error_log(mysqli_num_rows($exeResult) > 0);
+            $resultObject = new LoggedInUserResult(true, $isAdminLogin);
             while ($obj = mysqli_fetch_object($exeResult)) {
-                if (isset($obj->Email)) {
-                    $resultArray["resultObj"]->Email = $obj->Email;
+                if (isset($obj->EmailID)) {
+                    $resultObject->Email = $obj->EmailID;
                 }
 
                 if (isset($obj->Password)) {
@@ -322,41 +353,42 @@ class Database
                         return $resultArray;
                     }
 
-                    $resultArray["resultObj"]->Password = $obj->Password;
+                    $resultObject->Password = $obj->Password;
                 }
 
                 if (isset($obj->UserName)) {
-                    $resultArray["resultObj"]->UserName = $obj->UserName;
+                    $resultObject->UserName = $obj->UserName;
                 }
 
                 if (isset($obj->Id)) {
-                    $resultArray["resultObj"]->Id = $obj->Id;
+                    $resultObject->Id = $obj->Id;
                 }
 
                 if (isset($obj->DateCreated)) {
-                    $resultArray["resultObj"]->DateCreated = $obj->DateCreated;
+                    $resultObject->DateCreated = $obj->DateCreated;
                 }
 
                 if (isset($obj->SecurityQuestion)) {
-                    $resultArray["resultObj"]->SecurityQuestion = $obj->SecurityQuestion;
+                    $resultObject->SecurityQuestion = $obj->SecurityQuestion;
                 }
 
                 if (isset($obj->SecurityAnswer)) {
-                    $resultArray["resultObj"]->SecurityAnswer = $obj->SecurityAnswer;
+                    $resultObject->SecurityAnswer = $obj->SecurityAnswer;
                 }
 
                 if (isset($obj->AvatarPath)) {
-                    $resultArray["resultObj"]->AvatarPath = $obj->AvatarPath;
+                    $resultObject->AvatarPath = $obj->AvatarPath;
                 }
 
                 if (isset($obj->PhoneNumber)) {
-                    $resultArray["resultObj"]->PhoneNumber = $obj->PhoneNumber;
+                    $resultObject->PhoneNumber = $obj->PhoneNumber;
                 }
             }
 
             mysqli_free_result($exeResult);
             $resultArray["isError"] = false;
             unset($resultArray["errorMessage"]);
+            $resultArray["resultObj"] = serialize($resultObject);
             return $resultArray;
         }
 

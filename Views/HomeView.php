@@ -30,7 +30,7 @@ $User;
 
 if (!IsUserLoggedIn()) {
     Functions::Alert("Session expired!\nYou will be required to login again.");
-    Functions::Redirect("../Views/LoginRedirectView.php");
+    Functions::Redirect("../Views/LoginView.php");
     exit();
 }
 
@@ -41,6 +41,8 @@ $User = unserialize($_SESSION["userDetails"]);
 <html lang="en" dir="ltr">
 <link rel="stylesheet" type="text/css" href="../includes/css/home.css" />
 <script src="../includes/js/HomeViewScript.js"></script>
+<script src="../includes/js/jquery.min.js"></script>
+<script src="../includes/js/sweetalert.min.js"></script>
 
 <header>
     <?php require_once '../Common/Header.php' ?>
@@ -53,7 +55,7 @@ $User = unserialize($_SESSION["userDetails"]);
             <h3>z<span>Host</span></h3>
         </div>
         <div class="right_area">
-            <a onclick="logoutRequested();" href="javascript:void(0);" class="logout_btn">Logout</a>
+            <a onclick="logoutUser();" href="javascript:void(0);" class="logout_btn">Logout</a>
         </div>
     </div>
 
@@ -69,19 +71,20 @@ $User = unserialize($_SESSION["userDetails"]);
             </div>
             <hr class="breaker" />
             <div class="dashboard-contents item-container">
-                <a href="#" class="item"><span style="font-weight: bold;">Inbox</span></a>
-                <a href="#" class="item"><span style="font-weight: bold;">Compose</span></a>
-                <a href="#" class="item"><span style="font-weight: bold;">Draft</span></a>
-                <a href="#" class="item"><span style="font-weight: bold;">Trash</span></a>
-                <a href="#" class="item"><span style="font-weight: bold;">Settings</span></a>
+                <a href="#" onclick="getInboxMails();" class="item"><span style="font-weight: bold;">Inbox</span></a>
+                <a href="#" onclick="onComposeButtonClicked();" class="item"><span style="font-weight: bold;">Compose</span></a>
+                <a href="#" onclick="getDraftMails();" class="item"><span style="font-weight: bold;">Draft</span></a>
+                <a href="#" onclick="getTrashMails();" class="item"><span style="font-weight: bold;">Trash</span></a>
+                <a href="#" onclick="onSettingsButtonClicked();" class="item"><span style="font-weight: bold;">Settings</span></a>
             </div>
         </div>
 
         <div class="sel-body">
-            <table class="styled-table" cellspacing="0" cellpadding="0">
+            <table class="styled-table" id="mailTable" cellspacing="0" cellpadding="0">
                 <thead>
                     <tr>
                         <th>S.No</th>
+                        <th>Uuid</th>
                         <th>Sender</th>
                         <th>Subject</th>
                         <th>Received Time</th>
@@ -89,28 +92,15 @@ $User = unserialize($_SESSION["userDetails"]);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php 
-
-                    ?>
                     <tr>
                         <td class="table-row-field">1</td>
-                        <td class="table-row-field">Jobin</td>
-                        <td class="table-row-field">ghfghhgfhgfghasdasd</td>
-                        <td class="table-row-field">235615</td>
+                        <td class="table-row-field">Name_PH</td>
+                        <td class="table-row-field">Subject_PH</td>
+                        <td class="table-row-field">Time_PH</td>
                         <td class="table-row-field">
-                            <a class="deletebttn">test</a>
+                            <a class="deletebttn">Button_PH</a>
                         </td>
                     </tr>
-                    <tr class="active-row">
-                        <td class="table-row-field">1</td>
-                        <td class="table-row-field">Shijo</td>
-                        <td class="table-row-field">asdasdasdadasdasd</td>
-                        <td class="table-row-field">235615</td>
-                        <td class="table-row-field">
-                            <a class="deletebttn">test</a>
-                        </td>
-                    </tr>
-                    <!-- and so on... -->
                 </tbody>
             </table>
         </div>
