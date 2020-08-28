@@ -290,7 +290,7 @@ class Database
 
             if($response['Count'] <= 0){
                 $response['Status'] = '-1';
-                $response['Message'] = 'No emails exist.';
+                $response['Message'] = 'No emails exist for current mail folder.';
                 return $response;
             }
 

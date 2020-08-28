@@ -47,8 +47,13 @@ function OnDraftViewRequestReceived()
     $Db = new Database;
     $response = $Db->GetUserDraftEmails(GetCurrentUserEmail());
 
-    if ($response['Status'] == '0') {
-        SetResult("Database request failed!", "Try logging in again.", "-1", "error");
+    if ($response['Status'] == '-1') {
+        if($response['Count'] == 0){
+            SetResult("No mails found!", "You have no new mails.", "0", "success");
+            return;
+        }
+
+        SetResult("Failed!", $response['Message'], "-1", "error");
         return;
     }
 
@@ -71,8 +76,13 @@ function OnTrashViewRequestReceived()
     $Db = new Database;
     $response = $Db->GetUserTrashEmails(GetCurrentUserEmail());
 
-    if ($response['Status'] == '0') {
-        SetResult("Database request failed!", "Try logging in again.", "-1", "error");
+    if ($response['Status'] == '-1') {
+        if($response['Count'] == 0){
+            SetResult("No mails found!", "You have no new mails.", "0", "success");
+            return;
+        }
+
+        SetResult("Failed!", $response['Message'], "-1", "error");
         return;
     }
 
@@ -98,7 +108,7 @@ function OnTrashMailRequestReceived()
     }
 
     $Db = new Database;
-    if(!$Db->TrashUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
+    if($Db->TrashUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
         SetResult("Success!", "Mail trashed.", "0", "success");
         return;
     }
@@ -119,7 +129,7 @@ function OnDraftMailRequestReceived()
     }
 
     $Db = new Database;
-    if(!$Db->DraftUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
+    if($Db->DraftUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
         SetResult("Success!", "Mail drafted.", "0", "success");
         return;
     }
@@ -176,7 +186,12 @@ function OnInboxRequestReceived()
     $response = $Db->GetUserInboxEmails(GetCurrentUserEmail());
 
     if ($response['Status'] == '-1') {
-        SetResult("Database request failed!", "Try logging in again.", "-1", "error");
+        if($response['Count'] == 0){
+            SetResult("No mails found!", "You have no new mails.", "0", "success");
+            return;
+        }
+
+        SetResult("Failed!", $response['Message'], "-1", "error");
         return;
     }
 
@@ -201,7 +216,7 @@ function OnTrashMailDeleteRequestReceived(){
     }
 
     $Db = new Database;
-    if(!$Db->DeleteUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
+    if($Db->DeleteUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
         SetResult("Success!", "Mail deleted.", "0", "success");
         return;
     }

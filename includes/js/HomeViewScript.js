@@ -66,60 +66,89 @@ function logoutUser() {
 
 function deleteMail(rowIndex) {
   // mail uuid
-  var uuid = document
-    .getElementById("mailTable")
-    .rows[rowIndex].namedItem("mailUuid").innerHTML;
+  var uuid = getUuidOfSelectedRow(rowIndex);
 
   if (uuid == null) {
     console.log("uuid can't be null.");
     return;
   }
 
-  // create ajax request here to HomeController.php to delete the mail from db
-  $.ajax({
-    method: "POST",
-    url: "../Controllers/HomeController.php",
-    data: {
-      requestType: "delete_trash_mail",
-      emailUuid: uuid,
+  swal({
+    title: "Are you sure?",
+    text: "The mail will be deleted permentantly from your account.",
+    icon: "warning",
+    buttons: {
+      cancel: {
+        text: "Cancel",
+        value: null,
+        visible: true,
+        className: "",
+        closeModal: true,
+      },
+      confirm: {
+        text: "Delete",
+        value: true,
+        visible: true,
+        className: "",
+        closeModal: true,
+      },
     },
-    cache: false,
-    dataType: "json",
-    success: function () {
-      switch (result.Status) {
-        case "0":
-          swal(result.ShortReason, result.Reason, result.Level).then(
-            (value) => {
-              // if success, delete from ui
-              document.getElementById("mailTable").deleteRow(rowIndex);
-            }
-          );
-          break;
-        case "-1":
+  }).then((isConfirmed) => {
+    if (isConfirmed) {
+      // create ajax request here to HomeController.php to delete the mail from db
+      $.ajax({
+        method: "POST",
+        url: "../Controllers/HomeController.php",
+        data: {
+          requestType: "delete_trash_mail",
+          emailUuid: uuid,
+        },
+        cache: false,
+        dataType: "json",
+        success: function () {
+          switch (result.Status) {
+            case "0":
+              swal(result.ShortReason, result.Reason, result.Level).then(
+                (value) => {
+                  // if success, delete from ui
+                  document.getElementById("mailTable").deleteRow(rowIndex);
+                }
+              );
+              break;
+            case "-1":
+              swal(
+                result.ShortReason,
+                result.Reason,
+                result.Level
+              ).then((value) => {});
+              break;
+          }
+        },
+        error: function (e) {
           swal(
-            result.ShortReason,
-            result.Reason,
-            result.Level
-          ).then((value) => {});
-          break;
-      }
-    },
-    error: function (e) {
-      swal(
-        "Request Exception!",
-        "Exception occured during AJAX Request. Check console for more info.",
-        "error"
-      );
-      console.log(e);
-    },
+            "Request Exception!",
+            "Exception occured during AJAX Request. Check console for more info.",
+            "error"
+          );
+          console.log(e);
+        },
+      });
+    }
   });
+}
+
+function getUuidOfSelectedRow(rowIndex) {
+  var selectedRow = document.getElementById("mailTable").rows[rowIndex];
+  for (var i = 0, cell; (cell = selectedRow.cells[i]); i++) {
+    if (cell.id == "mailUuid") {
+      return cell.innerHTML;
+    }
+  }
 }
 
 function trashMail(rowIndex) {
   // mail uuid
-  var uuid = document
-    .getElementById("mailTable")
-    .rows[rowIndex].namedItem("mailUuid").innerHTML;
+  var uuid = getUuidOfSelectedRow(rowIndex);
 
   if (uuid == null) {
     console.log("uuid can't be null.");
@@ -136,7 +165,7 @@ function trashMail(rowIndex) {
     },
     cache: false,
     dataType: "json",
-    success: function () {
+    success: function (result) {
       switch (result.Status) {
         case "0":
           swal(result.ShortReason, result.Reason, result.Level).then(
@@ -178,7 +207,6 @@ function getInboxMails() {
     cache: false,
     dataType: "json",
     success: function (result) {
-      console.log(result);
       switch (result.Status) {
         case "-1":
           swal(result.ShortReason, result.Reason, result.Level).then(
@@ -190,7 +218,18 @@ function getInboxMails() {
           return;
         case "0":
           // inbox fetch done
-          if (result.Emails == null) {
+          if (result.Emails == null || result.Emails.length <= 0) {
+            setTimeout(function () {
+              swal(
+                "All caught up!",
+                "No new mails found in current mail folder.",
+                {
+                  buttons: false,
+                  timer: 3000,
+                }
+              );
+            }, 100);
+
             return;
           }
 
@@ -214,7 +253,7 @@ function getInboxMails() {
               mail.At +
               "</td>" +
               '<td class="table-row-field">' +
-              '<a class="deletebttn" id="trash-inbox">Trash</a>' +
+              '<a class="deletebttn" id="trash-inbox" onclick="onDeleteAnchorClicked(this);">Trash</a>' +
               "</td>";
             addRow(rowHtml, "mailTable");
           }
@@ -261,7 +300,18 @@ function getDraftMails() {
           return;
         case "0":
           // draft fetch done
-          if (result.Emails == null) {
+          if (result.Emails == null || result.Emails.length <= 0) {
+            setTimeout(function () {
+              swal(
+                "All caught up!",
+                "No new mails found in current mail folder.",
+                {
+                  buttons: false,
+                  timer: 3000,
+                }
+              );
+            }, 100);
+
             return;
           }
 
@@ -285,7 +335,7 @@ function getDraftMails() {
               mail.At +
               "</td>" +
               '<td class="table-row-field">' +
-              '<a class="deletebttn" id="trash-draft">Trash</a>' +
+              '<a class="deletebttn" id="trash-draft" onclick="onDeleteAnchorClicked(this);">Trash</a>' +
               "</td>";
             addRow(rowHtml, "mailTable");
           }
@@ -332,7 +382,18 @@ function getTrashMails() {
           return;
         case "0":
           // trash fetch done
-          if (result.Emails == null) {
+          if (result.Emails == null || result.Emails.length <= 0) {
+            setTimeout(function () {
+              swal(
+                "All caught up!",
+                "No new mails found in current mail folder.",
+                {
+                  buttons: false,
+                  timer: 3000,
+                }
+              );
+            }, 100);
+
             return;
           }
 
@@ -356,7 +417,7 @@ function getTrashMails() {
               mail.At +
               "</td>" +
               '<td class="table-row-field">' +
-              '<a class="deletebttn" id="del-trash">Delete</a>' +
+              '<a class="deletebttn" id="del-trash" onclick="onDeleteAnchorClicked(this);">Delete</a>' +
               "</td>";
             addRow(rowHtml, "mailTable");
           }
@@ -396,47 +457,44 @@ function addRow(rowHtml, tableId) {
     .getElementById(tableId)
     .getElementsByTagName("tbody")[0];
   var newRow = inboxTable.insertRow(inboxTable.rows.length);
+  newRow.setAttribute("onclick", "onRowClicked(this);");
   newRow.innerHTML = rowHtml;
 }
 
+function onRowClicked(row) {
+  row.setAttribute("class", "active-row");
+  var index = row.rowIndex;
+  console.log("Selected row: " + index);
+
+  // TODO: Display email ui
+  // includes: Reply, delete, view attachments
+}
+
+// click event for each delete option click on row
+function onDeleteAnchorClicked(anchor) {
+  console.log("Click registered for anchor: " + anchor.id);
+  switch (anchor.id) {
+    case "del-trash":
+      var index = anchor.parentNode.parentNode.rowIndex;
+      console.log("Delete requested for row: " + index);
+      deleteMail(index);
+      break;
+    case "trash-draft":
+      var index = anchor.parentNode.parentNode.rowIndex;
+      console.log("trash requested for row: " + index);
+      trashMail(index);
+      break;
+    case "trash-inbox":
+      var index = anchor.parentNode.parentNode.rowIndex;
+      console.log("trash requested for row: " + index);
+      trashMail(index);
+      break;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
-  $(document).ready(function () {
-    // click event on each row click
-       
-    $("mailTable tr").click(function () {      
-      $(this).setAttribute("class", "active-row");
-      var clickedRowIndex = $(this).index();
-      console.log("Selected row: " + clickedRowIndex);
+  console.log("document ready");
 
-      // TODO: Display email ui
-      // includes: Reply, delete, view attachments
-    });
-    
-
-    // click event for each delete option click on row
-    $("mailTable tr").on("click", "a", function () {
-      // clicked row index
-      console.log("Click registered for anchor: " + $(this).id.innerHTML);
-      switch ($(this).id.innerHTML) {
-        case "del-trash":
-          var index = $(this).parent().parent().index();
-          console.log("Delete requested for row: " + index);
-          deleteMail(index);
-          break;
-        case "trash-draft":
-          var index = $(this).parent().parent().index();
-          console.log("trash requested for row: " + index);
-          trashMail(index);
-          break;
-        case "trash-inbox":
-          var index = $(this).parent().parent().index();
-          console.log("trash requested for row: " + index);
-          trashMail(index);
-          break;
-      }
-    });
-
-    // load inbox emails by default as its the first selection
-    getInboxMails();
-  });
+  // load inbox emails by default as its the first selection
+  getInboxMails();
 });

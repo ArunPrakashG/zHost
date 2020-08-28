@@ -278,7 +278,7 @@ label #sidebar_btn:hover {
   border-bottom: thin solid #009879;
 }
 
-.styled-table tbody tr.active-row {
-  font-weight: bold;
-  color: #009879;
+.styled-table tbody tr.active-row {  
+  background-color: #bdbdbdc4;
+  color: #000000;
 }
