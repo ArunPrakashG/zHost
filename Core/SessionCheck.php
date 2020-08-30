@@ -45,7 +45,6 @@ function GetCurrentUserEmail(){
     }
 
     $details = unserialize($_SESSION["userDetails"]);
-    error_log(print_r($details, true));
     return $details->Email;
 }
 ?>

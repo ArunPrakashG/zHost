@@ -8,7 +8,6 @@ if (Config::DEBUG) {
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);
 	ini_set("log_errors", TRUE);
-	ini_set('error_log', Config::ERROR_LOG_PATH);
 }
 
 if (!isset($_SESSION)) {
@@ -151,7 +150,6 @@ function OnRegisterRequestReceived()
 	$_POST['password'] =  password_hash($_POST["psw"], PASSWORD_DEFAULT);
 
 	if ($Db->RegisterUser($_POST, $avatarFilePath, false)) {
-		error_log("Account registered");
 		SetResult("Account Registered!", "You will be redirected to login page now...", "0", "success");
 		return;
 	}
@@ -179,7 +177,6 @@ switch ($_POST['requestType']) {
 			$_SESSION['form-data']['psw-repeat'] = $_POST['psw-repeat'];
 		}
 
-		error_log("Result array JSON: " . json_encode($Result));
 		echo json_encode($Result);
 		break;
 }

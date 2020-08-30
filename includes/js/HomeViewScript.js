@@ -30,7 +30,6 @@ function logoutUser() {
         cache: false,
         dataType: "json",
         success: function (result) {
-          console.log(result);
           switch (result.Status) {
             case "-1":
               swal(result.ShortReason, result.Reason, result.Level).then(
@@ -105,7 +104,7 @@ function deleteMail(rowIndex) {
         },
         cache: false,
         dataType: "json",
-        success: function () {
+        success: function (result) {         
           switch (result.Status) {
             case "0":
               swal(result.ShortReason, result.Reason, result.Level).then(
@@ -120,7 +119,9 @@ function deleteMail(rowIndex) {
                 result.ShortReason,
                 result.Reason,
                 result.Level
-              ).then((value) => {});
+              ).then((value) => {
+
+              });
               break;
           }
         },
@@ -172,6 +173,7 @@ function trashMail(rowIndex) {
             (value) => {
               // if success, delete from ui
               document.getElementById("mailTable").deleteRow(rowIndex);
+              document.location = "../Views/HomeView.php";
             }
           );
           break;
@@ -196,7 +198,7 @@ function trashMail(rowIndex) {
 }
 
 function getInboxMails() {
-  $("#mailTable tbody tr").remove();
+  $("#mailTable tbody tr").remove(0);
 
   $.ajax({
     method: "POST",
@@ -235,26 +237,14 @@ function getInboxMails() {
 
           for (var i = 0; i < result.Emails.length; i++) {
             var mail = result.Emails[i];
-            var rowHtml =
-              '<td class="table-row-field">' +
-              i +
-              1 +
-              "</td>" +
-              '<td class="table-row-field" id="mailUuid">' +
-              mail.MailID +
-              "</td>" +
-              '<td class="table-row-field">' +
-              mail.From +
-              "</td>" +
-              '<td class="table-row-field">' +
-              mail.Subject +
-              "</td>" +
-              '<td class="table-row-field">' +
-              mail.At +
-              "</td>" +
-              '<td class="table-row-field">' +
-              '<a class="deletebttn" id="trash-inbox" onclick="onDeleteAnchorClicked(this);">Trash</a>' +
-              "</td>";
+            var rowHtml = '<td class="table-row-field">' + (i + 1) + '</td>' + 
+                          '<td class="table-row-field" id="mailUuid">' + mail.MailID + '</td>' +
+                          '<td class="table-row-field">' + mail.From + '</td>' +
+                          '<td class="table-row-field">' + (mail.Subject.length > 18 ? mail.Subject.substring(0, 18-3) + "..." : mail.Subject) +  '</td>' +
+                          '<td class="table-row-field">' + mail.At + '</td>' +
+                          '<td class="table-row-field">' +
+                              '<a class="deletebttn" id="trash-inbox" onclick="onDeleteAnchorClicked(this);">Trash</a>' +
+                          '</td>';
             addRow(rowHtml, "mailTable");
           }
 
@@ -288,7 +278,6 @@ function getDraftMails() {
     cache: false,
     dataType: "json",
     success: function (result) {
-      console.log(result);
       switch (result.Status) {
         case "-1":
           swal(result.ShortReason, result.Reason, result.Level).then(
@@ -370,7 +359,6 @@ function getTrashMails() {
     cache: false,
     dataType: "json",
     success: function (result) {
-      console.log(result);
       switch (result.Status) {
         case "-1":
           swal(result.ShortReason, result.Reason, result.Level).then(
@@ -472,29 +460,23 @@ function onRowClicked(row) {
 
 // click event for each delete option click on row
 function onDeleteAnchorClicked(anchor) {
-  console.log("Click registered for anchor: " + anchor.id);
   switch (anchor.id) {
     case "del-trash":
       var index = anchor.parentNode.parentNode.rowIndex;
-      console.log("Delete requested for row: " + index);
       deleteMail(index);
       break;
     case "trash-draft":
       var index = anchor.parentNode.parentNode.rowIndex;
-      console.log("trash requested for row: " + index);
       trashMail(index);
       break;
     case "trash-inbox":
       var index = anchor.parentNode.parentNode.rowIndex;
-      console.log("trash requested for row: " + index);
       trashMail(index);
       break;
   }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("document ready");
-
   // load inbox emails by default as its the first selection
   getInboxMails();
 });

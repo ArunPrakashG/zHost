@@ -55,9 +55,15 @@ function OnLogoutRequestReceived()
         return false;
     }
 
+    // these variables are part of the user session
+    // they are not required when session is no longer valid, ie, when user logs out
+    unset($_SESSION['Trash']);
+    unset($_SESSION['Draft']);
+    unset($_SESSION['Inbox']);
     unset($_SESSION['userDetails']);
     unset($_SESSION['USER_NAME']);
     unset($_SESSION['ID']);
+    
     // handling redirection and alert in client side for the animated alert to display
     SetResult("Success!", "You will be redirected to Home page.", "0", "success");
     return true;
@@ -81,13 +87,10 @@ function OnLoginRequestReceived()
 
     if ($loginResult = $Db->LoginUser($_POST["email"], $_POST["password"], false)) {
         if (isset($loginResult['isError']) && $loginResult['isError']) {
-            error_log($loginResult["errorMessage"]);
             SetResult("Error!", "Password is wrong.", "-1", "error");
             return false;
         }
 
-        error_log(print_r($loginResult, true));
-        error_log(print_r($loginResult['resultObj'], true));
         $loginResultObj = unserialize($loginResult['resultObj']);
         $_SESSION['userDetails'] = $loginResult['resultObj'];
         $_SESSION['ID'] = $loginResultObj->Id;
@@ -99,7 +102,7 @@ function OnLoginRequestReceived()
 
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
     SetResult("Invalid request type.", "Expected: POST", "-1", "error");
-    echo $Result;
+    echo json_encode($Result);
     exit();
 }
 
@@ -112,6 +115,5 @@ switch ($_POST['requestType']) {
         break;
 }
 
-error_log(json_encode($Result));
 echo json_encode($Result);
 ?>

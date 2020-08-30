@@ -235,6 +235,7 @@ label #sidebar_btn:hover {
 .deletebttn {
   width: 80px;
   height: 35px;
+  text-decoration: underline;
 }
 
 .styled-table {

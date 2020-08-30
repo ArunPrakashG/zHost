@@ -7,9 +7,7 @@ if (Config::DEBUG) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
-
     ini_set("log_errors", TRUE);
-    ini_set('error_log', Config::ERROR_LOG_PATH);
 }
 
 class Database
@@ -43,7 +41,7 @@ class Database
         // insert sample data
     }
 
-    private function ExecuteQuery($query)
+    public function ExecuteQuery($query)
     {
         if (!isset($query)) {
             throw new Exception("query is empty!");
@@ -57,15 +55,19 @@ class Database
         return mysqli_query($this->Connection, $query);
     }
 
-    public function RegisterUser($postArray, $avatarPath, $isAdmin)
+    public function RegisterUser($postArray, $avatarPath, $isAdmin, $withExistingCheck = false)
     {
         if (!isset($postArray) || !isset($avatarPath)) {
             return false;
         }
 
-        error_log(json_encode($postArray));
-        $sqlQuery = "INSERT INTO " . ($isAdmin ? Config::ADMIN_TABLE_NAME : Config::USER_TABLE_NAME) . "(`EmailID`, `UserName`, `Password`, `SecurityQuestion`, `SecurityAnswer`, `AvatarPath`, `PhoneNumber`) VALUES ('" . $postArray['email'] . "','" . $postArray['username'] . "','" . $postArray['password'] . "','" . $postArray['secquest'] . "','" . $postArray['secans'] . "','" . $avatarPath . "','" . $postArray['pnumber'] . "');";
-        error_log($sqlQuery);
+        if($withExistingCheck){
+            if($this->IsExistingUser($postArray['email'])){
+                return false;
+            }
+        }
+        
+        $sqlQuery = "INSERT INTO " . ($isAdmin ? Config::ADMIN_TABLE_NAME : Config::USER_TABLE_NAME) . "(`EmailID`, `UserName`, `Password`, `SecurityQuestion`, `SecurityAnswer`, `AvatarPath`, `PhoneNumber`) VALUES ('" . $postArray['email'] . "','" . $postArray['username'] . "','" . $postArray['password'] . "','" . $postArray['secquest'] . "','" . $postArray['secans'] . "','" . $avatarPath . "','" . $postArray['pnumber'] . "');";        
         return $this->ExecuteQuery($sqlQuery);
     }
 
@@ -227,18 +229,34 @@ class Database
         }
     }
 
-    public function ComposeEmail($userEmail, $mailObj){
-        if(!isset($userEmail) || !isset($mailObj)){
+    public function ComposeEmail($mailObj){
+        if(!isset($mailObj)){
             return false;
         }
 
-        $sqlQuery = "INSERT INTO emails (SendTo, ReceivedFrom, IsDraft, IsTrash, Title, Subject, Body, AttachmentPath, MailID) VALUES ('" . $mailObj['To'] . "','" . $mailObj['From'] . "','" . $mailObj['IsDraft'] . "','" . $mailObj['IsTrash'] . "','" . $mailObj['Title'] . "','" . $mailObj['Subject'] . "','" . $mailObj['Body'] . "','" . $mailObj['AttachmentFilePath'] . "', UUID_SHORT());";
-        if ($exeResult = $this->ExecuteQuery($sqlQuery)) {            
-            mysqli_free_result($exeResult);
-            return true;
-        }
-
-        return false;
+        $sqlQuery = "INSERT INTO emails(
+            MailID,
+            SendTo,
+            ReceviedFrom,
+            IsDraft,
+            IsTrash,
+            Title,
+            SUBJECT,
+            Body,
+            AttachmentPath
+        )
+        VALUES(
+            UUID_SHORT(),'" . 
+            $mailObj['To'] . "','" . 
+            $mailObj['From'] . "'," . 
+            $mailObj['IsDraft'] . "," . 
+            $mailObj['IsTrash'] . ",'" .  
+            $mailObj['Title'] . "','" .  
+            $mailObj['Subject'] . "','" .  
+            $mailObj['Body'] . "','" .  
+            $mailObj['AttachmentFilePath'] . "');";
+                
+        return $this->ExecuteQuery($sqlQuery);
     }
 
     public function GetUserDraftEmails($userEmail){
@@ -339,7 +357,6 @@ class Database
                 return $resultArray;
             }
 
-            error_log(mysqli_num_rows($exeResult) > 0);
             $resultObject = new LoggedInUserResult(true, $isAdminLogin);
             while ($obj = mysqli_fetch_object($exeResult)) {
                 if (isset($obj->EmailID)) {

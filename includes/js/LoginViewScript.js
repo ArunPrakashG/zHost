@@ -13,7 +13,6 @@ function loginRequested() {
 
     dataType: "json",
     success: function (result) {
-      console.log(result);
       switch (result.Status) {
         case "-1":
           swal(result.ShortReason, result.Reason, result.Level).then(

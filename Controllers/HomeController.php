@@ -165,9 +165,10 @@ function OnComposeRequestReceived()
     }
 
     $_POST['mailObject']['AttachmentFilePath'] = $attachmentFilePath;
+    $_POST['mailObject']['From'] = GetCurrentUserEmail();
 
     $Db = new Database;
-    if($Db->ComposeEmail(GetCurrentUserEmail(), $_POST['mailObject'])){
+    if($Db->ComposeEmail($_POST['mailObject'])){
         SetResult("Success!", "Mail composed.", "0", "success");
         return;
     }
@@ -251,7 +252,7 @@ function GetAndProcessFile($requestFileName)
 
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
     SetResult("Invalid request type.", "Expected: POST", "-1", "error");
-    echo $Result;
+    echo json_encode($Result);
     exit();
 }
 
