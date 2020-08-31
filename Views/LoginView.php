@@ -47,7 +47,7 @@ if (isset($_GET['refer']) && strcmp($_GET['refer'], "index")) {
                 <input type="password" name="password" value="" placeholder="Password" required>
                 <button type="submit" name="button">Login</button>
                 <br />
-                <p class="options">Forgot Password ? <a href="#">Click Here</a>!</p>
+                <p class="options">Forgot Password ? <a href="javascript:onForgotPasswordClicked();">Click Here</a>!</p>
                 <p class="options">Not Registered ? <a href="../Views/RegisterView.php">Register here</a>!</p>
                 <p class="options">Wanted Home page ? <a href="../Index.php">Home page</a>!</p>
             </form>

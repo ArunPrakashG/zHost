@@ -1,39 +1,56 @@
-function registerRequested() { 
+function registerRequested() {
   var file_data = document.getElementById("pro-image").files[0];
   var formData = new FormData($("#reg-form")[0]);
-  
+
   formData.append("file", file_data);
   formData.append("requestType", "register");
 
   $.ajax({
     method: "POST",
     url: "../Controllers/RegisterController.php",
-    data: formData,    
+    data: formData,
     processData: false,
     contentType: false,
     dataType: "json",
-    success: function (result) {      
+    success: function (result) {
       switch (result.Status) {
         case "-1":
-          swal(
-            result.ShortReason,
-            result.Reason,
-            result.Level
-          ).then((value) => {
-            document.location =
-              "../Views/RegisterView.php";
-          });
+          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
+            (value) => {
+              document.location = "../Views/RegisterView.php";
+            }
+          );
           return;
         case "0":
           // success
-          swal(
-            result.ShortReason,
-            result.Reason,
-            result.Level
-          ).then((value) => {
-            document.location =
-              "../Views/RedirectView.php?path=../Views/LoginView.php&name=Login Page&header=Login";
-          });
+          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
+            (value) => {
+              let timerInterval;
+              Swal.fire({
+                title: "Redirecting you to login page!",
+                html: "redirecting in <b></b> milliseconds.",
+                timer: 3000,
+                timerProgressBar: true,
+                allowOutsideClick: false,
+                onBeforeOpen: () => {
+                  Swal.showLoading();
+                  timerInterval = setInterval(() => {
+                    const content = Swal.getContent();
+                    if (content) {
+                      const b = content.querySelector("b");
+                      if (b) {
+                        b.textContent = Swal.getTimerLeft();
+                      }
+                    }
+                  }, 100);
+                },
+                onClose: () => {
+                  clearInterval(timerInterval);
+                  document.location = "../Views/LoginView.php";
+                },
+              });
+            }
+          );
           break;
       }
     },

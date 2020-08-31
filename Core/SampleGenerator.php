@@ -54,6 +54,8 @@ if($_GET['auth'] != "root_sample"){
     exit();
 }
 
+$Db->ExecuteQuery('DROP TABLE admin,users,emails;');
+
 $Db->ExecuteQuery('
 CREATE TABLE IF NOT EXISTS Users(
     Id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
@@ -86,7 +88,7 @@ CREATE TABLE IF NOT EXISTS Emails(
 	MailID varchar(80) UNIQUE NOT NULL,
 	ReceivedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	SendTo varchar(60) NOT NULL,
-	ReceviedFrom varchar(80) NOT NULL,
+	ReceivedFrom varchar(80) NOT NULL,
 	IsDraft BOOLEAN,
 	IsTrash BOOLEAN,
 	Title varchar(80),

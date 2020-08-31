@@ -20,16 +20,21 @@ $Result = array(
     'ShortReason' => 'NA',
     'Reason' => 'NA',
     'Status' => '-1',
-    'Level' => 'warning'
+    'Level' => 'warning',
+    'SecData' => ''
 );
 
-function SetResult($message, $reason, $status, $level)
+function SetResult($message, $reason, $status, $level, $secData = null)
 {
     global $Result;
     $Result['ShortReason'] = $message;
     $Result['Reason'] = $reason;
     $Result['Status'] = $status;
     $Result['Level'] = $level;
+
+    if(isset($secData)){
+        $Result['SecData'] = $secData;
+    }    
 }
 
 function ValidateLoginForum()
@@ -65,7 +70,7 @@ function OnLogoutRequestReceived()
     unset($_SESSION['ID']);
     
     // handling redirection and alert in client side for the animated alert to display
-    SetResult("Success!", "You will be redirected to Home page.", "0", "success");
+    SetResult("Success!", "You will be redirected to Login page.", "0", "success");
     return true;
 }
 
@@ -100,6 +105,36 @@ function OnLoginRequestReceived()
     }
 }
 
+function OnSecurityDataRequestReceived(){
+    if(!isset($_POST['email'])){
+        SetResult("Invalid email!", "Email is empty or invalid!", "-1", "error");
+        return;
+    }
+
+    $Db = new Database;
+    if($secData = $Db->GetUserSecurityData($_POST['email'])){
+        SetResult("Success!", "Security data fetched.", "0", "success", $secData['Data']);        
+        return;
+    }
+
+    SetResult("Failed!", "Failed to fetch security data (Check database connection)", "-1", "error");
+}
+
+function OnRecoveryPasswordRequestReceived(){
+    if(!isset($_POST['new_pass']) || !isset($_POST['email'])){
+        SetResult("Invalid Password/Email!", "Password or Email appears to be empty.", "-1", "warning");
+        return;
+    }
+
+    $Db = new Database;
+    if($Db->UpdateUserPassword($_POST['email'], $_POST['new_pass'])){
+        SetResult("Success!", "Password updated.", "0", "success");
+        return;
+    }
+
+    SetResult("Failed!", "Failed to update password. (Check database connection)", "-1", "error");
+}
+
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
     SetResult("Invalid request type.", "Expected: POST", "-1", "error");
     echo json_encode($Result);
@@ -112,6 +147,12 @@ switch ($_POST['requestType']) {
         break;
     case "login":
         OnLoginRequestReceived();        
+        break;
+    case "recovery_security_data":
+        OnSecurityDataRequestReceived();
+        break;
+    case "recovery_set_password":
+        OnRecoveryPasswordRequestReceived();
         break;
 }
 

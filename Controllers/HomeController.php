@@ -225,6 +225,26 @@ function OnTrashMailDeleteRequestReceived(){
     SetResult("Failed!", "Failed to delete email.", "-1", "error");
 }
 
+function OnTrashMailRestoreRequestReceived(){
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
+        SetResult("You are not logged in!", "Please login again in order delete emails.", "-1", "warning");
+        return;
+    }
+
+    if(!isset($_POST['emailUuid'])){
+        SetResult("UUID isn't set!", "Please specify the mail UUID.", "-1", "error");
+        return;
+    }
+
+    $Db = new Database;
+    if($Db->RestoreTrashUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
+        SetResult("Success!", "Mail Restored.", "0", "success");
+        return;
+    }
+
+    SetResult("Failed!", "Failed to restore email.", "-1", "error");
+}
+
 function GetAndProcessFile($requestFileName)
 {
     if (!isset($requestFileName)) {
@@ -270,6 +290,9 @@ switch ($_POST['requestType']) {
         break;
     case "delete_trash_mail":
         OnTrashMailDeleteRequestReceived();
+        break;
+    case "restore_trash_mail":
+        OnTrashMailRestoreRequestReceived();
         break;
     case "draft_mail":
         OnDraftMailRequestReceived();

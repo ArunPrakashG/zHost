@@ -5,29 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Chrome",
+            "type": "edge",
             "request": "launch",
-            "type": "pwa-chrome",
-            "url": "http://localhost/${workspaceFolderBaseName}",
-            "webRoot": "${workspaceFolder}"
-        },
-        {
-            "name": "Attach to Edge",
-            "port": 9222,
-            "request": "attach",
-            "type": "pwa-msedge",
-            "webRoot": "${workspaceFolder}"
-        },
-        {
-            "name": "Launch Edge",
-            "request": "launch",
-            "type": "pwa-msedge",
-            "url": "http://localhost/${workspaceFolderBasename}",
+            "name": "Launch Edge (Chromium - DevTools)",
+            "url": "http://192.168.1.20/${workspaceFolderBasename}",
             "webRoot": "${workspaceFolder}",
-            "includeDefaultArgs": true,
             "runtimeArgs": [
                 "--explicitly-allowed-ports=80,22"
             ]
+        },
+        {
+            "type": "edge",
+            "request": "attach",
+            "name": "Attach to Edge (Chromium - DevTools)",
+            "port": 9222
         }
     ]
 }

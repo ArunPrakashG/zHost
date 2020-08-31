@@ -1,26 +1,15 @@
 function logoutUser() {
-  swal({
+  Swal.fire({
     title: "Are you sure?",
     text: "You will logged out and redirected to Index page.",
     icon: "warning",
-    buttons: {
-      cancel: {
-        text: "Cancel",
-        value: null,
-        visible: true,
-        className: "",
-        closeModal: true,
-      },
-      confirm: {
-        text: "Confirm Logout",
-        value: true,
-        visible: true,
-        className: "",
-        closeModal: true,
-      },
-    },
-  }).then((isConfirmed) => {
-    if (isConfirmed) {
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Confirm Logout",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.value) {
       $.ajax({
         method: "POST",
         url: "../Controllers/UserController.php",
@@ -32,26 +21,47 @@ function logoutUser() {
         success: function (result) {
           switch (result.Status) {
             case "-1":
-              swal(result.ShortReason, result.Reason, result.Level).then(
+              Swal.fire(result.ShortReason, result.Reason, result.Level).then(
                 (value) => {
-                  document.location =
-                    "../Views/RedirectView.php?path=../Views/HomeView.php&name=Home Page&header=Home";
+                  document.location = "../Views/HomeView.php";
                 }
               );
               return;
             case "0":
               // logout done
-              swal(result.ShortReason, result.Reason, result.Level).then(
+              Swal.fire(result.ShortReason, result.Reason, result.Level).then(
                 (value) => {
-                  document.location =
-                    "../Views/RedirectView.php?path=../Views/LoginView.php&name=Login Page&header=Login";
+                  let timerInterval;
+                  Swal.fire({
+                    title: "Redirecting you to login page!",
+                    html: "redirecting in <b></b> milliseconds.",
+                    timer: 3000,
+                    timerProgressBar: true,
+                    allowOutsideClick: false,
+                    onBeforeOpen: () => {
+                      Swal.showLoading();
+                      timerInterval = setInterval(() => {
+                        const content = Swal.getContent();
+                        if (content) {
+                          const b = content.querySelector("b");
+                          if (b) {
+                            b.textContent = Swal.getTimerLeft();
+                          }
+                        }
+                      }, 100);
+                    },
+                    onClose: () => {
+                      clearInterval(timerInterval);
+                      document.location = "../Views/LoginView.php";
+                    },
+                  });
                 }
               );
               break;
           }
         },
         error: function (e) {
-          swal(
+          Swal.fire(
             "Request Exception!",
             "Exception occured during AJAX Request. Check console for more info.",
             "error"
@@ -72,28 +82,17 @@ function deleteMail(rowIndex) {
     return;
   }
 
-  swal({
+  Swal.fire({
     title: "Are you sure?",
     text: "The mail will be deleted permentantly from your account.",
     icon: "warning",
-    buttons: {
-      cancel: {
-        text: "Cancel",
-        value: null,
-        visible: true,
-        className: "",
-        closeModal: true,
-      },
-      confirm: {
-        text: "Delete",
-        value: true,
-        visible: true,
-        className: "",
-        closeModal: true,
-      },
-    },
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Confirm",
+    cancelButtonText: "Cancel",
   }).then((isConfirmed) => {
-    if (isConfirmed) {
+    if (isConfirmed.value) {
       // create ajax request here to HomeController.php to delete the mail from db
       $.ajax({
         method: "POST",
@@ -104,10 +103,10 @@ function deleteMail(rowIndex) {
         },
         cache: false,
         dataType: "json",
-        success: function (result) {         
+        success: function (result) {
           switch (result.Status) {
             case "0":
-              swal(result.ShortReason, result.Reason, result.Level).then(
+              Swal.fire(result.ShortReason, result.Reason, result.Level).then(
                 (value) => {
                   // if success, delete from ui
                   document.getElementById("mailTable").deleteRow(rowIndex);
@@ -115,18 +114,12 @@ function deleteMail(rowIndex) {
               );
               break;
             case "-1":
-              swal(
-                result.ShortReason,
-                result.Reason,
-                result.Level
-              ).then((value) => {
-
-              });
+              Swal.fire(result.ShortReason, result.Reason, result.Level);
               break;
           }
         },
         error: function (e) {
-          swal(
+          Swal.fire(
             "Request Exception!",
             "Exception occured during AJAX Request. Check console for more info.",
             "error"
@@ -169,7 +162,7 @@ function trashMail(rowIndex) {
     success: function (result) {
       switch (result.Status) {
         case "0":
-          swal(result.ShortReason, result.Reason, result.Level).then(
+          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
               // if success, delete from ui
               document.getElementById("mailTable").deleteRow(rowIndex);
@@ -178,7 +171,7 @@ function trashMail(rowIndex) {
           );
           break;
         case "-1":
-          swal(
+          Swal.fire(
             result.ShortReason,
             result.Reason,
             result.Level
@@ -187,7 +180,7 @@ function trashMail(rowIndex) {
       }
     },
     error: function (e) {
-      swal(
+      Swal.fire(
         "Request Exception!",
         "Exception occured during AJAX Request. Check console for more info.",
         "error"
@@ -211,7 +204,7 @@ function getInboxMails() {
     success: function (result) {
       switch (result.Status) {
         case "-1":
-          swal(result.ShortReason, result.Reason, result.Level).then(
+          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
               //document.location = "../Views/HomeView.php?previousError=true";
               return;
@@ -222,14 +215,12 @@ function getInboxMails() {
           // inbox fetch done
           if (result.Emails == null || result.Emails.length <= 0) {
             setTimeout(function () {
-              swal(
-                "All caught up!",
-                "No new mails found in current mail folder.",
-                {
-                  buttons: false,
-                  timer: 3000,
-                }
-              );
+              Swal.fire({
+                title: "All caught up!",
+                text: "No new mails found in current mail folder.",
+                timer: 3000,
+                timerProgressBar: true,
+              });
             }, 100);
 
             return;
@@ -237,14 +228,27 @@ function getInboxMails() {
 
           for (var i = 0; i < result.Emails.length; i++) {
             var mail = result.Emails[i];
-            var rowHtml = '<td class="table-row-field">' + (i + 1) + '</td>' + 
-                          '<td class="table-row-field" id="mailUuid">' + mail.MailID + '</td>' +
-                          '<td class="table-row-field">' + mail.From + '</td>' +
-                          '<td class="table-row-field">' + (mail.Subject.length > 18 ? mail.Subject.substring(0, 18-3) + "..." : mail.Subject) +  '</td>' +
-                          '<td class="table-row-field">' + mail.At + '</td>' +
-                          '<td class="table-row-field">' +
-                              '<a class="deletebttn" id="trash-inbox" onclick="onDeleteAnchorClicked(this);">Trash</a>' +
-                          '</td>';
+            var rowHtml =
+              '<td class="table-row-field">' +
+              (i + 1) +
+              "</td>" +
+              '<td class="table-row-field" id="mailUuid">' +
+              mail.MailID +
+              "</td>" +
+              '<td class="table-row-field">' +
+              mail.From +
+              "</td>" +
+              '<td class="table-row-field">' +
+              (mail.Subject.length > 18
+                ? mail.Subject.substring(0, 18 - 3) + "..."
+                : mail.Subject) +
+              "</td>" +
+              '<td class="table-row-field">' +
+              mail.At +
+              "</td>" +
+              '<td class="table-row-field">' +
+              '<a class="deletebttn" id="trash-inbox" onclick="onDeleteAnchorClicked(this);">Trash</a>' +
+              "</td>";
             addRow(rowHtml, "mailTable");
           }
 
@@ -256,7 +260,7 @@ function getInboxMails() {
       }
     },
     error: function (e) {
-      swal(
+      Swal.fire(
         "Request Exception!",
         "Exception occured during AJAX Request. Check console for more info.",
         "error"
@@ -280,7 +284,7 @@ function getDraftMails() {
     success: function (result) {
       switch (result.Status) {
         case "-1":
-          swal(result.ShortReason, result.Reason, result.Level).then(
+          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
               //document.location = "../Views/HomeView.php?previousError=true";
               return;
@@ -291,14 +295,12 @@ function getDraftMails() {
           // draft fetch done
           if (result.Emails == null || result.Emails.length <= 0) {
             setTimeout(function () {
-              swal(
-                "All caught up!",
-                "No new mails found in current mail folder.",
-                {
-                  buttons: false,
-                  timer: 3000,
-                }
-              );
+              Swal.fire({
+                title: "All caught up!",
+                text: "No new mails found in current mail folder.",
+                timer: 3000,
+                timerProgressBar: true,
+              });
             }, 100);
 
             return;
@@ -318,7 +320,9 @@ function getDraftMails() {
               mail.From +
               "</td>" +
               '<td class="table-row-field">' +
-              mail.Subject +
+              (mail.Subject.length > 18
+                ? mail.Subject.substring(0, 18 - 3) + "..."
+                : mail.Subject) +
               "</td>" +
               '<td class="table-row-field">' +
               mail.At +
@@ -337,7 +341,7 @@ function getDraftMails() {
       }
     },
     error: function (e) {
-      swal(
+      Swal.fire(
         "Request Exception!",
         "Exception occured during AJAX Request. Check console for more info.",
         "error"
@@ -361,7 +365,7 @@ function getTrashMails() {
     success: function (result) {
       switch (result.Status) {
         case "-1":
-          swal(result.ShortReason, result.Reason, result.Level).then(
+          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
               //document.location = "../Views/HomeView.php?previousError=true";
               return;
@@ -372,14 +376,12 @@ function getTrashMails() {
           // trash fetch done
           if (result.Emails == null || result.Emails.length <= 0) {
             setTimeout(function () {
-              swal(
-                "All caught up!",
-                "No new mails found in current mail folder.",
-                {
-                  buttons: false,
-                  timer: 3000,
-                }
-              );
+              Swal.fire({
+                title: "All caught up!",
+                text: "No new mails found in current mail folder.",
+                timer: 3000,
+                timerProgressBar: true,
+              });
             }, 100);
 
             return;
@@ -399,13 +401,15 @@ function getTrashMails() {
               mail.From +
               "</td>" +
               '<td class="table-row-field">' +
-              mail.Subject +
+              (mail.Subject.length > 18
+                ? mail.Subject.substring(0, 18 - 3) + "..."
+                : mail.Subject) +
               "</td>" +
               '<td class="table-row-field">' +
               mail.At +
               "</td>" +
               '<td class="table-row-field">' +
-              '<a class="deletebttn" id="del-trash" onclick="onDeleteAnchorClicked(this);">Delete</a>' +
+              '<a class="deletebttn" id="trash-options" onclick="onDeleteAnchorClicked(this);">Option</a>' +
               "</td>";
             addRow(rowHtml, "mailTable");
           }
@@ -418,7 +422,7 @@ function getTrashMails() {
       }
     },
     error: function (e) {
-      swal(
+      Swal.fire(
         "Request Exception!",
         "Exception occured during AJAX Request. Check console for more info.",
         "error"
@@ -449,7 +453,26 @@ function addRow(rowHtml, tableId) {
   newRow.innerHTML = rowHtml;
 }
 
+function allowSingleSelectedRow(tableId) {
+  var inboxTableRows = document
+    .getElementById(tableId)
+    .getElementsByTagName("tbody")[0].rows;
+
+  for (var i = 0; i < inboxTableRows.length; i++) {
+    if (inboxTableRows[i].hasAttribute("class")) {
+      inboxTableRows[i].removeAttribute("class");
+    }
+  }
+}
+
 function onRowClicked(row) {
+  if (row.hasAttribute("class")) {
+    row.removeAttribute("class");
+    return;
+  }
+
+  allowSingleSelectedRow("mailTable");
+
   row.setAttribute("class", "active-row");
   var index = row.rowIndex;
   console.log("Selected row: " + index);
@@ -458,19 +481,82 @@ function onRowClicked(row) {
   // includes: Reply, delete, view attachments
 }
 
+function trashOptions(index) {
+  Swal.fire({
+    text: "You can either Delete mail permanently or restore it.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Delete",
+    cancelButtonText: "Restore",
+    showCloseButton: true,
+  }).then((result) => {
+    if (!result.isDismissed) {
+      if (result.isConfirmed) {
+        // delete true
+        deleteMail(index);
+        return;
+      }
+    }
+
+    if (result.isDismissed && result.dismiss == "cancel") {
+      // restore true
+      restoreMail(index);
+    }
+  });
+}
+
+function restoreMail(index) {
+  // mail uuid
+  var uuid = getUuidOfSelectedRow(index);
+
+  if (uuid == null) {
+    console.log("uuid can't be null.");
+    return;
+  }
+
+  $.ajax({
+    method: "POST",
+    url: "../Controllers/HomeController.php",
+    data: {
+      requestType: "restore_trash_mail",
+      emailUuid: uuid,
+    },
+    cache: false,
+    dataType: "json",
+    success: function (result) {
+      switch (result.Status) {
+        case "0":
+          Swal.fire(result.ShortReason, result.Reason, result.Level);
+          break;
+        case "-1":
+          Swal.fire(result.ShortReason, result.Reason, result.Level);
+          break;
+      }
+    },
+    error: function (e) {
+      Swal.fire(
+        "Request Exception!",
+        "Exception occured during AJAX Request. Check console for more info.",
+        "error"
+      );
+      console.log(e);
+    },
+  });
+}
+
 // click event for each delete option click on row
 function onDeleteAnchorClicked(anchor) {
+  var index = anchor.parentNode.parentNode.rowIndex;
   switch (anchor.id) {
-    case "del-trash":
-      var index = anchor.parentNode.parentNode.rowIndex;
-      deleteMail(index);
+    case "trash-options":
+      trashOptions(index);
       break;
     case "trash-draft":
-      var index = anchor.parentNode.parentNode.rowIndex;
       trashMail(index);
       break;
     case "trash-inbox":
-      var index = anchor.parentNode.parentNode.rowIndex;
       trashMail(index);
       break;
   }

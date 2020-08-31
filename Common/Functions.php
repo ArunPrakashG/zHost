@@ -15,11 +15,13 @@ class Functions
 
     public static function SAlert($title, $message, $level = "warning")
     {
-        echo '<script src="../includes/js/sweetalert.min.js"></script>';
-		echo '<script type="text/javascript">';
-		echo 'swal("'. $title . '", "' . $message . '", "' . $level . '");';
-		echo '</script>';
+        echo '<script src="../includes/js/sweetalert2.min.js">';
+        echo "Swal.fire({
+            icon: '$level',
+            title: '$title',
+            text: '$message'
+        });";
+        echo '</script>';
     }
 }
-
 ?>
