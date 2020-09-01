@@ -197,7 +197,7 @@ function onForgotPasswordClicked() {
                                         title: "Redirecting you to login page!",
                                         html:
                                           "redirecting in <b></b> milliseconds.",
-                                        timer: 3000,
+                                        timer: 1500,
                                         timerProgressBar: true,
                                         allowOutsideClick: false,
                                         onBeforeOpen: () => {
@@ -231,8 +231,122 @@ function onForgotPasswordClicked() {
                   });
                   break;
                 case "pNumber":
-                  // TODO
+                  Swal.fire({
+                    title: "Phone Number",
+                    text: "Enter your phone number registered with the account",
+                    input: "tel",
+                    inputAttributes: {
+                      autocapitalize: "off",
+                      maxLength: 10
+                    },
+                    inputPlaceholder: "Phone Number",
+                    showCancelButton: true,
+                    confirmButtonText: "Continue",
+                  }).then((phoneNumberResult) => {
+                    if (phoneNumberResult.isDismissed) {
+                      return;
+                    }
 
+                    if (
+                      phoneNumberResult.value.replace(" ", "") ==
+                      reqResult.SecData.PhoneNumber.replace(" ", "")
+                    ) {
+                      Swal.mixin({
+                        confirmButtonText: "Continue",
+                        showCancelButton: false,
+                        allowOutsideClick: false,
+                        progressSteps: ["1", "2"],
+                      })
+                        .queue([
+                          {
+                            title: "New Password",
+                            text:
+                              "Enter your new password (will be used for future logins)",
+                            input: "password",
+                          },
+                          {
+                            title: "Confirm Password",
+                            text: "Re enter your password to confirm",
+                            input: "password",
+                          },
+                        ])
+                        .then((result) => {
+                          if (result.value) {
+                            if (result.value[0] != result.value[1]) {
+                              Swal.fire(
+                                "Password's do not match.",
+                                "Entered passwords do not match.",
+                                "error"
+                              );
+                              return;
+                            }
+
+                            $.ajax({
+                              method: "POST",
+                              url: "../Controllers/UserController.php",
+                              data: {
+                                requestType: "recovery_set_password",
+                                email: emailResult.value,
+                                new_pass: result.value[0],
+                              },
+
+                              dataType: "json",
+                              success: function (result) {
+                                switch (result.Status) {
+                                  case "-1":
+                                    Swal.fire(
+                                      result.ShortReason,
+                                      result.Reason,
+                                      result.Level
+                                    ).then((value) => {
+                                      document.location =
+                                        "../Views/LoginView.php";
+                                    });
+                                    return;
+                                  case "0":
+                                    // success
+                                    Swal.fire(
+                                      result.ShortReason,
+                                      result.Reason,
+                                      result.Level
+                                    ).then((value) => {
+                                      let timerInterval;
+                                      Swal.fire({
+                                        title: "Redirecting you to login page!",
+                                        html:
+                                          "redirecting in <b></b> milliseconds.",
+                                        timer: 1500,
+                                        timerProgressBar: true,
+                                        allowOutsideClick: false,
+                                        onBeforeOpen: () => {
+                                          Swal.showLoading();
+                                          timerInterval = setInterval(() => {
+                                            const content = Swal.getContent();
+                                            if (content) {
+                                              const b = content.querySelector(
+                                                "b"
+                                              );
+                                              if (b) {
+                                                b.textContent = Swal.getTimerLeft();
+                                              }
+                                            }
+                                          }, 100);
+                                        },
+                                        onClose: () => {
+                                          clearInterval(timerInterval);
+                                          document.location =
+                                            "../Views/LoginView.php";
+                                        },
+                                      });
+                                    });
+                                    break;
+                                }
+                              },
+                            });
+                          }
+                        });
+                    }
+                  });
                   break;
                 default:
                   return;
