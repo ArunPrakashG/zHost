@@ -237,7 +237,7 @@ function onForgotPasswordClicked() {
                     input: "tel",
                     inputAttributes: {
                       autocapitalize: "off",
-                      maxLength: 10
+                      maxLength: 10,
                     },
                     inputPlaceholder: "Phone Number",
                     showCancelButton: true,

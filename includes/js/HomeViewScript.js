@@ -140,7 +140,7 @@ function getUuidOfSelectedRow(rowIndex) {
   }
 }
 
-function trashMail(rowIndex) {
+function trashMail(rowIndex, isDraft) {
   // mail uuid
   var uuid = getUuidOfSelectedRow(rowIndex);
 
@@ -156,6 +156,7 @@ function trashMail(rowIndex) {
     data: {
       requestType: "trash_mail",
       emailUuid: uuid,
+      isDraft: isDraft
     },
     cache: false,
     dataType: "json",
@@ -351,6 +352,10 @@ function getDraftMails() {
   });
 }
 
+function isDraftMail(index){
+
+}
+
 function getTrashMails() {
   $("#mailTable tbody tr").remove();
 
@@ -439,10 +444,130 @@ function onSettingsButtonClicked() {
 }
 
 function onComposeButtonClicked() {
-  console.log("compose bttn clicked");
+  Swal.fire({
+    title: "<strong>COMPOSE MAIL</strong>",
+    html:
+      '<input id="mail-to" class="swal2-input" placeholder="To" required>' +
+      '<input id="mail-subject" class="swal2-input" placeholder="Subject" required>' +
+      '<textarea id="mail-body" class="swal2-textarea" type="textarea" placeholder="Enter your message..." required></textarea>' +
+      '<input id="mail-attachment" class="swal2-file" type="file" name="attachment" placeholder="Attachment">' +
+      '<input id="mail-option1" class="swal2-radio" type="radio" name="sendoption" value="instant" checked>' +
+      '<label for="mail-option1" class="swal2-radio">Instant Send</label>' +
+      "&nbsp; &nbsp; &nbsp;" +
+      '<input id="mail-option2" class="swal2-radio" type="radio" name="sendoption" value="draft">' +
+      '<label for="mail-option2" class="swal2-radio">Save Draft</label>',
+    showCancelButton: true,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showCloseButton: false,
+    confirmButtonText: "Send",
+    confirmButtonAriaLabel: "Send",
+    cancelButtonText: "Cancel",
+    cancelButtonAriaLabel: "Cancel",
+    preConfirm: () => {
+      return [
+        document.getElementById("mail-to").value,
+        document.getElementById("mail-subject").value,
+        document.getElementById("mail-body").value,
+        document.getElementById("mail-attachment").value,
+        document.getElementById("mail-option1").checked ? "instant" : "draft",
+      ];
+    },
+  }).then((formValues) => {
+    if (!formValues.isConfirmed) {
+      // TODO: Save current data as a draft mail
+      // Validate fields, if To and Subject fields are set, save as draft, else return
+      return;
+    }
+    
+    if (isBlank(formValues.value[0])) {
+      Swal.fire(
+        "Invalid Details!",
+        "You must specify a valid 'To' value.",
+        "warning"
+      );
+      return;
+    }
+
+    if (isBlank(formValues.value[1])) {
+      Swal.fire(
+        "Invalid Details!",
+        "You must specify a valid 'Subject' value.",
+        "warning"
+      );
+      return;
+    }
+
+    if (isBlank(formValues.value[2])) {
+      Swal.fire(
+        "Invalid Details!",
+        "You must specify a valid 'Body' value.",
+        "warning"
+      );
+      return;
+    }
+
+    var formData = new FormData();
+    var mailObject = {
+      To: formValues.value[0],
+      IsDraft: formValues.value[4] == "draft" ? 1 : 0,
+      IsTrash: 0,
+      Subject: formValues.value[1],
+      Body: formValues.value[2],
+      HasAttachment: isBlank(formValues.value[3]) ? false : true,
+    };
+
+    if(!isBlank(formValues.value[3])){
+      formData.append("file", $("#mail-attachment")[0].files[0]);
+    }
+
+    formData.append("requestType", "compose");
+    formData.append("mailObject", JSON.stringify(mailObject));
+
+    $.ajax({
+      url: "../Controllers/HomeController.php",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (result) {
+        result = JSON.parse(result);
+        switch (result.Status) {
+          case "0":
+            Swal.fire(
+              result.ShortReason,
+              result.Reason,
+              result.Level
+            ).then((value) => {
+              document.location="../Views/HomeView.php";
+            });
+            break;
+          case "-1":
+            Swal.fire(
+              result.ShortReason,
+              result.Reason,
+              result.Level
+            ).then((value) => {
+              document.location="../Views/HomeView.php";
+            });
+            break;
+        }
+      },
+      error: function (e) {
+        Swal.fire(
+          "Request Exception!",
+          "Exception occured during AJAX Request. Check console for more info.",
+          "error"
+        );
+        console.log(e);
+      },
+    });
+  });
 }
 
-function composeMail() {}
+function isBlank(str) {
+  return !str || /^\s*$/.test(str);
+}
 
 function addRow(rowHtml, tableId) {
   var inboxTable = document
@@ -479,6 +604,24 @@ function onRowClicked(row) {
 
   // TODO: Display email ui
   // includes: Reply, delete, view attachments
+}
+
+function displayEmailUi(selectedIndex) {
+  Swal.fire({
+    title: "<strong>HTML <u>example</u></strong>",
+    icon: "info",
+    html:
+      "You can use <b>bold text</b>, " +
+      '<a href="//sweetalert2.github.io">links</a> ' +
+      "and other HTML tags",
+    showCloseButton: true,
+    showCancelButton: true,
+    focusConfirm: false,
+    confirmButtonText: '<i class="fa fa-thumbs-up"></i> Great!',
+    confirmButtonAriaLabel: "Thumbs up, great!",
+    cancelButtonText: '<i class="fa fa-thumbs-down"></i>',
+    cancelButtonAriaLabel: "Thumbs down",
+  });
 }
 
 function trashOptions(index) {
@@ -554,10 +697,10 @@ function onDeleteAnchorClicked(anchor) {
       trashOptions(index);
       break;
     case "trash-draft":
-      trashMail(index);
+      trashMail(index, true);
       break;
     case "trash-inbox":
-      trashMail(index);
+      trashMail(index, false);
       break;
   }
 }

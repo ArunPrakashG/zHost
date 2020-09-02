@@ -35,7 +35,6 @@ class Database
     {
         $this->Connection = mysqli_connect(Config::HOST, Config::DB_USER_NAME, Config::DB_USER_PASSWORD) or exit("Failed to connect with database");
         mysqli_select_db($this->Connection, Config::DB_NAME);
-        error_log("Connected with database!");
     }
 
     public function ExecuteQuery($query)
@@ -134,13 +133,13 @@ class Database
         return false;
     }
 
-    public function DoesMailWithUuidExist($userEmail, $uuid)
+    public function DoesMailWithUuidExist($userEmail, $uuid, $isDraft = false)
     {
         if (!isset($uuid) || !isset($userEmail)) {
             return false;
         }
 
-        $sqlQuery = $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND MailID='$uuid';";
+        $sqlQuery = $sqlQuery = "SELECT * FROM emails WHERE " . ($isDraft ? "ReceivedFrom" : "SendTo") ."='$userEmail' AND MailID='$uuid';";
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $rowCount = mysqli_num_rows($exeResult);
             mysqli_free_result($exeResult);
@@ -178,21 +177,22 @@ class Database
         return $this->ExecuteQuery($sqlQuery);
     }
 
-    public function TrashUserMailWithUuid($userEmail, $uuid)
+    public function TrashUserMailWithUuid($userEmail, $uuid, $isDraft)
     {
         if (!isset($uuid) || !isset($userEmail)) {
             return false;
         }
 
-        if (!$this->DoesMailWithUuidExist($userEmail, $uuid)) {
+        if (!$this->DoesMailWithUuidExist($userEmail, $uuid, $isDraft)) {
+            error_log("mail doesnt exist");
             return false;
         }
 
-        $sqlQuery = "UPDATE emails SET IsTrash=1 WHERE SendTo='$userEmail' AND MailID='$uuid';";
+        $sqlQuery = "UPDATE emails SET IsTrash=1 WHERE " . ($isDraft ? "ReceivedFrom" : "SendTo") ."='$userEmail' AND MailID='$uuid';";
         return $this->ExecuteQuery($sqlQuery);
     }
 
-    public function RestoreTrashUserMailWithUuid($userEmail, $uuid)
+    public function RestoreTrashUserMailWithUuid($userEmail, $uuid, $isDraft)
     {
         if (!isset($uuid) || !isset($userEmail)) {
             return false;
@@ -202,7 +202,7 @@ class Database
             return false;
         }
 
-        $sqlQuery = "UPDATE emails SET IsTrash=0 WHERE SendTo='$userEmail' AND MailID='$uuid';";
+        $sqlQuery = "UPDATE emails SET IsTrash=0 WHERE " . ($isDraft ? "ReceivedFrom" : "SendTo") ."='$userEmail' AND MailID='$uuid';";
         return $this->ExecuteQuery($sqlQuery);
     }
 
@@ -333,7 +333,6 @@ class Database
             ReceivedFrom,
             IsDraft,
             IsTrash,
-            Title,
             SUBJECT,
             Body,
             AttachmentPath
@@ -344,11 +343,11 @@ class Database
             $mailObj['From'] . "'," .
             $mailObj['IsDraft'] . "," .
             $mailObj['IsTrash'] . ",'" .
-            $mailObj['Title'] . "','" .
             $mailObj['Subject'] . "','" .
             $mailObj['Body'] . "','" .
             $mailObj['AttachmentFilePath'] . "');";
 
+        error_log($sqlQuery);
         return $this->ExecuteQuery($sqlQuery);
     }
 
@@ -387,7 +386,7 @@ class Database
         $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail';";
 
         if ($onlyDraft) {
-            $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND IsDraft=1;";
+            $sqlQuery = "SELECT * FROM emails WHERE ReceivedFrom='$userEmail' AND IsDraft=1;";
         }
 
         if ($onlyTrash) {

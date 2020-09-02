@@ -24,14 +24,13 @@ function generateUser($userName, $email)
 
 // generate emails
 // Inbox
-function generateMail($to, $from, $isDraft, $isTrash, $title, $subject, $body)
+function generateMail($to, $from, $isDraft, $isTrash, $subject, $body)
 {
     return array(
         'To' => $to,
         'From' => $from,
         'IsDraft' => $isDraft ? 1 : 0,
         'IsTrash' => $isTrash ? 1 : 0,
-        'Title' => $title,
         'Subject' => $subject,
         'Body' => $body,
         'AttachmentFilePath' => "../includes/images/Attachments/default-attachment.jpg"
@@ -109,14 +108,14 @@ $Db->RegisterUser(generateUser("Praveen Geevarghese", "praveen@zhost.com"), $def
 $Db->RegisterUser(generateUser("Prabhat Esha", "prabhat@zhost.com"), $defaultAvatarPath, false, true);
 $Db->RegisterUser(generateUser("Jay Vipin", "jay@zhost.com"), $defaultAvatarPath, false, true);
 
-$mailObj1 = generateMail("arun@zhost.com", "gotam@zhost.com", false, false, "Project Abstract #1", "Abstract submittion date", "Hey arun, You have to submit your project before 10th this month.");
-$mailObj2 = generateMail("arun@zhost.com", "Bhaskar@zhost.com", false, false, "Project Abstract #2", "Abstract submittion date", "Hey arun, You have to submit your project before 10th this month.");
-$mailObj3 = generateMail("arun@zhost.com", "prabhat@zhost.com", false, false, "Project Abstract #3", "Abstract submittion date", "Hey arun, You have to submit your project before 10th this month.");
-$mailObj4 = generateMail("jobin@zhost.com", "praveen@zhost.com", false, false, "Project Abstract #4", "Abstract submittion date", "Hey jobin, You have to submit your project before 10th this month.");
-$mailObj5 = generateMail("shijo@zhost.com", "praveen@zhost.com", false, false, "Project Abstract #5", "Abstract submittion date", "Hey shijo, You have to submit your project before 10th this month.");
-$mailObj6 = generateMail("jobin@zhost.com", "jay@zhost.com", false, false, "Project Abstract #6", "Abstract submittion date", "Hey jobin, You have to submit your project before 10th this month.");
-$mailObj7 = generateMail("shijo@zhost.com", "prabhat@zhost.com", false, false, "Project Abstract #7", "Abstract submittion date", "Hey shijo, You have to submit your project before 10th this month.");
-$mailObj8 = generateMail("arun@zhost.com", "jay@zhost.com", false, false, "Project Abstract #8", "Abstract submittion date", "Hey arun, You have to submit your project before 10th this month.");
+$mailObj1 = generateMail("arun@zhost.com", "gotam@zhost.com", false, false, "Abstract submittion date", "Hey arun, You have to submit your project before 10th this month.");
+$mailObj2 = generateMail("arun@zhost.com", "Bhaskar@zhost.com", false, false, "Abstract submittion date", "Hey arun, You have to submit your project before 10th this month.");
+$mailObj3 = generateMail("arun@zhost.com", "prabhat@zhost.com", false, false, "Abstract submittion date", "Hey arun, You have to submit your project before 10th this month.");
+$mailObj4 = generateMail("jobin@zhost.com", "praveen@zhost.com", false, false, "Abstract submittion date", "Hey jobin, You have to submit your project before 10th this month.");
+$mailObj5 = generateMail("shijo@zhost.com", "praveen@zhost.com", false, false, "Abstract submittion date", "Hey shijo, You have to submit your project before 10th this month.");
+$mailObj6 = generateMail("jobin@zhost.com", "jay@zhost.com", false, false, "Abstract submittion date", "Hey jobin, You have to submit your project before 10th this month.");
+$mailObj7 = generateMail("shijo@zhost.com", "prabhat@zhost.com", false, false, "Abstract submittion date", "Hey shijo, You have to submit your project before 10th this month.");
+$mailObj8 = generateMail("arun@zhost.com", "jay@zhost.com", false, false, "Abstract submittion date", "Hey arun, You have to submit your project before 10th this month.");
 
 $Db->ComposeEmail($mailObj1);
 $Db->ComposeEmail($mailObj2);

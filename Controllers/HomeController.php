@@ -108,7 +108,7 @@ function OnTrashMailRequestReceived()
     }
 
     $Db = new Database;
-    if($Db->TrashUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
+    if($Db->TrashUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'], $_POST['isDraft'])){
         SetResult("Success!", "Mail trashed.", "0", "success");
         return;
     }
@@ -137,25 +137,26 @@ function OnDraftMailRequestReceived()
     SetResult("Failed!", "Failed to draft email.", "-1", "error");
 }
 
-function OnComposeRequestReceived()
-{
+function OnComposeRequestReceived(){
     if (!isset($_POST['mailObject'])) {
         SetResult("Mail object is empty.", "Incompleted request: 'mailObject'", "-1", "error");
         return;
     }
 
+    $_POST['mailObject'] = (array) json_decode($_POST['mailObject']);
+
     if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
-        SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
+        SetResult("You are not logged in!", "Please login again in order to execute this request.", "-1", "warning");
         return;
     }
 
     $attachmentFilePath = "";
     if (isset($_POST['mailObject']) && $_POST['mailObject']['HasAttachment']) {
-        $serverAssignedPath = GetAndProcessFile('attachment');        
-        if (isset($_FILES) && isset($_FILES['attachment'])) {
+        $serverAssignedPath = GetAndProcessFile('file');        
+        if (isset($_FILES) && isset($_FILES['file'])) {
             if (isset($serverAssignedPath) && !empty($serverAssignedPath)) {
                 $moveResult = move_uploaded_file(
-                    $_FILES['attachment']['tmp_name'],
+                    $_FILES['file']['tmp_name'],
                     $serverAssignedPath
                 );
 
@@ -167,13 +168,23 @@ function OnComposeRequestReceived()
     $_POST['mailObject']['AttachmentFilePath'] = $attachmentFilePath;
     $_POST['mailObject']['From'] = GetCurrentUserEmail();
 
-    $Db = new Database;
-    if($Db->ComposeEmail($_POST['mailObject'])){
-        SetResult("Success!", "Mail composed.", "0", "success");
+    if($_POST['mailObject']['To'] == $_POST['mailObject']['From']){
+        SetResult("Failed!", "You cannot send mail to yourself.", "-1", "error");
         return;
     }
 
-    SetResult("Failed!", "Failed to compose.", "-1", "error");
+    $Db = new Database;
+    if(!$Db->IsExistingUser($_POST['mailObject']['To'])){
+        SetResult("Failed!", "Entered email is invalid or such a user doesn't exist.", "-1", "error");
+        return;
+    }
+
+    if($Db->ComposeEmail($_POST['mailObject'])){
+        SetResult("Mail Composed!", $_POST['mailObject']['IsDraft'] == '1' ? "You can view this email in the 'Draft' Tab!" : "You can view this mail in the 'Send' Tab!", "0", "success");
+        return;
+    }
+
+    SetResult("Failed!", "Failed to compose mail.", "-1", "error");
 }
 
 function OnInboxRequestReceived()
@@ -237,7 +248,7 @@ function OnTrashMailRestoreRequestReceived(){
     }
 
     $Db = new Database;
-    if($Db->RestoreTrashUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
+    if($Db->RestoreTrashUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'], )){
         SetResult("Success!", "Mail Restored.", "0", "success");
         return;
     }
