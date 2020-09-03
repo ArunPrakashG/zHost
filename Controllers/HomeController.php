@@ -38,7 +38,7 @@ function SetResult($message, $reason, $status, $level, $emailArray = null)
 }
 
 function OnDraftViewRequestReceived()
-{    
+{
     if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
         SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
         return;
@@ -48,7 +48,7 @@ function OnDraftViewRequestReceived()
     $response = $Db->GetUserDraftEmails(GetCurrentUserEmail());
 
     if ($response['Status'] == '-1') {
-        if($response['Count'] == 0){
+        if ($response['Count'] == 0) {
             SetResult("No mails found!", "You have no new mails.", "0", "success");
             return;
         }
@@ -77,7 +77,7 @@ function OnTrashViewRequestReceived()
     $response = $Db->GetUserTrashEmails(GetCurrentUserEmail());
 
     if ($response['Status'] == '-1') {
-        if($response['Count'] == 0){
+        if ($response['Count'] == 0) {
             SetResult("No mails found!", "You have no new mails.", "0", "success");
             return;
         }
@@ -95,99 +95,7 @@ function OnTrashViewRequestReceived()
     SetResult("You have pending trash emails!", "", "0", "success", $response['Emails']);
 }
 
-function OnTrashMailRequestReceived()
-{
-    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
-        SetResult("You are not logged in!", "Please login again in order delete emails.", "-1", "warning");
-        return;
-    }
-
-    if(!isset($_POST['emailUuid'])){
-        SetResult("UUID isn't set!", "Please specify the mail UUID.", "-1", "error");
-        return;
-    }
-
-    $Db = new Database;
-    if($Db->TrashUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'], $_POST['isDraft'])){
-        SetResult("Success!", "Mail trashed.", "0", "success");
-        return;
-    }
-
-    SetResult("Failed!", "Failed to trash email.", "-1", "error");
-}
-
-function OnDraftMailRequestReceived()
-{
-    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
-        SetResult("You are not logged in!", "Please login again in order to draft emails.", "-1", "warning");
-        return;
-    }
-
-    if(!isset($_POST['emailUuid'])){
-        SetResult("UUID isn't set!", "Please specify the mail UUID.", "-1", "error");
-        return;
-    }
-
-    $Db = new Database;
-    if($Db->DraftUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
-        SetResult("Success!", "Mail drafted.", "0", "success");
-        return;
-    }
-
-    SetResult("Failed!", "Failed to draft email.", "-1", "error");
-}
-
-function OnComposeRequestReceived(){
-    if (!isset($_POST['mailObject'])) {
-        SetResult("Mail object is empty.", "Incompleted request: 'mailObject'", "-1", "error");
-        return;
-    }
-
-    $_POST['mailObject'] = (array) json_decode($_POST['mailObject']);
-
-    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
-        SetResult("You are not logged in!", "Please login again in order to execute this request.", "-1", "warning");
-        return;
-    }
-
-    $attachmentFilePath = "";
-    if (isset($_POST['mailObject']) && $_POST['mailObject']['HasAttachment']) {
-        $serverAssignedPath = GetAndProcessFile('file');        
-        if (isset($_FILES) && isset($_FILES['file'])) {
-            if (isset($serverAssignedPath) && !empty($serverAssignedPath)) {
-                $moveResult = move_uploaded_file(
-                    $_FILES['file']['tmp_name'],
-                    $serverAssignedPath
-                );
-
-                $attachmentFilePath = $moveResult ? $serverAssignedPath : "";
-            }
-        }
-    }
-
-    $_POST['mailObject']['AttachmentFilePath'] = $attachmentFilePath;
-    $_POST['mailObject']['From'] = GetCurrentUserEmail();
-
-    if($_POST['mailObject']['To'] == $_POST['mailObject']['From']){
-        SetResult("Failed!", "You cannot send mail to yourself.", "-1", "error");
-        return;
-    }
-
-    $Db = new Database;
-    if(!$Db->IsExistingUser($_POST['mailObject']['To'])){
-        SetResult("Failed!", "Entered email is invalid or such a user doesn't exist.", "-1", "error");
-        return;
-    }
-
-    if($Db->ComposeEmail($_POST['mailObject'])){
-        SetResult("Mail Composed!", $_POST['mailObject']['IsDraft'] == '1' ? "You can view this email in the 'Draft' Tab!" : "You can view this mail in the 'Send' Tab!", "0", "success");
-        return;
-    }
-
-    SetResult("Failed!", "Failed to compose mail.", "-1", "error");
-}
-
-function OnInboxRequestReceived()
+function OnInboxViewRequestReceived()
 {
     if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
         SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
@@ -198,7 +106,7 @@ function OnInboxRequestReceived()
     $response = $Db->GetUserInboxEmails(GetCurrentUserEmail());
 
     if ($response['Status'] == '-1') {
-        if($response['Count'] == 0){
+        if ($response['Count'] == 0) {
             SetResult("No mails found!", "You have no new mails.", "0", "success");
             return;
         }
@@ -216,19 +124,113 @@ function OnInboxRequestReceived()
     SetResult("You have pending Mails!", "", "0", "success", $response['Emails']);
 }
 
-function OnTrashMailDeleteRequestReceived(){
+function OnTrashMailRequestReceived()
+{
     if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
         SetResult("You are not logged in!", "Please login again in order delete emails.", "-1", "warning");
         return;
     }
 
-    if(!isset($_POST['emailUuid'])){
+    if (!isset($_POST['emailUuid'])) {
         SetResult("UUID isn't set!", "Please specify the mail UUID.", "-1", "error");
         return;
     }
 
     $Db = new Database;
-    if($Db->DeleteUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'])){
+    if ($Db->TrashMailWithUuid($_POST['emailUuid'])) {
+        SetResult("Success!", "Mail trashed.", "0", "success");
+        return;
+    }
+
+    SetResult("Failed!", "Failed to trash email.", "-1", "error");
+}
+
+function OnDraftMailRequestReceived()
+{
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
+        SetResult("You are not logged in!", "Please login again in order to draft emails.", "-1", "warning");
+        return;
+    }
+
+    if (!isset($_POST['emailUuid'])) {
+        SetResult("UUID isn't set!", "Please specify the mail UUID.", "-1", "error");
+        return;
+    }
+
+    $Db = new Database;
+    if ($Db->DraftMailWithUuid($_POST['emailUuid'])) {
+        SetResult("Success!", "Mail drafted.", "0", "success");
+        return;
+    }
+
+    SetResult("Failed!", "Failed to draft email.", "-1", "error");
+}
+
+function OnComposeRequestReceived()
+{
+    if (!isset($_POST['mailObject'])) {
+        SetResult("Mail object is empty.", "Incompleted request: 'mailObject'", "-1", "error");
+        return;
+    }
+
+    $_POST['mailObject'] = (array) json_decode($_POST['mailObject']);
+
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
+        SetResult("You are not logged in!", "Please login again in order to execute this request.", "-1", "warning");
+        return;
+    }
+
+    $attachmentFilePath = "";
+    if (isset($_POST['mailObject']) && $_POST['mailObject']['HasAttachment']) {
+        $serverAssignedPath = GetAndProcessFile('file');
+        if (isset($_FILES) && isset($_FILES['file'])) {
+            if (isset($serverAssignedPath) && !empty($serverAssignedPath)) {
+                $moveResult = move_uploaded_file(
+                    $_FILES['file']['tmp_name'],
+                    $serverAssignedPath
+                );
+
+                $attachmentFilePath = $moveResult ? $serverAssignedPath : "";
+            }
+        }
+    }
+
+    $_POST['mailObject']['AttachmentFilePath'] = $attachmentFilePath;
+    $_POST['mailObject']['From'] = GetCurrentUserEmail();
+
+    if ($_POST['mailObject']['To'] == $_POST['mailObject']['From']) {
+        SetResult("Failed!", "You cannot send mail to yourself.", "-1", "error");
+        return;
+    }
+
+    $Db = new Database;
+    if (!$Db->IsExistingUser($_POST['mailObject']['To'])) {
+        SetResult("Failed!", "Entered email is invalid or such a user doesn't exist.", "-1", "error");
+        return;
+    }
+
+    if ($Db->ComposeEmail($_POST['mailObject'])) {
+        SetResult("Mail Composed!", $_POST['mailObject']['IsDraft'] == '1' ? "You can view this email in the 'Draft' Tab!" : "You can view this mail in the 'Send' Tab!", "0", "success");
+        return;
+    }
+
+    SetResult("Failed!", "Failed to compose mail.", "-1", "error");
+}
+
+function OnTrashMailDeleteRequestReceived()
+{
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
+        SetResult("You are not logged in!", "Please login again in order delete emails.", "-1", "warning");
+        return;
+    }
+
+    if (!isset($_POST['emailUuid'])) {
+        SetResult("UUID isn't set!", "Please specify the mail UUID.", "-1", "error");
+        return;
+    }
+
+    $Db = new Database;
+    if ($Db->DeleteMailWithUuid($_POST['emailUuid'])) {
         SetResult("Success!", "Mail deleted.", "0", "success");
         return;
     }
@@ -236,19 +238,20 @@ function OnTrashMailDeleteRequestReceived(){
     SetResult("Failed!", "Failed to delete email.", "-1", "error");
 }
 
-function OnTrashMailRestoreRequestReceived(){
+function OnTrashMailRestoreRequestReceived()
+{
     if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
         SetResult("You are not logged in!", "Please login again in order delete emails.", "-1", "warning");
         return;
     }
 
-    if(!isset($_POST['emailUuid'])){
+    if (!isset($_POST['emailUuid'])) {
         SetResult("UUID isn't set!", "Please specify the mail UUID.", "-1", "error");
         return;
     }
 
     $Db = new Database;
-    if($Db->RestoreTrashUserMailWithUuid(GetCurrentUserEmail(), $_POST['emailUuid'], )){
+    if ($Db->RestoreTrashUserMailWithUuid($_POST['emailUuid'])) {
         SetResult("Success!", "Mail Restored.", "0", "success");
         return;
     }
@@ -281,6 +284,55 @@ function GetAndProcessFile($requestFileName)
     return "";
 }
 
+function OnDraftMailCheckRequestReceived()
+{
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
+        SetResult("You are not logged in!", "Please login again in order delete emails.", "-1", "warning");
+        return;
+    }
+
+    if (!isset($_POST['emailUuid'])) {
+        SetResult("UUID isn't set!", "Please specify the mail UUID.", "-1", "error");
+        return;
+    }
+
+    $Db =  new Database;
+    if ($Db->IsDraftMail($_POST['emailUuid'])) {
+        SetResult("Success", "Mail is draft.", "0", "success");
+        return;
+    }
+
+    SetResult("Fail!", "Mail isn't draft or request failed.", "-1", "info");
+}
+
+function OnGetMailRequestReceived(){
+    if(!isset($_POST['uuid'])){
+        SetResult("Failed!", "Uuid is invalid.", "-1", "error");
+        return;
+    }
+
+    $Db = new Database;
+    $response = $Db->GetMailWithUuid($_POST['uuid']);
+
+    if ($response['Status'] == '-1') {
+        if ($response['Count'] == 0) {
+            SetResult("No mails found!", "Can't find any mail with this uuid.", "0", "success");
+            return;
+        }
+
+        SetResult("Failed!", $response['Message'], "-1", "error");
+        return;
+    }
+
+    if ($response['Count'] <= 0) {
+        SetResult("Doesn't exist!", "A mail with this uuid doesn't exist!", "0", "success");
+        return;
+    }
+
+    $_SESSION['Trash'] = $response['Emails'];
+    SetResult("Success!", "", "0", "success", $response['Emails']);
+}
+
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
     SetResult("Invalid request type.", "Expected: POST", "-1", "error");
     echo json_encode($Result);
@@ -296,6 +348,9 @@ switch ($_POST['requestType']) {
     case "trash_view":
         OnTrashViewRequestReceived();
         break;
+    case "inbox_view":
+        OnInboxViewRequestReceived();
+        break;
     case "trash_mail":
         OnTrashMailRequestReceived();
         break;
@@ -308,11 +363,14 @@ switch ($_POST['requestType']) {
     case "draft_mail":
         OnDraftMailRequestReceived();
         break;
-    case "inbox":
-        OnInboxRequestReceived();
-        break;
     case "compose":
         OnComposeRequestReceived();
+        break;
+    case "draft_check":
+        OnDraftMailCheckRequestReceived();
+        break;
+    case "get_mail":
+        OnGetMailRequestReceived();
         break;
     default:
         break;

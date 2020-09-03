@@ -140,7 +140,7 @@ function getUuidOfSelectedRow(rowIndex) {
   }
 }
 
-function trashMail(rowIndex, isDraft) {
+function trashMail(rowIndex) {
   // mail uuid
   var uuid = getUuidOfSelectedRow(rowIndex);
 
@@ -156,7 +156,6 @@ function trashMail(rowIndex, isDraft) {
     data: {
       requestType: "trash_mail",
       emailUuid: uuid,
-      isDraft: isDraft
     },
     cache: false,
     dataType: "json",
@@ -198,7 +197,7 @@ function getInboxMails() {
     method: "POST",
     url: "../Controllers/HomeController.php",
     data: {
-      requestType: "inbox",
+      requestType: "inbox_view",
     },
     cache: false,
     dataType: "json",
@@ -329,7 +328,7 @@ function getDraftMails() {
               mail.At +
               "</td>" +
               '<td class="table-row-field">' +
-              '<a class="deletebttn" id="trash-draft" onclick="onDeleteAnchorClicked(this);">Trash</a>' +
+              '<a class="deletebttn" id="delete-draft" onclick="onDeleteAnchorClicked(this);">Delete</a>' +
               "</td>";
             addRow(rowHtml, "mailTable");
           }
@@ -350,10 +349,6 @@ function getDraftMails() {
       console.log(e);
     },
   });
-}
-
-function isDraftMail(index){
-
 }
 
 function getTrashMails() {
@@ -437,12 +432,6 @@ function getTrashMails() {
   });
 }
 
-function draftMail(rowIndex) {}
-
-function onSettingsButtonClicked() {
-  console.log("settings bttn clicked");
-}
-
 function onComposeButtonClicked() {
   Swal.fire({
     title: "<strong>COMPOSE MAIL</strong>",
@@ -479,7 +468,7 @@ function onComposeButtonClicked() {
       // Validate fields, if To and Subject fields are set, save as draft, else return
       return;
     }
-    
+
     if (isBlank(formValues.value[0])) {
       Swal.fire(
         "Invalid Details!",
@@ -517,7 +506,7 @@ function onComposeButtonClicked() {
       HasAttachment: isBlank(formValues.value[3]) ? false : true,
     };
 
-    if(!isBlank(formValues.value[3])){
+    if (!isBlank(formValues.value[3])) {
       formData.append("file", $("#mail-attachment")[0].files[0]);
     }
 
@@ -534,22 +523,18 @@ function onComposeButtonClicked() {
         result = JSON.parse(result);
         switch (result.Status) {
           case "0":
-            Swal.fire(
-              result.ShortReason,
-              result.Reason,
-              result.Level
-            ).then((value) => {
-              document.location="../Views/HomeView.php";
-            });
+            Swal.fire(result.ShortReason, result.Reason, result.Level).then(
+              (value) => {
+                document.location = "../Views/HomeView.php";
+              }
+            );
             break;
           case "-1":
-            Swal.fire(
-              result.ShortReason,
-              result.Reason,
-              result.Level
-            ).then((value) => {
-              document.location="../Views/HomeView.php";
-            });
+            Swal.fire(result.ShortReason, result.Reason, result.Level).then(
+              (value) => {
+                document.location = "../Views/HomeView.php";
+              }
+            );
             break;
         }
       },
@@ -565,10 +550,6 @@ function onComposeButtonClicked() {
   });
 }
 
-function isBlank(str) {
-  return !str || /^\s*$/.test(str);
-}
-
 function addRow(rowHtml, tableId) {
   var inboxTable = document
     .getElementById(tableId)
@@ -578,7 +559,7 @@ function addRow(rowHtml, tableId) {
   newRow.innerHTML = rowHtml;
 }
 
-function allowSingleSelectedRow(tableId) {
+function allowOnlySingleSelectedRow(tableId) {
   var inboxTableRows = document
     .getElementById(tableId)
     .getElementsByTagName("tbody")[0].rows;
@@ -596,38 +577,112 @@ function onRowClicked(row) {
     return;
   }
 
-  allowSingleSelectedRow("mailTable");
+  allowOnlySingleSelectedRow("mailTable");
 
   row.setAttribute("class", "active-row");
   var index = row.rowIndex;
   console.log("Selected row: " + index);
-
+  displayEmailUi(index);
   // TODO: Display email ui
   // includes: Reply, delete, view attachments
 }
 
+function onSettingsButtonClicked() {
+  console.log("settings bttn clicked");
+}
+
 function displayEmailUi(selectedIndex) {
-  Swal.fire({
-    title: "<strong>HTML <u>example</u></strong>",
-    icon: "info",
-    html:
-      "You can use <b>bold text</b>, " +
-      '<a href="//sweetalert2.github.io">links</a> ' +
-      "and other HTML tags",
-    showCloseButton: true,
-    showCancelButton: true,
-    focusConfirm: false,
-    confirmButtonText: '<i class="fa fa-thumbs-up"></i> Great!',
-    confirmButtonAriaLabel: "Thumbs up, great!",
-    cancelButtonText: '<i class="fa fa-thumbs-down"></i>',
-    cancelButtonAriaLabel: "Thumbs down",
-  });
+  var mailUuid = getUuidOfSelectedRow(selectedIndex);
+
+  if (mailUuid == null) {
+    console.log("uuid can't be null.");
+    return;
+  }
+
+  $.ajax({
+    method: "POST",
+    url: "../Controllers/HomeController.php",
+    data: {
+      requestType: "get_mail",
+      uuid: mailUuid
+    },
+    cache: false,
+    dataType: "json",
+    success: function (result) {
+      switch (result.Status) {
+        case "-1":
+          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
+            (value) => {
+              //document.location = "../Views/HomeView.php?previousError=true";
+              return;
+            }
+          );
+          return;
+        case "0":
+          // draft fetch done
+          if (result.Emails == null || result.Emails.length <= 0) {
+            setTimeout(function () {
+              Swal.fire({
+                title: result.ShortReason,
+                text: result.Reason,
+                icon: result.Level,
+                timer: 3000,
+                timerProgressBar: true,
+              });
+            }, 100);
+
+            return;
+          }
+
+          console.log(result.Emails);
+          console.log(result.Emails[0].IsDraft);
+          console.log(result.Emails[0].IsTrash);
+          var attachmentHtml = result.Emails[0].AttachmentPath != "" ? "<b>Attachment:</b></br>" +
+          "<img src=" + result.Emails[0].AttachmentPath + " style='width:150px;'>" : "";
+
+          var draftedCheckBoxHtml = result.Emails[0].IsDraft == 0 ? '<input type="checkbox" disabled="disabled"> Is Drafted <br/>' : '<input type="checkbox" checked="true" disabled="disabled"> Is Drafted <br/>';
+          var trashedCheckBoxHtml = result.Emails[0].IsTrash == 0 ? '<input type="checkbox" disabled="disabled"> Is Trashed <br/>' : '<input type="checkbox" checked="true" disabled="disabled"> Is Trashed <br/>';
+
+          Swal.fire({
+            title: "From: <u>" + result.Emails[0].From + "</u>",            
+            html:
+              '<div style="text-align: left;" >' +
+              "<b>" + result.Emails[0].Subject + " @ " + result.Emails[0].At + "<br/>" +
+              "<p>" + result.Emails[0].Body + "</p>" +
+              draftedCheckBoxHtml +
+              trashedCheckBoxHtml + "<br/>" +
+              attachmentHtml + 
+              "</div>",
+            showCloseButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Quick Reply',            
+            cancelButtonText: 'Cancel',            
+          }).then((result) => {
+            if(result.value){
+              // handle quick reply
+            }
+
+            // handle 2nd button
+          })
+
+          break;
+      }
+    },
+    error: function (e) {
+      Swal.fire(
+        "Request Exception!",
+        "Exception occured during AJAX Request. Check console for more info.",
+        "error"
+      );
+      console.log(e);
+    },
+  });  
 }
 
 function trashOptions(index) {
   Swal.fire({
     text: "You can either Delete mail permanently or restore it.",
-    icon: "warning",
+    icon: "info",
     showCancelButton: true,
     confirmButtonColor: "#d33",
     cancelButtonColor: "#3085d6",
@@ -689,6 +744,10 @@ function restoreMail(index) {
   });
 }
 
+function isBlank(str) {
+  return !str || /^\s*$/.test(str);
+}
+
 // click event for each delete option click on row
 function onDeleteAnchorClicked(anchor) {
   var index = anchor.parentNode.parentNode.rowIndex;
@@ -696,11 +755,11 @@ function onDeleteAnchorClicked(anchor) {
     case "trash-options":
       trashOptions(index);
       break;
-    case "trash-draft":
-      trashMail(index, true);
+    case "delete-draft":
+      deleteMail(index);
       break;
     case "trash-inbox":
-      trashMail(index, false);
+      trashMail(index);
       break;
   }
 }

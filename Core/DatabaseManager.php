@@ -118,28 +118,13 @@ class Database
         return false;
     }
 
-    public function DeleteUserMailWithTitle($userEmail, $emailTitle)
+    public function DoesMailWithUuidExist($uuid)
     {
-        if (!isset($userEmail) || !isset($emailTitle)) {
+        if (!isset($uuid)) {
             return false;
         }
 
-        $sqlQuery = "DELETE FROM emails WHERE SendTo='$userEmail' AND Title='$emailTitle';";
-        if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
-            mysqli_free_result($exeResult);
-            return true;
-        }
-
-        return false;
-    }
-
-    public function DoesMailWithUuidExist($userEmail, $uuid, $isDraft = false)
-    {
-        if (!isset($uuid) || !isset($userEmail)) {
-            return false;
-        }
-
-        $sqlQuery = $sqlQuery = "SELECT * FROM emails WHERE " . ($isDraft ? "ReceivedFrom" : "SendTo") ."='$userEmail' AND MailID='$uuid';";
+        $sqlQuery = $sqlQuery = "SELECT * FROM emails WHERE MailID='$uuid';";
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $rowCount = mysqli_num_rows($exeResult);
             mysqli_free_result($exeResult);
@@ -149,60 +134,60 @@ class Database
         return false;
     }
 
-    public function DraftUserMailWithUuid($userEmail, $uuid)
+    public function DraftMailWithUuid($uuid)
     {
-        if (!isset($uuid) || !isset($userEmail)) {
+        if (!isset($uuid)) {
             return false;
         }
 
-        if (!$this->DoesMailWithUuidExist($userEmail, $uuid)) {
+        if (!$this->DoesMailWithUuidExist($uuid)) {
             return false;
         }
 
-        $sqlQuery = "UPDATE mails SET IsDraft=1 WHERE SendTo='$userEmail' AND MailID='$uuid';";
+        $sqlQuery = "UPDATE mails SET IsDraft=1 WHERE MailID='$uuid';";
         return $this->ExecuteQuery($sqlQuery);
     }
 
-    public function DeleteUserMailWithUuid($userEmail, $uuid)
+    public function DeleteMailWithUuid($uuid)
     {
-        if (!isset($uuid) || !isset($userEmail)) {
+        if (!isset($uuid)) {
             return false;
         }
 
-        if (!$this->DoesMailWithUuidExist($userEmail, $uuid)) {
+        if (!$this->DoesMailWithUuidExist($uuid)) {
             return false;
         }
 
-        $sqlQuery = $sqlQuery = "DELETE FROM emails WHERE SendTo='$userEmail' AND MailID='$uuid';";
+        $sqlQuery = $sqlQuery = "DELETE FROM emails WHERE MailID='$uuid';";
         return $this->ExecuteQuery($sqlQuery);
     }
 
-    public function TrashUserMailWithUuid($userEmail, $uuid, $isDraft)
+    public function TrashMailWithUuid($uuid)
     {
-        if (!isset($uuid) || !isset($userEmail)) {
+        if (!isset($uuid)) {
             return false;
         }
 
-        if (!$this->DoesMailWithUuidExist($userEmail, $uuid, $isDraft)) {
+        if (!$this->DoesMailWithUuidExist($uuid)) {
             error_log("mail doesnt exist");
             return false;
         }
 
-        $sqlQuery = "UPDATE emails SET IsTrash=1 WHERE " . ($isDraft ? "ReceivedFrom" : "SendTo") ."='$userEmail' AND MailID='$uuid';";
-        return $this->ExecuteQuery($sqlQuery);
+        $sqlQuery1 = "UPDATE emails SET IsTrash=1 WHERE MailID='$uuid';";
+        return $this->ExecuteQuery($sqlQuery1);
     }
 
-    public function RestoreTrashUserMailWithUuid($userEmail, $uuid, $isDraft)
+    public function RestoreTrashUserMailWithUuid($uuid)
     {
-        if (!isset($uuid) || !isset($userEmail)) {
+        if (!isset($uuid)) {
             return false;
         }
 
-        if (!$this->DoesMailWithUuidExist($userEmail, $uuid)) {
+        if (!$this->DoesMailWithUuidExist($uuid)) {
             return false;
         }
 
-        $sqlQuery = "UPDATE emails SET IsTrash=0 WHERE " . ($isDraft ? "ReceivedFrom" : "SendTo") ."='$userEmail' AND MailID='$uuid';";
+        $sqlQuery = "UPDATE emails SET IsTrash=0 WHERE MailID='$uuid';";
         return $this->ExecuteQuery($sqlQuery);
     }
 
@@ -218,7 +203,7 @@ class Database
 
         $newPassword = password_hash($newPassword, PASSWORD_DEFAULT);
         $sqlQuery = "UPDATE users SET Password='$newPassword' WHERE EmailID='$userEmail';";
-        if($this->ExecuteQuery($sqlQuery)){
+        if ($this->ExecuteQuery($sqlQuery)) {
             // send a password changed email to user inbox as other email services do, for confirmation
             $mailObj = array(
                 'To' => $userEmail,
@@ -277,7 +262,7 @@ class Database
         return $result;
     }
 
-    public function FetchMailWithUuid($userEmail, $uuid)
+    public function FetchMailWithUuid($uuid)
     {
         $result = array(
             'Status' => '-1',
@@ -286,11 +271,11 @@ class Database
             'Emails' => array()
         );
 
-        if (!isset($uuid) || !isset($userEmail)) {
+        if (!isset($uuid)) {
             return $result;
         }
 
-        $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND MailID='$uuid';";
+        $sqlQuery = "SELECT * FROM emails WHERE MailID='$uuid';";
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $result['Count'] = mysqli_num_rows($exeResult);
             $result['Status'] = '0';
@@ -347,8 +332,21 @@ class Database
             $mailObj['Body'] . "','" .
             $mailObj['AttachmentFilePath'] . "');";
 
-        error_log($sqlQuery);
         return $this->ExecuteQuery($sqlQuery);
+    }
+
+    public function IsDraftMail($uuid)
+    {
+        if (!isset($uuid)) {
+            return false;
+        }
+
+        $sqlQuery = "SELECT * FROM emails WHERE MailID='$uuid' AND IsDraft=1";
+        if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
+            return mysqli_num_rows($exeResult) > 0;
+        }
+
+        return false;
     }
 
     public function GetUserDraftEmails($userEmail)
@@ -364,6 +362,107 @@ class Database
     public function GetUserInboxEmails($userEmail)
     {
         return $this->GetUserEmails($userEmail, false, false);
+    }
+
+    public function GetAllDraftsSendFrom($sendFrom)
+    {
+        $response = array(
+            'Status' => '-1',
+            'Message' => 'Invalid',
+            'Count' => 0,
+            'Emails' => array()
+        );
+
+        if (!isset($sendFrom)) {
+            return $response;
+        }
+
+        if (!IsUserLoggedIn()) {
+            return $response;
+        }
+
+        $sqlQuery = "SELECT * FROM emails where ReceivedFrom='$sendFrom' WHERE IsDraft=1;";
+        if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
+            $response['Count'] = mysqli_num_rows($exeResult);
+            $response['Status'] = '0';
+            $response['Message'] = 'Success';
+
+            if ($response['Count'] <= 0) {
+                $response['Status'] = '-1';
+                $response['Message'] = 'No emails exist for current mail folder.';
+                return $response;
+            }
+
+            while ($row = mysqli_fetch_object($exeResult)) {
+                $emailObj = array();
+                $emailObj['To'] = $row->SendTo ?? "";
+                $emailObj['From'] = $row->ReceivedFrom ?? "";
+                $emailObj['At'] = $row->ReceivedTime ?? "";
+                $emailObj['IsDraft'] = $row->IsDraft ?? "";
+                $emailObj['IsTrash'] = $row->IsTrash ?? "";
+                $emailObj['Title'] = $row->Title ?? "";
+                $emailObj['Subject'] = $row->Subject ?? "";
+                $emailObj['Body'] = $row->Body ?? "";
+                $emailObj['AttachmentPath'] = $row->AttachmentPath ?? "";
+                $emailObj['MailID'] = $row->MailID ?? "";
+                array_push($response['Emails'], $emailObj);
+            }
+
+            mysqli_free_result($exeResult);
+            return $response;
+        }
+
+        $response['Status'] = '-1';
+        $response['Message'] = 'Database connection failed.';
+        return $response;
+    }
+
+    public function GetMailWithUuid($uuid){
+        $response = array(
+            'Status' => '-1',
+            'Message' => 'Invalid',
+            'Count' => 0,
+            'Emails' => array()
+        );
+
+        if(!isset($uuid)){
+            return $response;
+        }
+
+        $sqlQuery = "SELECT * FROM emails WHERE MailID='$uuid';";
+        if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
+            $response['Count'] = mysqli_num_rows($exeResult);
+            $response['Status'] = '0';
+            $response['Message'] = 'Success';
+
+            if ($response['Count'] <= 0) {
+                $response['Status'] = '-1';
+                $response['Message'] = 'No emails exist with this id.';
+                return $response;
+            }
+
+            while ($row = mysqli_fetch_object($exeResult)) {
+                $emailObj = array();
+                $emailObj['To'] = $row->SendTo ?? "";
+                $emailObj['From'] = $row->ReceivedFrom ?? "";
+                $emailObj['At'] = $row->ReceivedTime ?? "";
+                $emailObj['IsDraft'] = $row->IsDraft ?? "";
+                $emailObj['IsTrash'] = $row->IsTrash ?? "";
+                $emailObj['Title'] = $row->Title ?? "";
+                $emailObj['Subject'] = $row->Subject ?? "";
+                $emailObj['Body'] = $row->Body ?? "";
+                $emailObj['AttachmentPath'] = $row->AttachmentPath ?? "";
+                $emailObj['MailID'] = $row->MailID ?? "";
+                array_push($response['Emails'], $emailObj);
+            }
+
+            mysqli_free_result($exeResult);
+            return $response;
+        }
+
+        $response['Status'] = '-1';
+        $response['Message'] = 'Database connection failed.';
+        return $response;
     }
 
     public function GetUserEmails($userEmail, $onlyDraft, $onlyTrash)
