@@ -74,6 +74,7 @@ $User = unserialize($_SESSION["userDetails"]);
                 <a href="#" onclick="getInboxMails();" class="item"><span style="font-weight: bold;">Inbox</span></a>
                 <a href="#" onclick="onComposeButtonClicked();" class="item"><span style="font-weight: bold;">Compose</span></a>
                 <a href="#" onclick="getDraftMails();" class="item"><span style="font-weight: bold;">Draft</span></a>
+                <a href="#" onclick="getSendMails();" class="item"><span style="font-weight: bold;">Send</span></a>
                 <a href="#" onclick="getTrashMails();" class="item"><span style="font-weight: bold;">Trash</span></a>
                 <a href="#" onclick="onSettingsButtonClicked();" class="item"><span style="font-weight: bold;">Settings</span></a>
             </div>
@@ -99,7 +100,7 @@ $User = unserialize($_SESSION["userDetails"]);
                         <td class="table-row-field">Subject_PH</td>
                         <td class="table-row-field">Time_PH</td>
                         <td class="table-row-field">
-                            <a class="deletebttn">Button_PH</a>
+                            <button class="deletebttn">Button_PH</button>
                         </td>
                     </tr>
                 </tbody>

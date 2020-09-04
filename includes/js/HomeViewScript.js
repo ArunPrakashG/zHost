@@ -247,7 +247,7 @@ function getInboxMails() {
               mail.At +
               "</td>" +
               '<td class="table-row-field">' +
-              '<a class="deletebttn" id="trash-inbox" onclick="onDeleteAnchorClicked(this);">Trash</a>' +
+              '<button class="deletebttn" id="trash-inbox" onclick="onDeleteAnchorClicked(this);">Trash</button>' +
               "</td>";
             addRow(rowHtml, "mailTable");
           }
@@ -328,7 +328,7 @@ function getDraftMails() {
               mail.At +
               "</td>" +
               '<td class="table-row-field">' +
-              '<a class="deletebttn" id="delete-draft" onclick="onDeleteAnchorClicked(this);">Delete</a>' +
+              '<button class="deletebttn" id="delete-draft" onclick="onDeleteAnchorClicked(this);">Delete</button>' +
               "</td>";
             addRow(rowHtml, "mailTable");
           }
@@ -409,7 +409,7 @@ function getTrashMails() {
               mail.At +
               "</td>" +
               '<td class="table-row-field">' +
-              '<a class="deletebttn" id="trash-options" onclick="onDeleteAnchorClicked(this);">Option</a>' +
+              '<button class="deletebttn" id="trash-options" onclick="onDeleteAnchorClicked(this);">Option</button>' +
               "</td>";
             addRow(rowHtml, "mailTable");
           }
@@ -430,6 +430,10 @@ function getTrashMails() {
       console.log(e);
     },
   });
+}
+
+function getSendMails(){
+  
 }
 
 function onComposeButtonClicked() {
@@ -555,6 +559,7 @@ function addRow(rowHtml, tableId) {
     .getElementById(tableId)
     .getElementsByTagName("tbody")[0];
   var newRow = inboxTable.insertRow(inboxTable.rows.length);
+  newRow.setAttribute("ondblclick", "onRowDoubleClicked(this);");
   newRow.setAttribute("onclick", "onRowClicked(this);");
   newRow.innerHTML = rowHtml;
 }
@@ -571,6 +576,14 @@ function allowOnlySingleSelectedRow(tableId) {
   }
 }
 
+function onRowDoubleClicked(row) {
+  var index = row.rowIndex;
+  displayEmailUi(index);
+
+  // TODO: Display email ui
+  // includes: Reply, delete, view attachments
+}
+
 function onRowClicked(row) {
   if (row.hasAttribute("class")) {
     row.removeAttribute("class");
@@ -578,13 +591,7 @@ function onRowClicked(row) {
   }
 
   allowOnlySingleSelectedRow("mailTable");
-
   row.setAttribute("class", "active-row");
-  var index = row.rowIndex;
-  console.log("Selected row: " + index);
-  displayEmailUi(index);
-  // TODO: Display email ui
-  // includes: Reply, delete, view attachments
 }
 
 function onSettingsButtonClicked() {
@@ -604,7 +611,7 @@ function displayEmailUi(selectedIndex) {
     url: "../Controllers/HomeController.php",
     data: {
       requestType: "get_mail",
-      uuid: mailUuid
+      uuid: mailUuid,
     },
     cache: false,
     dataType: "json",
@@ -637,33 +644,51 @@ function displayEmailUi(selectedIndex) {
           console.log(result.Emails);
           console.log(result.Emails[0].IsDraft);
           console.log(result.Emails[0].IsTrash);
-          var attachmentHtml = result.Emails[0].AttachmentPath != "" ? "<b>Attachment:</b></br>" +
-          "<img src=" + result.Emails[0].AttachmentPath + " style='width:150px;'>" : "";
+          var attachmentHtml =
+            result.Emails[0].AttachmentPath != ""
+              ? "<b>Attachment:</b></br>" +
+                "<img src=" +
+                result.Emails[0].AttachmentPath +
+                " style='width:150px;'>"
+              : "";
 
-          var draftedCheckBoxHtml = result.Emails[0].IsDraft == 0 ? '<input type="checkbox" disabled="disabled"> Is Drafted <br/>' : '<input type="checkbox" checked="true" disabled="disabled"> Is Drafted <br/>';
-          var trashedCheckBoxHtml = result.Emails[0].IsTrash == 0 ? '<input type="checkbox" disabled="disabled"> Is Trashed <br/>' : '<input type="checkbox" checked="true" disabled="disabled"> Is Trashed <br/>';
+          var draftedCheckBoxHtml =
+            result.Emails[0].IsDraft == 0
+              ? '<input type="checkbox" disabled="disabled"> Is Drafted <br/>'
+              : '<input type="checkbox" checked="true" disabled="disabled"> Is Drafted <br/>';
+          var trashedCheckBoxHtml =
+            result.Emails[0].IsTrash == 0
+              ? '<input type="checkbox" disabled="disabled"> Is Trashed <br/>'
+              : '<input type="checkbox" checked="true" disabled="disabled"> Is Trashed <br/>';
 
           Swal.fire({
-            title: "From: <u>" + result.Emails[0].From + "</u>",            
+            title: "From: <u>" + result.Emails[0].From + "</u>",
             html:
               '<div style="text-align: left;" >' +
-              "<b>" + result.Emails[0].Subject + " @ " + result.Emails[0].At + "<br/>" +
-              "<p>" + result.Emails[0].Body + "</p>" +
+              "<b>" +
+              result.Emails[0].Subject +
+              " @ " +
+              result.Emails[0].At +
+              "<br/>" +
+              "<p>" +
+              result.Emails[0].Body +
+              "</p>" +
               draftedCheckBoxHtml +
-              trashedCheckBoxHtml + "<br/>" +
-              attachmentHtml + 
+              trashedCheckBoxHtml +
+              "<br/>" +
+              attachmentHtml +
               "</div>",
             showCloseButton: true,
             showCancelButton: true,
-            confirmButtonText: 'Quick Reply',            
-            cancelButtonText: 'Cancel',            
+            confirmButtonText: "Quick Reply",
+            cancelButtonText: "Cancel",
           }).then((result) => {
-            if(result.value){
+            if (result.value) {
               // handle quick reply
             }
 
             // handle 2nd button
-          })
+          });
 
           break;
       }
@@ -676,7 +701,7 @@ function displayEmailUi(selectedIndex) {
       );
       console.log(e);
     },
-  });  
+  });
 }
 
 function trashOptions(index) {
@@ -766,5 +791,5 @@ function onDeleteAnchorClicked(anchor) {
 
 document.addEventListener("DOMContentLoaded", function () {
   // load inbox emails by default as its the first selection
-  getInboxMails();
+  getInboxMails();  
 });
