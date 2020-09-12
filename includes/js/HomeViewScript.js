@@ -433,7 +433,80 @@ function getTrashMails() {
 }
 
 function getSendMails(){
-  
+  $("#mailTable tbody tr").remove();
+
+  $.ajax({
+    method: "POST",
+    url: "../Controllers/HomeController.php",
+    data: {
+      requestType: "send_view",
+    },
+    cache: false,
+    dataType: "json",
+    success: function (result) {
+      switch (result.Status) {
+        case "-1":
+          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
+            (value) => {
+              //document.location = "../Views/HomeView.php?previousError=true";
+              return;
+            }
+          );
+          return;
+        case "0":
+          // send fetch done
+          if (result.Emails == null || result.Emails.length <= 0) {
+            setTimeout(function () {
+              Swal.fire({
+                title: "All caught up!",
+                text: "No new mails found in current mail folder.",
+                timer: 3000,
+                timerProgressBar: true,
+              });
+            }, 100);
+
+            return;
+          }
+
+          for (var i = 0; i < result.Emails.length; i++) {
+            var mail = result.Emails[i];
+            var rowHtml =
+              '<td class="table-row-field">' +
+              i +
+              1 +
+              "</td>" +
+              '<td class="table-row-field" id="mailUuid">' +
+              mail.MailID +
+              "</td>" +
+              '<td class="table-row-field">' +
+              mail.From +
+              "</td>" +
+              '<td class="table-row-field">' +
+              (mail.Subject.length > 18
+                ? mail.Subject.substring(0, 18 - 3) + "..."
+                : mail.Subject) +
+              "</td>" +
+              '<td class="table-row-field">' +
+              mail.At +
+              "</td>" +
+              '<td class="table-row-field">' +
+              '<button class="deletebttn" id="trash-options" disabled onclick="onDeleteAnchorClicked(this);">Option</button>' +
+              "</td>";
+            addRow(rowHtml, "mailTable");
+          }
+          
+          break;
+      }
+    },
+    error: function (e) {
+      Swal.fire(
+        "Request Exception!",
+        "Exception occured during AJAX Request. Check console for more info.",
+        "error"
+      );
+      console.log(e);
+    },
+  });
 }
 
 function onComposeButtonClicked() {
@@ -681,13 +754,13 @@ function displayEmailUi(selectedIndex) {
             showCloseButton: true,
             showCancelButton: true,
             confirmButtonText: "Quick Reply",
-            cancelButtonText: "Cancel",
+            cancelButtonText: "Delete",
           }).then((result) => {
             if (result.value) {
               // handle quick reply
             }
 
-            // handle 2nd button
+            // handle delete mail
           });
 
           break;

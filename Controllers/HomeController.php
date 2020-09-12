@@ -305,6 +305,34 @@ function OnDraftMailCheckRequestReceived()
     SetResult("Fail!", "Mail isn't draft or request failed.", "-1", "info");
 }
 
+function OnSendViewRequestReceived(){
+    if (!IsUserLoggedIn() || GetCurrentUserEmail() == null) {
+        SetResult("You are not logged in!", "Please login again in order to get requested emails.", "-1", "warning");
+        return;
+    }
+
+    $Db = new Database;
+    $response = $Db->GetUserSendEmails(GetCurrentUserEmail());
+
+    if ($response['Status'] == '-1') {
+        if ($response['Count'] == 0) {
+            SetResult("No mails found!", "You didn't send any emails yet.", "0", "success");
+            return;
+        }
+
+        SetResult("Failed!", $response['Message'], "-1", "error");
+        return;
+    }
+
+    if ($response['Count'] <= 0) {
+        SetResult("No send emails exist!", "You havn't send any emails yet.", "0", "success");
+        return;
+    }
+
+    $_SESSION['Inbox'] = $response['Emails'];
+    SetResult("You have pending Mails!", "", "0", "success", $response['Emails']);
+}
+
 function OnGetMailRequestReceived(){
     if(!isset($_POST['uuid'])){
         SetResult("Failed!", "Uuid is invalid.", "-1", "error");
@@ -350,6 +378,9 @@ switch ($_POST['requestType']) {
         break;
     case "inbox_view":
         OnInboxViewRequestReceived();
+        break;
+    case "send_view":
+        OnSendViewRequestReceived();
         break;
     case "trash_mail":
         OnTrashMailRequestReceived();

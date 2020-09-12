@@ -364,6 +364,11 @@ class Database
         return $this->GetUserEmails($userEmail, false, false);
     }
 
+    public function GetUserSendEmails($userEmail)
+    {
+        return $this->GetSendEmails($userEmail);
+    }
+
     public function GetAllDraftsSendFrom($sendFrom)
     {
         $response = array(
@@ -417,7 +422,8 @@ class Database
         return $response;
     }
 
-    public function GetMailWithUuid($uuid){
+    public function GetMailWithUuid($uuid)
+    {
         $response = array(
             'Status' => '-1',
             'Message' => 'Invalid',
@@ -425,7 +431,7 @@ class Database
             'Emails' => array()
         );
 
-        if(!isset($uuid)){
+        if (!isset($uuid)) {
             return $response;
         }
 
@@ -438,6 +444,60 @@ class Database
             if ($response['Count'] <= 0) {
                 $response['Status'] = '-1';
                 $response['Message'] = 'No emails exist with this id.';
+                return $response;
+            }
+
+            while ($row = mysqli_fetch_object($exeResult)) {
+                $emailObj = array();
+                $emailObj['To'] = $row->SendTo ?? "";
+                $emailObj['From'] = $row->ReceivedFrom ?? "";
+                $emailObj['At'] = $row->ReceivedTime ?? "";
+                $emailObj['IsDraft'] = $row->IsDraft ?? "";
+                $emailObj['IsTrash'] = $row->IsTrash ?? "";
+                $emailObj['Title'] = $row->Title ?? "";
+                $emailObj['Subject'] = $row->Subject ?? "";
+                $emailObj['Body'] = $row->Body ?? "";
+                $emailObj['AttachmentPath'] = $row->AttachmentPath ?? "";
+                $emailObj['MailID'] = $row->MailID ?? "";
+                array_push($response['Emails'], $emailObj);
+            }
+
+            mysqli_free_result($exeResult);
+            return $response;
+        }
+
+        $response['Status'] = '-1';
+        $response['Message'] = 'Database connection failed.';
+        return $response;
+    }
+
+    public function GetSendEmails($userEmail)
+    {
+        $response = array(
+            'Status' => '-1',
+            'Message' => 'Invalid',
+            'Count' => 0,
+            'Emails' => array()
+        );
+
+        if (!isset($userEmail)) {
+            return $response;
+        }
+
+        if (!IsUserLoggedIn()) {
+            return $response;
+        }
+
+        $sqlQuery = "SELECT * FROM emails WHERE ReceivedFrom='$userEmail';";
+
+        if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
+            $response['Count'] = mysqli_num_rows($exeResult);
+            $response['Status'] = '0';
+            $response['Message'] = 'Success';
+
+            if ($response['Count'] <= 0) {
+                $response['Status'] = '-1';
+                $response['Message'] = 'No emails exist for current mail folder.';
                 return $response;
             }
 
