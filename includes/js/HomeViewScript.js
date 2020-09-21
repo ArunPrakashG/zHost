@@ -432,7 +432,7 @@ function getTrashMails() {
   });
 }
 
-function getSendMails(){
+function getSendMails() {
   $("#mailTable tbody tr").remove();
 
   $.ajax({
@@ -494,7 +494,7 @@ function getSendMails(){
               "</td>";
             addRow(rowHtml, "mailTable");
           }
-          
+
           break;
       }
     },
@@ -543,6 +543,64 @@ function onComposeButtonClicked() {
     if (!formValues.isConfirmed) {
       // TODO: Save current data as a draft mail
       // Validate fields, if To and Subject fields are set, save as draft, else return
+      if (isBlank(formValues.value[0]) || isBlank(formValues.value[1])) {
+        return;
+      }
+
+      var formData = new FormData();
+      var mailObject = {
+        To: formValues.value[0],
+        IsDraft: 1,
+        IsTrash: 0,
+        Subject: formValues.value[1],
+        Body: formValues.value[2] ?? "",
+        HasAttachment: isBlank(formValues.value[3]) ? false : true,
+      };
+
+      if (!isBlank(formValues.value[3])) {
+        formData.append("file", $("#mail-attachment")[0].files[0]);
+      }
+
+      formData.append("requestType", "compose");
+      formData.append("mailObject", JSON.stringify(mailObject));
+
+      $.ajax({
+        url: "../Controllers/HomeController.php",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (result) {
+          result = JSON.parse(result);
+          switch (result.Status) {
+            case "0":
+              Swal.fire("Saved!", "Mail saved as draft!", result.Level).then(
+                (value) => {
+                  document.location = "../Views/HomeView.php";
+                }
+              );
+              break;
+            case "-1":
+              Swal.fire(
+                "Failed to save mail",
+                result.Reason,
+                result.Level
+              ).then((value) => {
+                document.location = "../Views/HomeView.php";
+              });
+              break;
+          }
+        },
+        error: function (e) {
+          Swal.fire(
+            "Request Exception!",
+            "Exception occured during AJAX Request. Check console for more info.",
+            "error"
+          );
+          console.log(e);
+        },
+      });
+
       return;
     }
 
@@ -679,6 +737,7 @@ function displayEmailUi(selectedIndex) {
     return;
   }
 
+  quickReplySendTo = "";
   $.ajax({
     method: "POST",
     url: "../Controllers/HomeController.php",
@@ -714,9 +773,6 @@ function displayEmailUi(selectedIndex) {
             return;
           }
 
-          console.log(result.Emails);
-          console.log(result.Emails[0].IsDraft);
-          console.log(result.Emails[0].IsTrash);
           var attachmentHtml =
             result.Emails[0].AttachmentPath != ""
               ? "<b>Attachment:</b></br>" +
@@ -734,6 +790,7 @@ function displayEmailUi(selectedIndex) {
               ? '<input type="checkbox" disabled="disabled"> Is Trashed <br/>'
               : '<input type="checkbox" checked="true" disabled="disabled"> Is Trashed <br/>';
 
+          quickReplySendTo = result.Emails[0].From;
           Swal.fire({
             title: "From: <u>" + result.Emails[0].From + "</u>",
             html:
@@ -755,12 +812,33 @@ function displayEmailUi(selectedIndex) {
             showCancelButton: true,
             confirmButtonText: "Quick Reply",
             cancelButtonText: "Delete",
+            showDenyButton: true,
+            denyButtonText: "Edit",
           }).then((result) => {
-            if (result.value) {
-              // handle quick reply
+            console.log(result);
+
+            if (result.isDismissed) {
+              switch (result.dismiss) {
+                case "backdrop":
+                case "close":
+                case "esc":
+                  return;
+                case "cancel":
+                  // handle delete mail
+                  trashMail(selectedIndex);
+                  break;
+              }
             }
 
-            // handle delete mail
+            if (result.isConfirmed) {
+              // handle quick reply
+              quickReply(quickReplySendTo);
+            }
+
+            if(result.isDenied){
+              // handle mail edit
+              // TODO
+            }
           });
 
           break;
@@ -774,6 +852,106 @@ function displayEmailUi(selectedIndex) {
       );
       console.log(e);
     },
+  });
+}
+
+function quickReply(sendTo) {
+  Swal.fire({
+    title: "<strong>COMPOSE MAIL</strong>",
+    html:
+      '<input id="mail-subject-quick" class="swal2-input" placeholder="Subject" required>' +
+      '<textarea id="mail-body-quick" class="swal2-textarea" type="textarea" placeholder="Enter your message..." required></textarea>' +
+      '<input id="mail-attachment-quick" class="swal2-file" type="file" name="attachment" placeholder="Attachment">',
+    showCancelButton: true,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showCloseButton: false,
+    confirmButtonText: "Reply",
+    confirmButtonAriaLabel: "Reply",
+    cancelButtonText: "Cancel",
+    cancelButtonAriaLabel: "Cancel",    
+    preConfirm: () => {
+      return [
+        document.getElementById("mail-subject-quick").value,
+        document.getElementById("mail-body-quick").value,
+        document.getElementById("mail-attachment-quick").value,
+      ];
+    },
+  }).then((formValues) => {
+    if (!formValues.value) {
+      return;
+    }
+
+    if (isBlank(formValues.value[0])) {
+      Swal.fire(
+        "Invalid Details!",
+        "You must specify a valid 'Subject' value.",
+        "warning"
+      );
+      return;
+    }
+
+    if (isBlank(formValues.value[1])) {
+      Swal.fire(
+        "Invalid Details!",
+        "You must specify a valid 'Body' value.",
+        "warning"
+      );
+      return;
+    }
+
+    var formData = new FormData();
+    var mailObject = {
+      To: sendTo,
+      IsDraft: 0,
+      IsTrash: 0,
+      Subject: formValues.value[0],
+      Body: formValues.value[1],
+      HasAttachment: isBlank(formValues.value[2]) ? false : true,
+    };
+
+    if (!isBlank(formValues.value[2])) {
+      formData.append("file", $("#mail-attachment")[0].files[0]);
+    }
+
+    console.log(JSON.stringify(mailObject));
+    formData.append("requestType", "compose");
+    formData.append("mailObject", JSON.stringify(mailObject));
+
+    $.ajax({
+      url: "../Controllers/HomeController.php",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (result) {
+        result = JSON.parse(result);
+        switch (result.Status) {
+          case "0":
+            Swal.fire(result.ShortReason, result.Reason, result.Level).then(
+              (value) => {
+                document.location = "../Views/HomeView.php";
+              }
+            );
+            break;
+          case "-1":
+            Swal.fire(result.ShortReason, result.Reason, result.Level).then(
+              (value) => {
+                document.location = "../Views/HomeView.php";
+              }
+            );
+            break;
+        }
+      },
+      error: function (e) {
+        Swal.fire(
+          "Request Exception!",
+          "Exception occured during AJAX Request. Check console for more info.",
+          "error"
+        );
+        console.log(e);
+      },
+    });
   });
 }
 
@@ -864,5 +1042,5 @@ function onDeleteAnchorClicked(anchor) {
 
 document.addEventListener("DOMContentLoaded", function () {
   // load inbox emails by default as its the first selection
-  getInboxMails();  
+  getInboxMails();
 });
