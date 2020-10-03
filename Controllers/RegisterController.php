@@ -140,8 +140,6 @@ function OnRegisterRequestReceived()
 	}
 
 	$Db = new Database;
-
-	// TODO: Return display level as well on the json
 	if ($Db->IsExistingUser($_POST["email"])) {
 		SetResult("Account exist!", "An account with this email id already exist.", "-1", "warning");
 		return;
@@ -159,7 +157,7 @@ function OnRegisterRequestReceived()
 
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
 	SetResult("Invalid request type.", "Expected: POST", "-1", "error");
-	echo $Result;
+	echo json_encode($Result);
 	exit();
 }
 

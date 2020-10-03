@@ -541,9 +541,12 @@ function onComposeButtonClicked() {
     },
   }).then((formValues) => {
     if (!formValues.isConfirmed) {
-      // TODO: Save current data as a draft mail
       // Validate fields, if To and Subject fields are set, save as draft, else return
-      if (isBlank(formValues.value[0]) || isBlank(formValues.value[1])) {
+      if (
+        !formValues.value ||
+        isBlank(formValues.value[0]) ||
+        isBlank(formValues.value[1])
+      ) {
         return;
       }
 
@@ -710,9 +713,6 @@ function allowOnlySingleSelectedRow(tableId) {
 function onRowDoubleClicked(row) {
   var index = row.rowIndex;
   displayEmailUi(index);
-
-  // TODO: Display email ui
-  // includes: Reply, delete, view attachments
 }
 
 function onRowClicked(row) {
@@ -814,10 +814,10 @@ function displayEmailUi(selectedIndex) {
             cancelButtonText: "Delete",
             showDenyButton: true,
             denyButtonText: "Edit",
-          }).then((result) => {
-            console.log(result);
-
-            if (result.isDismissed) {
+          }).then((iResult) => {
+            console.log(iResult);
+            console.log(result.Emails[0]);
+            if (iResult.isDismissed) {
               switch (result.dismiss) {
                 case "backdrop":
                 case "close":
@@ -830,14 +830,15 @@ function displayEmailUi(selectedIndex) {
               }
             }
 
-            if (result.isConfirmed) {
+            if (iResult.isConfirmed) {
               // handle quick reply
               quickReply(quickReplySendTo);
             }
 
-            if(result.isDenied){
+            if (iResult.isDenied) {
               // handle mail edit
               // TODO
+              quickEdit(result.Emails[0]);
             }
           });
 
@@ -857,7 +858,7 @@ function displayEmailUi(selectedIndex) {
 
 function quickReply(sendTo) {
   Swal.fire({
-    title: "<strong>COMPOSE MAIL</strong>",
+    title: "<strong>Reply</strong>",
     html:
       '<input id="mail-subject-quick" class="swal2-input" placeholder="Subject" required>' +
       '<textarea id="mail-body-quick" class="swal2-textarea" type="textarea" placeholder="Enter your message..." required></textarea>' +
@@ -869,7 +870,7 @@ function quickReply(sendTo) {
     confirmButtonText: "Reply",
     confirmButtonAriaLabel: "Reply",
     cancelButtonText: "Cancel",
-    cancelButtonAriaLabel: "Cancel",    
+    cancelButtonAriaLabel: "Cancel",
     preConfirm: () => {
       return [
         document.getElementById("mail-subject-quick").value,
@@ -955,6 +956,76 @@ function quickReply(sendTo) {
   });
 }
 
+function quickEdit(emailObj) {
+  Swal.fire({
+    title: "<strong>Edit</strong>",
+    html:
+      '<input id="qmail-subject" class="swal2-input" placeholder="Subject" value="' +
+      emailObj.Subject +
+      '" required>' +
+      '<textarea id="qmail-body" class="swal2-textarea" type="textarea" placeholder="Enter your message..." required>' +
+      emailObj.Body +
+      "</textarea>",
+    showCancelButton: true,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showCloseButton: false,
+    confirmButtonText: "Update",
+    confirmButtonAriaLabel: "Update",
+    cancelButtonText: "Cancel",
+    cancelButtonAriaLabel: "Cancel",
+    preConfirm: () => {
+      return [
+        document.getElementById("qmail-subject").value,
+        document.getElementById("qmail-body").value,
+      ];
+    },
+  }).then((result) => {
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    var sub = result.value[0];
+    var body = result.value[1];
+    var uuid = emailObj.MailID;
+
+    $.ajax({
+      method: "POST",
+      url: "../Controllers/HomeController.php",
+      data: {
+        requestType: "update_mail",
+        uuid: uuid,
+        nSubject: sub,
+        nBody: body,
+      },
+      cache: false,
+      dataType: "json",
+      success: function (result) {
+        switch (result.Status) {
+          case "0":
+            Swal.fire(result.ShortReason, result.Reason, result.Level).then(
+              (result) => {
+                location.reload();
+              }
+            );
+            break;
+          case "-1":
+            Swal.fire(result.ShortReason, result.Reason, result.Level);
+            break;
+        }
+      },
+      error: function (e) {
+        Swal.fire(
+          "Request Exception!",
+          "Exception occured during AJAX Request. Check console for more info.",
+          "error"
+        );
+        console.log(e);
+      },
+    });
+  });
+}
+
 function trashOptions(index) {
   Swal.fire({
     text: "You can either Delete mail permanently or restore it.",
@@ -1002,7 +1073,11 @@ function restoreMail(index) {
     success: function (result) {
       switch (result.Status) {
         case "0":
-          Swal.fire(result.ShortReason, result.Reason, result.Level);
+          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
+            (result) => {
+              location.reload();
+            }
+          );
           break;
         case "-1":
           Swal.fire(result.ShortReason, result.Reason, result.Level);

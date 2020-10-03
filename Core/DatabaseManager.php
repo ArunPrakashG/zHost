@@ -591,6 +591,15 @@ class Database
         return $response;
     }
 
+    public function UpdateMailWithUuid($uuid, $newSubject, $newBody){
+        if(!isset($uuid) || !isset($newSubject) || !isset($newBody)){
+            return false;
+        }
+
+        $sqlQuery = "UPDATE emails SET Subject='" . $newSubject . "', Body='" . $newBody . "' WHERE MailID='" . $_POST['uuid'] . "';";
+        return $this->ExecuteQuery($sqlQuery);
+    }
+
     public function LoginUser($email, $password, $isAdminLogin)
     {
         $resultArray = array();

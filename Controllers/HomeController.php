@@ -361,6 +361,43 @@ function OnGetMailRequestReceived(){
     SetResult("Success!", "", "0", "success", $response['Emails']);
 }
 
+function OnUpdateMailRequestReceived(){
+    if(!isset($_POST['uuid'])){
+        SetResult("Failed!", "Uuid is invalid.", "-1", "error");
+        return;
+    }
+
+    if(!isset($_POST['nBody']) || !isset($_POST['nSubject'])){
+        SetResult("Failed!", "Failed to update message, will be as is.", "-1", "error");
+        return;
+    }
+
+    $Db = new Database;
+    $response = $Db->GetMailWithUuid($_POST['uuid']);
+
+    if ($response['Status'] == '-1') {
+        if ($response['Count'] == 0) {
+            SetResult("No mails found!", "Can't find any mail with this uuid.", "0", "success");
+            return;
+        }
+
+        SetResult("Failed!", $response['Message'], "-1", "error");
+        return;
+    }
+
+    if($response['Count'] > 1){
+        SetResult("Failed!", "There is more than one mail with the same unique id. Datebase has been modified!", "-1", "error");
+        return;
+    }
+
+    if(!$Db->UpdateMailWithUuid($_POST['uuid'], $_POST['nSubject'], $_POST['nBody'])){
+        SetResult("Failed!", "Error occured while updating mail data.", "-1", "error");
+        return;
+    }
+
+    SetResult("Success!", "Mail updated!", "0", "success");
+}
+
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
     SetResult("Invalid request type.", "Expected: POST", "-1", "error");
     echo json_encode($Result);
@@ -402,6 +439,9 @@ switch ($_POST['requestType']) {
         break;
     case "get_mail":
         OnGetMailRequestReceived();
+        break;
+    case "update_mail":
+        OnUpdateMailRequestReceived();
         break;
     default:
         break;
