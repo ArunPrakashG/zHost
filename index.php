@@ -12,11 +12,41 @@ $_SESSION['PageTitle'] = "Welcome!";
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-<link rel="stylesheet" href="includes/css/index.css" />
+<link rel="stylesheet" href="includes/css/index-style.css" />
 <link rel="stylesheet" href="includes/css/hover-bttn.css" />
-<script src="includes/js/IndexViewScript.js"></script>
-
 <?php include_once $_SERVER['ZHOST_ROOT'] . '/Common/Header.php'; ?>
+
+<script type="text/javascript">
+	function onHomeLinkClicked() {
+		let timerInterval;
+		Swal.fire({
+			title: "Please wait...",
+			html: "Redirecting you to Dashboard in <b></b> milliseconds.",
+			timer: 2000,
+			timerProgressBar: true,
+			willOpen: () => {
+				Swal.showLoading();
+				timerInterval = setInterval(() => {
+					const content = Swal.getContent();
+					if (content) {
+						const b = content.querySelector("b");
+						if (b) {
+							b.textContent = Swal.getTimerLeft();
+						}
+					}
+				}, 100);
+			},
+			onClose: () => {
+				clearInterval(timerInterval);
+			},
+		}).then((result) => {
+			if (result.dismiss === Swal.DismissReason.timer) {
+				window.location = "Views/DashboardView.php";
+				return;
+			}
+		});
+	}
+</script>
 
 <body class="is-preload body">
 	<header id="header">
@@ -45,6 +75,8 @@ $_SESSION['PageTitle'] = "Welcome!";
 		</ul>
 
 	</footer>
+	<script src="includes/js/IndexViewScript.js"></script>
+	<script src="includes/js/jquery.min.js"></script>
 </body>
 
 </html>
