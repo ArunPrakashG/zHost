@@ -14,6 +14,7 @@ $_SESSION['PageTitle'] = "Welcome!";
 <html lang="en" dir="ltr">
 <link rel="stylesheet" href="includes/css/index.css" />
 <link rel="stylesheet" href="includes/css/hover-bttn.css" />
+<script src="includes/js/IndexViewScript.js"></script>
 
 <?php include_once $_SERVER['ZHOST_ROOT'] . '/Common/Header.php'; ?>
 
@@ -31,24 +32,19 @@ $_SESSION['PageTitle'] = "Welcome!";
 
 	<footer id="footer">
 		<ul class="icons">
-			<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-			<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
 			<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
 		</ul>
 		<ul class="copyright">
 			<?php
 			if (IsUserLoggedIn()) {
 				$User = unserialize($_SESSION["userDetails"]);
-				echo '<li>Logged in as <span style="font-weight: bold;"><a href="Views/RedirectView.php?path=../Views/HomeView.php&name=Home Page&header=Home">' . $User->UserName . '</a></span>' . ($User->IsAdmin ? " (Admin) " : " (User) ") . '</li>';
+				echo '<li>Logged in as <span style="font-weight: bold;"><a href="onHomeLinkClicked();">' . $User->UserName . '</a></span>' . ($User->IsAdmin ? " (Admin) " : " (User) ") . '</li>';
 			}
 			?>
 			<li>&copy; zHost <?php echo date("Y"); ?></li>
 		</ul>
 
 	</footer>
-
-	<script src="includes/js/main.js"></script>
-
 </body>
 
 </html>

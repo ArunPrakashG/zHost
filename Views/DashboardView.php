@@ -14,7 +14,7 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
-$_SESSION['PageTitle'] = "Home";
+$_SESSION['PageTitle'] = "Dashboard";
 
 // these variables are no longer required or checked at
 unset($_SESSION["loginErrorMessage"]);
@@ -39,10 +39,8 @@ $User = unserialize($_SESSION["userDetails"]);
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-<link rel="stylesheet" type="text/css" href="../includes/css/home.css" />
-<script src="../includes/js/HomeViewScript.js"></script>
-<script src="../includes/js/jquery.min.js"></script>
-<script src="../includes/js/sweetalert.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../includes/css/dashboard-style.css" />
+<script src="../includes/js/DashboardViewScript.js"></script>
 
 <header>
     <?php require_once '../Common/Header.php' ?>

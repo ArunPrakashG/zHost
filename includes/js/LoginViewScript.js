@@ -46,7 +46,7 @@ function loginRequested() {
                 },
                 onClose: () => {
                   clearInterval(timerInterval);
-                  document.location = "../Views/HomeView.php";
+                  document.location = "../Views/DashboardView.php";
                 },
               });
             }

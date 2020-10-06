@@ -23,7 +23,7 @@ function logoutUser() {
             case "-1":
               Swal.fire(result.ShortReason, result.Reason, result.Level).then(
                 (value) => {
-                  document.location = "../Views/HomeView.php";
+                  document.location = "../Views/DashboardView.php";
                 }
               );
               return;
@@ -33,8 +33,9 @@ function logoutUser() {
                 (value) => {
                   let timerInterval;
                   Swal.fire({
-                    title: "Redirecting you to login page!",
-                    html: "redirecting in <b></b> milliseconds.",
+                    title: "Please wait...",
+                    html:
+                      "Redirecting you to login page in <b></b> milliseconds.",
                     timer: 3000,
                     timerProgressBar: true,
                     allowOutsideClick: false,
@@ -166,7 +167,7 @@ function trashMail(rowIndex) {
             (value) => {
               // if success, delete from ui
               document.getElementById("mailTable").deleteRow(rowIndex);
-              document.location = "../Views/HomeView.php";
+              window.location.reload();
             }
           );
           break;
@@ -206,7 +207,7 @@ function getInboxMails() {
         case "-1":
           Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
-              //document.location = "../Views/HomeView.php?previousError=true";
+              //document.location = "../Views/DashboardView.php?previousError=true";
               return;
             }
           );
@@ -286,7 +287,7 @@ function getDraftMails() {
         case "-1":
           Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
-              //document.location = "../Views/HomeView.php?previousError=true";
+              //document.location = "../Views/DashboardView.php?previousError=true";
               return;
             }
           );
@@ -367,7 +368,7 @@ function getTrashMails() {
         case "-1":
           Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
-              //document.location = "../Views/HomeView.php?previousError=true";
+              //document.location = "../Views/DashboardView.php?previousError=true";
               return;
             }
           );
@@ -448,7 +449,7 @@ function getSendMails() {
         case "-1":
           Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
-              //document.location = "../Views/HomeView.php?previousError=true";
+              //document.location = "../Views/DashboardView.php?previousError=true";
               return;
             }
           );
@@ -579,7 +580,7 @@ function onComposeButtonClicked() {
             case "0":
               Swal.fire("Saved!", "Mail saved as draft!", result.Level).then(
                 (value) => {
-                  document.location = "../Views/HomeView.php";
+                  document.location = "../Views/DashboardView.php";
                 }
               );
               break;
@@ -589,7 +590,7 @@ function onComposeButtonClicked() {
                 result.Reason,
                 result.Level
               ).then((value) => {
-                document.location = "../Views/HomeView.php";
+                document.location = "../Views/DashboardView.php";
               });
               break;
           }
@@ -663,14 +664,14 @@ function onComposeButtonClicked() {
           case "0":
             Swal.fire(result.ShortReason, result.Reason, result.Level).then(
               (value) => {
-                document.location = "../Views/HomeView.php";
+                document.location = "../Views/DashboardView.php";
               }
             );
             break;
           case "-1":
             Swal.fire(result.ShortReason, result.Reason, result.Level).then(
               (value) => {
-                document.location = "../Views/HomeView.php";
+                document.location = "../Views/DashboardView.php";
               }
             );
             break;
@@ -752,7 +753,7 @@ function displayEmailUi(selectedIndex) {
         case "-1":
           Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
-              //document.location = "../Views/HomeView.php?previousError=true";
+              //document.location = "../Views/DashboardView.php?previousError=true";
               return;
             }
           );
@@ -837,7 +838,6 @@ function displayEmailUi(selectedIndex) {
 
             if (iResult.isDenied) {
               // handle mail edit
-              // TODO
               quickEdit(result.Emails[0]);
             }
           });
@@ -931,14 +931,14 @@ function quickReply(sendTo) {
           case "0":
             Swal.fire(result.ShortReason, result.Reason, result.Level).then(
               (value) => {
-                document.location = "../Views/HomeView.php";
+                document.location = "../Views/DashboardView.php";
               }
             );
             break;
           case "-1":
             Swal.fire(result.ShortReason, result.Reason, result.Level).then(
               (value) => {
-                document.location = "../Views/HomeView.php";
+                document.location = "../Views/DashboardView.php";
               }
             );
             break;

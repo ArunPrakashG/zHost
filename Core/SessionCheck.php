@@ -11,7 +11,7 @@ function IsSessionActive($redirectToHomeIfActive, $redirectToLoginIfNotActive)
     if (IsUserLoggedIn()) {
         if ($redirectToHomeIfActive) {
             Functions::Alert("You are already logged in! (" . $_SESSION['ID'] . ")\nRedirecting you to Home page...");            
-            Functions::Redirect("../Views/RedirectView.php?path=../Views/HomeView.php&name=Home Page&header=Home");
+            Functions::Redirect("../Views/DashboardView.php");
         }
 
         return true;
@@ -19,7 +19,7 @@ function IsSessionActive($redirectToHomeIfActive, $redirectToLoginIfNotActive)
 
     if ($redirectToLoginIfNotActive) {
         Functions::Alert("Logon session expired.\nYou will be redirected to login page now...");  
-        Functions::Redirect("../Views/RedirectView.php?path=../Views/LoginView.php&name=Login Page&header=Login");
+        Functions::Redirect("../Views/LoginView.php");
     }
 
     return false;

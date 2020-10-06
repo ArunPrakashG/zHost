@@ -13,11 +13,9 @@ if (!isset($_SESSION)) {
     // we dont need to go directories behind with ../
     if (strcmp($_SESSION['PageTitle'], "Welcome!") == 0) {
         echo '<script src="includes/js/jquery.min.js" charset="utf-8"></script>';
-        //echo '<script src="includes/js/sweetalert.min.js"></script>';
         echo '<script src="includes/js/sweetalert2.min.js"></script>';
     } else {
         echo '<script src="../includes/js/jquery.min.js" charset="utf-8"></script>';
-        //echo '<script src="../includes/js/sweetalert.min.js"></script>';
         echo '<script src="../includes/js/sweetalert2.min.js"></script>';
     }
     ?>

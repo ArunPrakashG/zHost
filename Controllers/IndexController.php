@@ -16,12 +16,12 @@ require_once '../Core/Config.php';
 	if (array_key_exists('loginBttn', $_POST)) {
 		$_SESSION['rq'] = "login";
 		Functions::Redirect("../Views/LoginView.php?refer=index");
-		die();
+		exit();
 	}
 
 	if (array_key_exists('registerBttn', $_POST)) {
 		$_SESSION['rq'] = "register";
 		Functions::Redirect("../Views/RegisterView.php?refer=index");
-		die();
+		exit();
 	}
 ?>

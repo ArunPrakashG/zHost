@@ -77,8 +77,4 @@ if (isset($_GET['refer']) && strcmp($_GET['refer'], "index")) {
 	</div>
 
 </body>
-
-<?php //include_once '../Common/Footer.php'; 
-?>
-
 </html>

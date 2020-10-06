@@ -4,15 +4,6 @@
   var $body = document.querySelector("body");
 
   !(function () {
-    function t(t) {
-      this.el = t;
-      for (
-        var n = t.className.replace(/^\s+|\s+$/g, "").split(/\s+/), i = 0;
-        i < n.length;
-        i++
-      )
-        e.call(this, n[i]);
-    }
     function n(t, n, i) {
       Object.defineProperty
         ? Object.defineProperty(t, n, { get: i })
@@ -146,3 +137,33 @@
     }, settings.delay);
   })();
 })();
+
+function onHomeLinkClicked() {
+  let timerInterval;
+  Swal.fire({
+    title: "Please wait...",
+    html: "Redirecting you to Dashboard in <b></b> milliseconds.",
+    timer: 2000,
+    timerProgressBar: true,
+    willOpen: () => {
+      Swal.showLoading();
+      timerInterval = setInterval(() => {
+        const content = Swal.getContent();
+        if (content) {
+          const b = content.querySelector("b");
+          if (b) {
+            b.textContent = Swal.getTimerLeft();
+          }
+        }
+      }, 100);
+    },
+    onClose: () => {
+      clearInterval(timerInterval);
+    },
+  }).then((result) => {
+    if (result.dismiss === Swal.DismissReason.timer) {
+      window.location = "Views/DashboardView.php";
+      return;
+    }
+  });
+}
