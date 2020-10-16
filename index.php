@@ -68,7 +68,7 @@ $_SESSION['PageTitle'] = "Welcome!";
 			<?php
 			if (IsUserLoggedIn()) {
 				$User = unserialize($_SESSION["userDetails"]);
-				echo '<li>Logged in as <span style="font-weight: bold;"><a href="onHomeLinkClicked();">' . $User->UserName . '</a></span>' . ($User->IsAdmin ? " (Admin) " : " (User) ") . '</li>';
+				echo '<li>Logged in as <span style="font-weight: bold;"><a href="javascript:onHomeLinkClicked();">' . $User->UserName . '</a></span>' . ($User->IsAdmin ? " (Admin) " : " (User) ") . '</li>';
 			}
 			?>
 			<li>&copy; zHost <?php echo date("Y"); ?></li>
