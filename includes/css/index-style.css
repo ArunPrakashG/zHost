@@ -1,9 +1,5 @@
 @import url(fontawesome-all.min.css);
-/*
-	Eventually by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-*/
+
 html,
 body,
 div,
@@ -95,72 +91,98 @@ video {
 
 h1,
 p,
-span{
+span {
   transition-property: box-shadow;
   -webkit-animation-name: fadeIn;
   -webkit-animation-duration: 0.5s;
   animation-name: fadeIn;
   animation-duration: 0.5s;
+  color: #000;
 }
 
-@-webkit-keyframes fadeIn { 
-  0% { opacity: 0; }
-  20% { opacity: 0; }
-  40% { opacity: 0.3; }
-  60% { opacity: 0.5; }
-  80% { opacity: 0.9; }
-  100% { opacity: 1; }
-}
-
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  20% { opacity: 0; }
-  40% { opacity: 0.3; }
-  60% { opacity: 0.5; }
-  80% { opacity: 0.9; }
-  100% { opacity: 1; }
-}
-
-.host-span{
-  color: #fff;
-  font-weight: 800;
-  font-style: normal;
-  text-transform: uppercase;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;  
-  transition: 0.8s;
-  transition-property: box-shadow;
-  -webkit-animation-name: fadeIn;
-  -webkit-animation-duration: 1s;
-  animation-name: fadeIn;
-  animation-duration: 1s;
-}
-
-.host-span { 
-  text-shadow: 0 0 15px #ff9900;
-}
-
-.host-span:hover {
-  text-shadow: 0 0 5px #e6ff58, 0 0 25px #eec494, 0 0 50px #f87f7f,
-  0 0 100px #61ee5d;
-  opacity: 1;  
-}
-
-@-webkit-keyframes fadeIn { 
-  0% { opacity: 0; }
-  20% { opacity: 0; }
-  40% { opacity: 0.3; }
-  60% { opacity: 0.5; }
-  80% { opacity: 0.9; }
-  100% { opacity: 1; }
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.3;
+  }
+  60% {
+    opacity: 0.5;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeIn {
-  0% { opacity: 0; }
-  20% { opacity: 0; }
-  40% { opacity: 0.3; }
-  60% { opacity: 0.5; }
-  80% { opacity: 0.9; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.3;
+  }
+  60% {
+    opacity: 0.5;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.3;
+  }
+  60% {
+    opacity: 0.5;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.3;
+  }
+  60% {
+    opacity: 0.5;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 article,
@@ -203,7 +225,7 @@ table {
   border-spacing: 0;
 }
 
-body {
+#bodyContainer {
   -webkit-text-size-adjust: none;
 }
 
@@ -231,13 +253,13 @@ textarea {
   width: device-width;
 }
 
-body {
+#bodyContainer {
   -ms-overflow-style: scrollbar;
 }
 
 @media screen and (max-width: 480px) {
   html,
-  body {
+  #bodyContainer {
     min-width: 320px;
   }
 }
@@ -253,38 +275,37 @@ html {
 }
 
 html,
-body {
-  height: 100%;
+#bodyContainer {
   overflow-x: hidden;
   width: 100%;
 }
 @media screen and (max-height: 640px) {
   html,
-  body {
+  #bodyContainer {
     height: auto;
     min-height: 100%;
   }
 }
 
-body {
+#bodyContainer {
   display: -moz-flex;
   display: -webkit-flex;
   display: -ms-flex;
   display: flex;
-  -moz-flex-direction: column;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
+  -moz-flex-direction: row;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
   -moz-justify-content: center;
   -webkit-justify-content: center;
   -ms-justify-content: center;
   justify-content: center;
-  background-color: #000;
+  background-color: transparent;
   padding: 6em 4em 4em 4em;
 }
-body.is-preload *,
-body.is-preload *:before,
-body.is-preload *:after {
+#bodyContainer.is-preload *,
+#bodyContainer.is-preload *:before,
+#bodyContainer.is-preload *:after {
   -moz-animation: none !important;
   -webkit-animation: none !important;
   -ms-animation: none !important;
@@ -294,22 +315,22 @@ body.is-preload *:after {
   -ms-transition: none !important;
   transition: none !important;
 }
-body > * {
+#bodyContainer > * {
   position: relative;
   z-index: 2;
 }
 @media screen and (max-width: 1680px) {
-  body {
+  #bodyContainer {
     padding: 6em 3.5em 3.5em 3.5em;
   }
 }
 @media screen and (max-width: 736px) {
-  body {
+  #bodyContainer {
     padding: 5em 2em 2em 2em;
   }
 }
 @media screen and (max-width: 360px) {
-  body {
+  #bodyContainer {
     padding: 5em 1.25em 1.25em 1.25em;
   }
 }
@@ -322,9 +343,7 @@ body > * {
   transition: opacity 2s ease-in-out;
   height: 100%;
   left: 0;
-  opacity: 0.375;
-  position: fixed;
-  top: 0;
+  opacity: 0.575;
   width: 100%;
   z-index: 1;
 }
@@ -376,7 +395,7 @@ body > * {
   -ms-animation-direction: alternate !important;
   animation-direction: alternate !important;
 }
-body.is-preload #bg {
+#bodyContainer.is-preload #bg {
   opacity: 0;
 }
 
@@ -445,15 +464,15 @@ body,
 input,
 select,
 textarea {
-  color: rgba(255, 255, 255, 0.75);
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   font-size: 13pt;
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.65em;
 }
 @media screen and (max-width: 1680px) {
-  body,
+  #bodyContainer,
   input,
   select,
   textarea {
@@ -461,7 +480,7 @@ textarea {
   }
 }
 @media screen and (max-width: 1280px) {
-  body,
+  #bodyContainer,
   input,
   select,
   textarea {
@@ -469,7 +488,7 @@ textarea {
   }
 }
 @media screen and (max-width: 980px) {
-  body,
+  #bodyContainer,
   input,
   select,
   textarea {
@@ -477,7 +496,7 @@ textarea {
   }
 }
 @media screen and (max-width: 736px) {
-  body,
+  #bodyContainer,
   input,
   select,
   textarea {
@@ -485,7 +504,7 @@ textarea {
   }
 }
 @media screen and (max-width: 480px) {
-  body,
+  #bodyContainer,
   input,
   select,
   textarea {
@@ -498,7 +517,7 @@ a {
   -webkit-transition: border-bottom-color 0.2s ease, color 0.2s ease;
   -ms-transition: border-bottom-color 0.2s ease, color 0.2s ease;
   transition: border-bottom-color 0.2s ease, color 0.2s ease;
-  border-bottom: dotted 1px rgba(255, 255, 255, 0.25);
+
   color: #1cb495;
   text-decoration: none;
 }
@@ -510,7 +529,6 @@ a:hover {
 
 strong,
 b {
-  color: #fff;
   font-weight: 700;
 }
 
@@ -529,7 +547,6 @@ h3,
 h4,
 h5,
 h6 {
-  color: #fff;
   font-weight: 700;
   line-height: 1em;
   margin: 0 0 1em 0;
@@ -632,7 +649,6 @@ article.special {
 }
 
 header p {
-  color: rgba(255, 255, 255, 0.5);
   position: relative;
   margin: 0 0 1.5em 0;
 }
@@ -977,10 +993,10 @@ textarea {
   -ms-transition: opacity 0.5s ease-in-out;
   transition: opacity 0.5s ease-in-out;
   bottom: 4em;
-  color: rgba(255, 255, 255, 0.5);
   left: 4em;
   opacity: 0.5;
   position: absolute;
+  z-index: 1;
 }
 #footer .icons {
   margin: 0 0 0.5em 0;
@@ -1022,4 +1038,125 @@ textarea {
   content: "";
   clear: both;
   display: table;
+}
+
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+  z-index: 1;
+  width: 100%;
+  position: fixed;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: rgb(233, 233, 233);
+  color: rgb(224, 38, 38);
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #01f509;
+  color: rgb(255, 255, 255);
+}
+
+/* Appearance */
+.links {
+  background-color: #123;
+  background-image: linear-gradient(to bottom, #0003, transparent);
+  border-bottom: 1px solid #0003;
+  box-shadow: 0 0 32px #0003;
+  font-variant: all-small-caps;
+  font-weight: 300;
+}
+.links > a {
+  color: #e8e8e8;
+  padding: 0.75em;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.5s;
+}
+.links > a:hover {
+  background: #ffffff06;
+  color: #adf;
+}
+.links > .line {
+  background: rgb(255, 255, 255);
+  height: 3px;
+  pointer-events: none;
+}
+
+/* The Magic */
+#testNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.links {
+  display: grid;
+  grid-template-columns: repeat(var(--items), 1fr);
+  position: relative;
+  font-variant: all-small-caps;
+}
+
+.links > .line {
+  opacity: 0;
+  transition: all 0.5s;
+  position: absolute;
+  bottom: 0;
+  left: var(--left, calc(100% / var(--items) * (var(--index) - 1)));
+  width: var(--width, calc(100% / var(--items)));
+  --index: 0;
+}
+
+.links > a:hover ~ .line {
+  opacity: 1;
+}
+
+.links > a:nth-of-type(1):hover ~ .line {
+  --index: 1;
+}
+.links > a:nth-of-type(2):hover ~ .line {
+  --index: 2;
+}
+.links > a:nth-of-type(3):hover ~ .line {
+  --index: 3;
+}
+.links > a:nth-of-type(4):hover ~ .line {
+  --index: 4;
+}
+.links > a:nth-of-type(5):hover ~ .line {
+  --index: 5;
+}
+.links > a:nth-of-type(6):hover ~ .line {
+  --index: 6;
+}
+.links > a:nth-of-type(7):hover ~ .line {
+  --index: 7;
+}
+.links > a:nth-of-type(8):hover ~ .line {
+  --index: 8;
+}
+.links > a:nth-of-type(9):hover ~ .line {
+  --index: 9;
+}
+.links > a:nth-of-type(10):hover ~ .line {
+  --index: 10;
+}
+.links > a:last-of-type:hover ~ .line {
+  --index: var(--items);
 }

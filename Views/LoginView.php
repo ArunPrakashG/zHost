@@ -49,7 +49,7 @@ if (isset($_GET['refer']) && strcmp($_GET['refer'], "index")) {
                 <br />
                 <p class="options">Forgot Password ? <a href="javascript:onForgotPasswordClicked();">Click Here</a>!</p>
                 <p class="options">Not Registered ? <a href="../Views/RegisterView.php">Register here</a>!</p>
-                <p class="options">Wanted Home page ? <a href="../Index.php">Home page</a>!</p>
+                <p class="options">Wanted Home page ? <a href="../index.php">Home page</a>!</p>
             </form>
         </div>
     </div>

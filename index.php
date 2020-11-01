@@ -48,17 +48,31 @@ $_SESSION['PageTitle'] = "Welcome!";
 	}
 </script>
 
-<body class="is-preload body">
-	<header id="header">
-		<h1>z<span class="host-span">Host</span></h1>
-		<p>An online mail server system developed as a part of <br />
-			college <span style="font-weight: bold;">mini project.</span></p>
-	</header>
+<body>
+	<div id="testNav">
+		<nav class="links" style="--items: 5;">			
+			<a href="javascript: window.location.reload();">Index</a>
+			<a href="Views/LoginView.php?refer=index">Sign In</a>
+			<a href="Views/RegisterView.php?refer=index">Sign Up</a>
+			<a href="Views/AboutUsView.php?refer=index">About Us</a>
+			<a href="Views/ContactUsView.php?refer=index">Contact Us</a>
+			<span class="line"></span>
+		</nav>
+	</div>
 
+	<div id="bodyContainer" class="is-preload body">
+		<header id="header">
+			<h1>zHOST</h1>
+			<p>An online mail server system developed as a part of <br />
+				college <span style="font-weight: bold;">mini project.</span></p>
+		</header>
+	</div>
+	<!--
 	<form method="post" action="Controllers/IndexController.php">
 		<input type="submit" name="loginBttn" class="btn btn-primary" value="LOGIN" />
 		<input type="submit" name="registerBttn" class="btn btn-primary" value="REGISTER" />
 	</form>
+	-->
 
 	<footer id="footer">
 		<ul class="icons">
@@ -75,6 +89,7 @@ $_SESSION['PageTitle'] = "Welcome!";
 		</ul>
 
 	</footer>
+
 	<script src="includes/js/IndexViewScript.js"></script>
 	<script src="includes/js/jquery.min.js"></script>
 </body>

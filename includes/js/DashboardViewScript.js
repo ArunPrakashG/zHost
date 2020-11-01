@@ -812,14 +812,12 @@ function displayEmailUi(selectedIndex) {
             showCloseButton: true,
             showCancelButton: true,
             confirmButtonText: "Quick Reply",
-            cancelButtonText: "Delete",
+            cancelButtonText: "Trash",
             showDenyButton: true,
             denyButtonText: "Edit",
           }).then((iResult) => {
-            console.log(iResult);
-            console.log(result.Emails[0]);
             if (iResult.isDismissed) {
-              switch (result.dismiss) {
+              switch (iResult.dismiss) {
                 case "backdrop":
                 case "close":
                 case "esc":

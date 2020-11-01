@@ -50,7 +50,7 @@ $User = unserialize($_SESSION["userDetails"]);
             <i class="fas fa-bars" id="sidebar_btn"></i>
         </label>
         <div class="left_area">
-            <h3>z<span>Host</span></h3>
+            <h3>z<span onclick="window.location='../index.php';">Host</span></h3>
         </div>
         <div class="right_area">
             <a onclick="logoutUser();" href="javascript:void(0);" class="logout_btn">Logout</a>
@@ -74,7 +74,7 @@ $User = unserialize($_SESSION["userDetails"]);
                 <a href="#" onclick="getDraftMails();" class="item"><span style="font-weight: bold;">Draft</span></a>
                 <a href="#" onclick="getSendMails();" class="item"><span style="font-weight: bold;">Send</span></a>
                 <a href="#" onclick="getTrashMails();" class="item"><span style="font-weight: bold;">Trash</span></a>
-                <a href="#" onclick="onSettingsButtonClicked();" class="item"><span style="font-weight: bold;">Settings</span></a>
+                <!-- <a href="#" onclick="onSettingsButtonClicked();" class="item"><span style="font-weight: bold;">Settings</span></a> -->
             </div>
         </div>
 

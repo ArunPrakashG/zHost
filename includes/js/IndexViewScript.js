@@ -95,8 +95,7 @@
       images: {
         "includes/images/bg01.jpg": "center",
         "includes/images/bg02.jpg": "center",
-        "includes/images/bg03.jpg": "center",
-        "includes/images/homepage-bg.png": "center",
+        "includes/images/bg03.jpg": "center"
       },
 
       delay: 6000,
