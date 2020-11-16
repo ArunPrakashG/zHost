@@ -5,13 +5,13 @@ require_once '../Common/Functions.php';
 require_once '../Core/SessionCheck.php';
 
 if (Config::DEBUG) {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  error_reporting(E_ALL);
 }
 
 if (!isset($_SESSION)) {
-    session_start();
+  session_start();
 }
 
 $_SESSION['PageTitle'] = "Dashboard";
@@ -29,82 +29,142 @@ unset($_SESSION["rq"]);
 $User;
 
 if (!IsUserLoggedIn()) {
-    Functions::Alert("Session expired!\nYou will be required to login again.");
-    Functions::Redirect("../Views/LoginView.php");
-    exit();
+  Functions::Alert("Session expired!\nYou will be required to login again.");
+  Functions::Redirect("../Views/LoginView.php");
+  exit();
 }
 
 $User = unserialize($_SESSION["userDetails"]);
 ?>
 
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<link rel="stylesheet" type="text/css" href="../includes/css/dashboard-style.css" />
-<script src="../includes/js/DashboardViewScript.js"></script>
+<!doctype html>
+<html lang="en">
 
-<header>
-    <?php require_once '../Common/Header.php' ?>
+<head>
+  <?php require_once '../Common/Header.php' ?>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="../includes/css/style-starter.css">
+  <script src="../includes/js/jquery-1.10.2.min.js"></script>
+  <script src="../includes/js/jquery-3.5.1.min.js"></script>
+  <script src="../includes/js/bootstrap.bundle.min.js"></script>
+  <script src="../includes/js/DashboardViewScript.js"></script>
+</head>
 
-    <div class="header-container">
-        <label for="check">
-            <i class="fas fa-bars" id="sidebar_btn"></i>
-        </label>
-        <div class="left_area">
-            <h3>z<span onclick="window.location='../index.php';">Host</span></h3>
-        </div>
-        <div class="right_area">
-            <a onclick="logoutUser();" href="javascript:void(0);" class="logout_btn">Logout</a>
-        </div>
+<body class="">
+  <section>
+    <div class="sidebar-menu sticky-sidebar-menu">
+      <div class="logo">
+        <h1><a href="../Views/DashboardView.php">ZHOST</a></h1>
+      </div>
+      <div class="logo-icon text-center">
+        <a href="dashboard.php" title="logo"><img src="assets/images/logo.png" alt="logo-icon"> </a>
+      </div>
+      <div class="sidebar-menu-inner">
+        <ul class="nav nav-pills nav-stacked custom-nav">
+          <li class="active"><a href="#" onclick="getInboxMails();"><span> Inbox</span></a></li>
+          <li class=""><a href="#" onclick="onComposeButtonClicked();"><span> Compose</span></a></li>
+          <li class=""><a href="#" onclick="getDraftMails();"><span> Draft</span></a></li>
+          <li class=""><a href="#" onclick="getSendMails();"><span> Send</span></a></li>
+          <li class=""><a href="#" onclick="getTrashMails();"><span> Trash</span></a></li>
+        </ul>
+      </div>
     </div>
-
-</header>
-
-<body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="profile_info">
-                <img src=<?php echo $User->AvatarPath ?> class="profile_image" alt="place_holder">
-                <h4><?php echo $User->UserName ?></h4>
-                <h4><?php echo $User->Email ?></h4>
+    <div class="header sticky-header">
+      <div class="menu-right">
+        <div class="navbar user-panel-top">
+          <div class="search-box">
+            <form action="#" method="get">
+              <input class="search-input" placeholder="Search Here..." type="search" id="search">
+              <button class="search-submit" value=""><span class="fa fa-search"></span></button>
+            </form>
+          </div>
+          <div class="user-dropdown-details d-flex">
+            <div class="profile_details">
+              <ul>
+                <li class="dropdown profile_details_drop">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="dropdownMenu3" aria-haspopup="true" aria-expanded="false">
+                    <div class="profile_img">
+                      <img src="<?php echo $User->AvatarPath ?>" class="rounded-circle" alt="" />
+                      <div class="user-active">
+                        <span></span>
+                      </div>
+                    </div>
+                  </a>
+                  <ul class="dropdown-menu drp-mnu" aria-labelledby="dropdownMenu3">
+                    <li class="user-info">
+                      <h5 class="user-name"><?php echo $User->UserName ?></h5>
+                      <span class="status ml-2">Available</span>
+                    </li>
+                    <li> <a href="#"><i class="lnr lnr-user"></i>My Profile</a> </li>
+                    <li> <a href="#"><i class="lnr lnr-cog"></i>Settings</a> </li>
+                    <li class="logout"> <a href="javascript:void(0);" onclick="logoutUser();"><i class="fa fa-power-off"></i> Logout</a> </li>
+                  </ul>
+                </li>
+              </ul>
             </div>
-            <hr class="breaker" />
-            <div class="dashboard-contents item-container">
-                <a href="#" onclick="getInboxMails();" class="item"><span style="font-weight: bold;">Inbox</span></a>
-                <a href="#" onclick="onComposeButtonClicked();" class="item"><span style="font-weight: bold;">Compose</span></a>
-                <a href="#" onclick="getDraftMails();" class="item"><span style="font-weight: bold;">Draft</span></a>
-                <a href="#" onclick="getSendMails();" class="item"><span style="font-weight: bold;">Send</span></a>
-                <a href="#" onclick="getTrashMails();" class="item"><span style="font-weight: bold;">Trash</span></a>
-                <!-- <a href="#" onclick="onSettingsButtonClicked();" class="item"><span style="font-weight: bold;">Settings</span></a> -->
-            </div>
+          </div>
         </div>
-
-        <div class="sel-body">
-            <table class="styled-table" id="mailTable" cellspacing="0" cellpadding="0">
-                <thead>
-                    <tr>
-                        <th>S.No</th>
-                        <th>Uuid</th>
-                        <th>Sender</th>
-                        <th>Subject</th>
-                        <th>Received Time</th>
-                        <th>Option</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="table-row-field">1</td>
-                        <td class="table-row-field">Uuid_PH</td>
-                        <td class="table-row-field">Name_PH</td>
-                        <td class="table-row-field">Subject_PH</td>
-                        <td class="table-row-field">Time_PH</td>
-                        <td class="table-row-field">
-                            <button class="deletebttn">Button_PH</button>
-                        </td>
-                    </tr>
-                </tbody>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="container-fluid content-top-gap">
+        <div class="card card_border py-2 mb-4">
+          <div class="card-body">
+            <table id="mailTable" class="table table-striped table-bordered table-responsive">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Uuid</th>
+                  <th scope="col">Sender</th>
+                  <th scope="col">Subject</th>
+                  <th scope="col">Received Time</th>
+                  <th scope="col">Option</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td>Uuid_PH</td>
+                  <td>Name_PH</td>
+                  <td>Subject_PH</td>
+                  <td>Sender_PH</td>
+                  <td>Time_PH</td>
+                  <td>
+                    <button class="deletebttn">Button_PH</button>
+                  </td>
+                </tr>
+              </tbody>
             </table>
+          </div>
         </div>
+      </div>
     </div>
+  </section>
+  <footer class="dashboard">
+    <p>&copy All Rights Reserved</a> z-Host</p>
+  </footer>
+  <button onclick="topFunction()" id="movetop" class="bg-primary" title="Go to top">
+    <span class="fa fa-angle-up"></span>
+  </button>
+  <script>
+    window.onscroll = function() {
+      scrollFunction()
+    };
+
+    function scrollFunction() {
+      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        document.getElementById("movetop").style.display = "block";
+      } else {
+        document.getElementById("movetop").style.display = "none";
+      }
+    }
+
+    function topFunction() {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
+  </script>
 </body>
 
 </html>

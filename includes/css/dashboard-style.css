@@ -9,12 +9,12 @@ body {
   font-family: "assistant-regular";
 }
 
-.container{
-    display:flex;
+.container {
+  display: flex;
 }
 
-.sel-body{
-    flex-grow: 1;
+.sel-body {
+  flex-grow: 1;
 }
 
 header {
@@ -255,7 +255,7 @@ label #sidebar_btn:hover {
 
 .table-row-field {
   margin: 0px;
-  padding: 15px;  
+  padding: 15px;
   text-align: center;
 }
 
@@ -281,7 +281,7 @@ label #sidebar_btn:hover {
   border-bottom: thin solid #009879;
 }
 
-.styled-table tbody tr.active-row {  
+.styled-table tbody tr.active-row {
   background-color: #bdbdbdc4;
   color: #000000;
 }
