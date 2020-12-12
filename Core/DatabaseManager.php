@@ -664,6 +664,30 @@ class Database
                 if (isset($obj->PhoneNumber)) {
                     $resultObject->PhoneNumber = $obj->PhoneNumber;
                 }
+
+                if(isset($obj->FirstName)){
+                    $resultObject->FirstName = $obj->FirstName;
+                }
+
+                if(isset($obj->LastName)){
+                    $resultObject->LastName = $obj->LastName;
+                }
+
+                if(isset($obj->Address)){
+                    $resultObject->Address = $obj->Address;
+                }
+
+                if(isset($obj->WorkLink)){
+                    $resultObject->WorkLink = $obj->WorkLink;
+                }
+
+                if(isset($obj->Profession)){
+                    $resultObject->Profession = $obj->Profession;
+                }
+
+                if(isset($obj->Bio)){
+                    $resultObject->Bio = $obj->Bio;
+                }
             }
 
             mysqli_free_result($exeResult);

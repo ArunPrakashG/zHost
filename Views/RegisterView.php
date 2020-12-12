@@ -40,7 +40,7 @@ if (isset($_GET['refer']) && strcmp($_GET['refer'], "index")) {
 				<p class="subheading">Please fill in this form to create an account.</p>
 				<hr>
 
-				<label class="heading" for="email"><b>Email</b></label>
+				<label class="heading" for="email"><b>Z Host User ID</b></label>
 				<input type="text" placeholder="Enter Email" name="email" id="email" required value=<?php echo isset($_SESSION['form-data']['email']) ? $_SESSION['form-data']['email'] : "" ?>>
 
 				<label class="heading" for="username"><b>Username</b></label>

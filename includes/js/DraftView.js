@@ -1,3 +1,5 @@
+var currentActiveIndex = 0;
+
 function logoutUser() {
   Swal.fire({
     title: "Are you sure?",
@@ -23,7 +25,7 @@ function logoutUser() {
             case "-1":
               Swal.fire(result.ShortReason, result.Reason, result.Level).then(
                 (value) => {
-                  document.location = "../Views/DashboardView.php";
+                  document.location = "../Views/DraftView.php";
                 }
               );
               return;
@@ -191,87 +193,8 @@ function trashMail(rowIndex) {
   });
 }
 
-function getInboxMails() {
-  $("#mailTable tbody tr").remove(0);
-
-  $.ajax({
-    method: "POST",
-    url: "../Controllers/HomeController.php",
-    data: {
-      requestType: "inbox_view",
-    },
-    cache: false,
-    dataType: "json",
-    success: function (result) {
-      switch (result.Status) {
-        case "-1":
-          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
-            (value) => {
-              //document.location = "../Views/DashboardView.php?previousError=true";
-              return;
-            }
-          );
-          return;
-        case "0":
-          // inbox fetch done
-          if (result.Emails == null || result.Emails.length <= 0) {
-            setTimeout(function () {
-              Swal.fire({
-                title: "All caught up!",
-                text: "No new mails found in current mail folder.",
-                timer: 3000,
-                timerProgressBar: true,
-              });
-            }, 100);
-
-            return;
-          }
-
-          for (var i = 0; i < result.Emails.length; i++) {
-            var mail = result.Emails[i];
-            var rowHtml =
-              '<td class="table-row-field">' +
-              (i + 1) +
-              "</td>" +
-              '<td class="table-row-field" id="mailUuid">' +
-              mail.MailID +
-              "</td>" +
-              '<td class="table-row-field">' +
-              mail.From +
-              "</td>" +
-              '<td class="table-row-field">' +
-              (mail.Subject.length > 18
-                ? mail.Subject.substring(0, 18 - 3) + "..."
-                : mail.Subject) +
-              "</td>" +
-              '<td class="table-row-field">' +
-              mail.At +
-              "</td>" +
-              '<td class="table-row-field">' +
-              '<button class="deletebttn" id="trash-inbox" onclick="onDeleteAnchorClicked(this);">Trash</button>' +
-              "</td>";
-            addRow(rowHtml, "mailTable");
-          }
-
-          //if(result.Emails.length > 0){
-          //document.getElementsByClassName("mailTable")[0].rows[0].setAttribute('class', 'active-row');
-          //}
-
-          break;
-      }
-    },
-    error: function (e) {
-      Swal.fire(
-        "Request Exception!",
-        "Exception occured during AJAX Request. Check console for more info.",
-        "error"
-      );
-      console.log(e);
-    },
-  });
-}
-
 function getDraftMails() {
+  currentActiveIndex = 2;
   $("#mailTable tbody tr").remove();
 
   $.ajax({
@@ -287,7 +210,7 @@ function getDraftMails() {
         case "-1":
           Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
-              //document.location = "../Views/DashboardView.php?previousError=true";
+              //document.location = "../Views/DraftView.php?previousError=true";
               return;
             }
           );
@@ -308,30 +231,8 @@ function getDraftMails() {
           }
 
           for (var i = 0; i < result.Emails.length; i++) {
-            var mail = result.Emails[i];
-            var rowHtml =
-              '<td class="table-row-field">' +
-              i +
-              1 +
-              "</td>" +
-              '<td class="table-row-field" id="mailUuid">' +
-              mail.MailID +
-              "</td>" +
-              '<td class="table-row-field">' +
-              mail.From +
-              "</td>" +
-              '<td class="table-row-field">' +
-              (mail.Subject.length > 18
-                ? mail.Subject.substring(0, 18 - 3) + "..."
-                : mail.Subject) +
-              "</td>" +
-              '<td class="table-row-field">' +
-              mail.At +
-              "</td>" +
-              '<td class="table-row-field">' +
-              '<button class="deletebttn" id="delete-draft" onclick="onDeleteAnchorClicked(this);">Delete</button>' +
-              "</td>";
-            addRow(rowHtml, "mailTable");
+            var mail = result.Emails[i];           
+            addRow(generateRowHtml(i, mail), "mailTable");
           }
 
           //if(result.Emails.length > 0){
@@ -352,162 +253,54 @@ function getDraftMails() {
   });
 }
 
-function getTrashMails() {
-  $("#mailTable tbody tr").remove();
+function generateRowHtml(indexer, mail) {
+  if (mail == null) {
+    setTimeout(function () {
+      Swal.fire({
+        title: "Failed!",
+        text: "Failed internally.",
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    }, 100);
+    return "";
+  }
 
-  $.ajax({
-    method: "POST",
-    url: "../Controllers/HomeController.php",
-    data: {
-      requestType: "trash_view",
-    },
-    cache: false,
-    dataType: "json",
-    success: function (result) {
-      switch (result.Status) {
-        case "-1":
-          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
-            (value) => {
-              //document.location = "../Views/DashboardView.php?previousError=true";
-              return;
-            }
-          );
-          return;
-        case "0":
-          // trash fetch done
-          if (result.Emails == null || result.Emails.length <= 0) {
-            setTimeout(function () {
-              Swal.fire({
-                title: "All caught up!",
-                text: "No new mails found in current mail folder.",
-                timer: 3000,
-                timerProgressBar: true,
-              });
-            }, 100);
-
-            return;
-          }
-
-          for (var i = 0; i < result.Emails.length; i++) {
-            var mail = result.Emails[i];
-            var rowHtml =
-              '<td class="table-row-field">' +
-              i +
-              1 +
-              "</td>" +
-              '<td class="table-row-field" id="mailUuid">' +
-              mail.MailID +
-              "</td>" +
-              '<td class="table-row-field">' +
-              mail.From +
-              "</td>" +
-              '<td class="table-row-field">' +
-              (mail.Subject.length > 18
-                ? mail.Subject.substring(0, 18 - 3) + "..."
-                : mail.Subject) +
-              "</td>" +
-              '<td class="table-row-field">' +
-              mail.At +
-              "</td>" +
-              '<td class="table-row-field">' +
-              '<button class="deletebttn" id="trash-options" onclick="onDeleteAnchorClicked(this);">Option</button>' +
-              "</td>";
-            addRow(rowHtml, "mailTable");
-          }
-
-          //if(result.Emails.length > 0){
-          //document.getElementsByClassName("mailTable")[0].rows[0].setAttribute('class', 'active-row');
-          //}
-
-          break;
-      }
-    },
-    error: function (e) {
-      Swal.fire(
-        "Request Exception!",
-        "Exception occured during AJAX Request. Check console for more info.",
-        "error"
-      );
-      console.log(e);
-    },
-  });
+  return (
+    '<td class="table-row-field">' +
+    indexer +
+    1 +
+    "</td>" +
+    '<td class="table-row-field hidden" id="mailUuid">' +
+    mail.MailID +
+    "</td>" +
+    '<td class="table-row-field">' +
+    mail.To +
+    "</td>" +
+    '<td class="table-row-field">' +
+    (mail.Subject.length > 18
+      ? mail.Subject.substring(0, 18 - 3) + "..."
+      : mail.Subject) +
+    "</td>" +
+    '<td class="table-row-field">' +
+    getJsDateTime(mail.At) +
+    "</td>" +
+    '<td class="table-row-field">' +
+    '<button class="deletebttn" id="delete-draft" onclick="onDeleteAnchorClicked(this);">Delete</button>' +
+    "</td>"
+  );
 }
 
-function getSendMails() {
-  $("#mailTable tbody tr").remove();
+function getJsDateTime(timeStamp) {
+  if (timeStamp == null) {
+    return "";
+  }
 
-  $.ajax({
-    method: "POST",
-    url: "../Controllers/HomeController.php",
-    data: {
-      requestType: "send_view",
-    },
-    cache: false,
-    dataType: "json",
-    success: function (result) {
-      switch (result.Status) {
-        case "-1":
-          Swal.fire(result.ShortReason, result.Reason, result.Level).then(
-            (value) => {
-              //document.location = "../Views/DashboardView.php?previousError=true";
-              return;
-            }
-          );
-          return;
-        case "0":
-          // send fetch done
-          if (result.Emails == null || result.Emails.length <= 0) {
-            setTimeout(function () {
-              Swal.fire({
-                title: "All caught up!",
-                text: "No new mails found in current mail folder.",
-                timer: 3000,
-                timerProgressBar: true,
-              });
-            }, 100);
+  if (!moment(timeStamp).isValid()) {
+    return "";
+  }
 
-            return;
-          }
-
-          for (var i = 0; i < result.Emails.length; i++) {
-            var mail = result.Emails[i];
-            var rowHtml =
-              '<td class="table-row-field">' +
-              i +
-              1 +
-              "</td>" +
-              '<td class="table-row-field" id="mailUuid">' +
-              mail.MailID +
-              "</td>" +
-              '<td class="table-row-field">' +
-              mail.From +
-              "</td>" +
-              '<td class="table-row-field">' +
-              (mail.Subject.length > 18
-                ? mail.Subject.substring(0, 18 - 3) + "..."
-                : mail.Subject) +
-              "</td>" +
-              '<td class="table-row-field">' +
-              mail.At +
-              "</td>" +
-              '<td class="table-row-field">' +
-              '<button class="deletebttn" id="trash-options" disabled onclick="onDeleteAnchorClicked(this);">Option</button>' +
-              "</td>";
-            addRow(rowHtml, "mailTable");
-          }
-
-          break;
-      }
-    },
-    error: function (e) {
-      Swal.fire(
-        "Request Exception!",
-        "Exception occured during AJAX Request. Check console for more info.",
-        "error"
-      );
-      console.log(e);
-    },
-  });
+  return moment(timeStamp).fromNow();
 }
 
 function onComposeButtonClicked() {
@@ -580,7 +373,7 @@ function onComposeButtonClicked() {
             case "0":
               Swal.fire("Saved!", "Mail saved as draft!", result.Level).then(
                 (value) => {
-                  document.location = "../Views/DashboardView.php";
+                  document.location = "../Views/DraftView.php";
                 }
               );
               break;
@@ -590,7 +383,7 @@ function onComposeButtonClicked() {
                 result.Reason,
                 result.Level
               ).then((value) => {
-                document.location = "../Views/DashboardView.php";
+                document.location = "../Views/DraftView.php";
               });
               break;
           }
@@ -664,14 +457,14 @@ function onComposeButtonClicked() {
           case "0":
             Swal.fire(result.ShortReason, result.Reason, result.Level).then(
               (value) => {
-                document.location = "../Views/DashboardView.php";
+                document.location = "../Views/DraftView.php";
               }
             );
             break;
           case "-1":
             Swal.fire(result.ShortReason, result.Reason, result.Level).then(
               (value) => {
-                document.location = "../Views/DashboardView.php";
+                document.location = "../Views/DraftView.php";
               }
             );
             break;
@@ -753,7 +546,7 @@ function displayEmailUi(selectedIndex) {
         case "-1":
           Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
-              //document.location = "../Views/DashboardView.php?previousError=true";
+              //document.location = "../Views/DraftView.php?previousError=true";
               return;
             }
           );
@@ -929,14 +722,14 @@ function quickReply(sendTo) {
           case "0":
             Swal.fire(result.ShortReason, result.Reason, result.Level).then(
               (value) => {
-                document.location = "../Views/DashboardView.php";
+                document.location = "../Views/DraftView.php";
               }
             );
             break;
           case "-1":
             Swal.fire(result.ShortReason, result.Reason, result.Level).then(
               (value) => {
-                document.location = "../Views/DashboardView.php";
+                document.location = "../Views/DraftView.php";
               }
             );
             break;
@@ -1115,5 +908,5 @@ function onDeleteAnchorClicked(anchor) {
 
 document.addEventListener("DOMContentLoaded", function () {
   // load inbox emails by default as its the first selection
-  getInboxMails();
+  getDraftMails();
 });

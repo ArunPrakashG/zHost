@@ -9,6 +9,12 @@
         public $IsAdmin;
         public $SecurityQuestion;
         public $SecurityAnswer;
+        public $FirstName;
+        public $LastName;
+        public $Address;
+        public $WorkLink;
+        public $Profession;
+        public $Bio;
         public $AvatarPath;
         public $PhoneNumber;
         public $ResultStatus;

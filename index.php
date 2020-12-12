@@ -67,7 +67,8 @@ $_SESSION['PageTitle'] = "Welcome!";
 				college <span style="font-weight: bold;">mini project.</span></p>
 		</header>
 	</div>
-	<!--
+	
+	<!-- test
 	<form method="post" action="Controllers/IndexController.php">
 		<input type="submit" name="loginBttn" class="btn btn-primary" value="LOGIN" />
 		<input type="submit" name="registerBttn" class="btn btn-primary" value="REGISTER" />

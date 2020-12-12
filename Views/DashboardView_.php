@@ -45,26 +45,28 @@ $User = unserialize($_SESSION["userDetails"]);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="../includes/css/style-starter.css">
+  <link rel="stylesheet" href="../includes/css/dashboard_.css">
   <script src="../includes/js/jquery-1.10.2.min.js"></script>
   <script src="../includes/js/jquery-3.5.1.min.js"></script>
   <script src="../includes/js/bootstrap.bundle.min.js"></script>
   <script src="../includes/js/DashboardViewScript.js"></script>
+  <script src="../includes/js/moment.min.js"></script>
 </head>
 
 <body class="">
   <section>
     <div class="sidebar-menu sticky-sidebar-menu">
       <div class="logo">
-        <h1><a href="../Views/DashboardView.php">ZHOST</a></h1>
+        <h1><a href="../index.php">ZHOST</a></h1>
       </div>
       <div class="logo-icon text-center">
         <a href="dashboard.php" title="logo"><img src="assets/images/logo.png" alt="logo-icon"> </a>
       </div>
       <div class="sidebar-menu-inner">
-        <ul class="nav nav-pills nav-stacked custom-nav">
-          <li class="active"><a href="#" onclick="getInboxMails();"><span> Inbox</span></a></li>
+        <ul class="nav nav-pills nav-stacked custom-nav" id="navItems">
+          <li class="active"><a href="../Views/InboxView.php"><span> Inbox</span></a></li>
           <li class=""><a href="#" onclick="onComposeButtonClicked();"><span> Compose</span></a></li>
-          <li class=""><a href="#" onclick="getDraftMails();"><span> Draft</span></a></li>
+          <li class=""><a href="../Views/DraftView.php"><span> Draft</span></a></li>
           <li class=""><a href="#" onclick="getSendMails();"><span> Send</span></a></li>
           <li class=""><a href="#" onclick="getTrashMails();"><span> Trash</span></a></li>
         </ul>
@@ -97,7 +99,6 @@ $User = unserialize($_SESSION["userDetails"]);
                       <span class="status ml-2">Available</span>
                     </li>
                     <li> <a href="#"><i class="lnr lnr-user"></i>My Profile</a> </li>
-                    <li> <a href="#"><i class="lnr lnr-cog"></i>Settings</a> </li>
                     <li class="logout"> <a href="javascript:void(0);" onclick="logoutUser();"><i class="fa fa-power-off"></i> Logout</a> </li>
                   </ul>
                 </li>
@@ -114,8 +115,8 @@ $User = unserialize($_SESSION["userDetails"]);
             <table id="mailTable" class="table table-striped table-bordered table-responsive">
               <thead>
                 <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Uuid</th>
+                  <th scope="col">S.No</th>
+                  <th scope="col" class="hidden">Uuid</th>
                   <th scope="col">Sender</th>
                   <th scope="col">Subject</th>
                   <th scope="col">Received Time</th>
@@ -125,13 +126,13 @@ $User = unserialize($_SESSION["userDetails"]);
               <tbody>
                 <tr>
                   <th scope="row">1</th>
-                  <td>Uuid_PH</td>
+                  <td class="hidden">Uuid_PH</td>
                   <td>Name_PH</td>
                   <td>Subject_PH</td>
                   <td>Sender_PH</td>
                   <td>Time_PH</td>
                   <td>
-                    <button class="deletebttn">Button_PH</button>
+                    <button class="deletebttn btn-light">Button_PH</button>
                   </td>
                 </tr>
               </tbody>
