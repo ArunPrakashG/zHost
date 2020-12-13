@@ -2,12 +2,31 @@
 
 require_once $_SERVER['ZHOST_ROOT'] . '/Core/SessionCheck.php';
 require_once $_SERVER['ZHOST_ROOT'] . '/Core/UserModel.php';
+require_once $_SERVER['ZHOST_ROOT'] . '/Core/DatabaseManager.php';
 
 if (!isset($_SESSION)) {
 	session_start();
 }
 
 $_SESSION['PageTitle'] = "Welcome!";
+
+if (isset($_SESSION['updateStatus']) && $_SESSION['updateStatus'] == 0) {
+    unset($_SESSION['updateResult']);
+    unset($_SESSION['updateStatus']);
+
+    $Db = new Database();
+    $loginResult = $Db->LoginUser($User->Email, $User->Password, false);
+    if ($loginResult['isError']) {
+        unset($_SESSION["userDetails"]);
+
+        if (!IsUserLoggedIn()) {
+            Functions::Alert("Session expired!\nYou will be required to login again.");
+            Functions::Redirect("../Views/LoginView.php");
+            exit();
+        }
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -21,8 +40,8 @@ $_SESSION['PageTitle'] = "Welcome!";
 		let timerInterval;
 		Swal.fire({
 			title: "Please wait...",
-			html: "Redirecting you to Dashboard in <b></b> milliseconds.",
-			timer: 2000,
+			html: "Redirecting you to Inbox in <b></b> milliseconds.",
+			timer: 1000,
 			timerProgressBar: true,
 			willOpen: () => {
 				Swal.showLoading();
@@ -41,7 +60,7 @@ $_SESSION['PageTitle'] = "Welcome!";
 			},
 		}).then((result) => {
 			if (result.dismiss === Swal.DismissReason.timer) {
-				window.location = "Views/DashboardView.php";
+				window.location = "Views/InboxView.php";
 				return;
 			}
 		});
@@ -83,7 +102,7 @@ $_SESSION['PageTitle'] = "Welcome!";
 			<?php
 			if (IsUserLoggedIn()) {
 				$User = unserialize($_SESSION["userDetails"]);
-				echo '<li>Logged in as <span style="font-weight: bold;"><a href="javascript:onHomeLinkClicked();">' . $User->UserName . '</a></span>' . ($User->IsAdmin ? " (Admin) " : " (User) ") . '</li>';
+				echo '<li>Logged in as <span style="font-weight: bold;"><a href="javascript:onHomeLinkClicked();">' . $User->FirstName . " " . $User->LastName . '</a></span>' . ($User->IsAdmin ? " (Admin) " : " (User) ") . '</li>';
 			}
 			?>
 			<li>&copy; zHost <?php echo date("Y"); ?></li>

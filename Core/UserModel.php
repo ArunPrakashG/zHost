@@ -3,6 +3,7 @@
     {
         public $UserName;
         public $Email;
+        public $DateOfBirth;
         public $Password;
         public $Id;
         public $DateCreated;

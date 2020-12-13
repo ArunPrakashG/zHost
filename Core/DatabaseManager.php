@@ -67,7 +67,7 @@ class Database
             }
         }
 
-        $sqlQuery = "INSERT INTO " . ($isAdmin ? Config::ADMIN_TABLE_NAME : Config::USER_TABLE_NAME) . "(`EmailID`, `UserName`, `Password`, `SecurityQuestion`, `SecurityAnswer`, `AvatarPath`, `PhoneNumber`) VALUES ('" . $postArray['email'] . "','" . $postArray['username'] . "','" . $postArray['password'] . "','" . $postArray['secquest'] . "','" . $postArray['secans'] . "','" . $avatarPath . "','" . $postArray['pnumber'] . "');";
+        $sqlQuery = "INSERT INTO " . ($isAdmin ? Config::ADMIN_TABLE_NAME : Config::USER_TABLE_NAME) . "(`EmailID`, `FirstName`, `LastName`, `Password`, `Address`, `DateOfBirth`, `Gender` `SecurityQuestion`, `SecurityAnswer`, `AvatarPath`, `PhoneNumber`) VALUES ('" . $postArray['email'] . "','" . $postArray['firstName'] . "','" . $postArray['lastName'] . "','" . $postArray['gender'] . "','" . $postArray['address'] . "','" . $postArray['password'] . "','" . $postArray['sec-questSelector'] . "','" . $postArray['secans'] . "','" . $avatarPath . "','" . $postArray['pnumber'] . "');";
         return $this->ExecuteQuery($sqlQuery);
     }
 
@@ -600,6 +600,24 @@ class Database
         return $this->ExecuteQuery($sqlQuery);
     }
 
+    public function UpdateUser($userMailID, $post){
+        if(!isset($userMailID) || !isset($post)){
+            return false;
+        }
+
+        $sqlQuery = 'UPDATE users SET FirstName="' . $post["firstName"] . '", LastName="'. $post["lastName"] .'", DateOfBirth="'. $post['dateOfBirth'] . '", Address="'. $post["address"] . '", PhoneNumber='. $post['phoneNumber'] . ', AvatarPath="' . $post['avatarPath'] . '", Password="' . $_POST['password'] . '", Bio="' . $post['bio'] . '", Gender="' . $post['gender'] . '" WHERE EmailID="' . $userMailID . '";';        
+        return $this->ExecuteQuery($sqlQuery);
+    }
+
+    public function GetUserPassword($email){
+        if(!isset($email)){
+            return "";
+        }
+
+        $sqlQuery = "SELECT Password FROM users WHERE EmailID='" . $email . "';";
+        return $this->ExecuteQuery($sqlQuery);
+    }
+
     public function LoginUser($email, $password, $isAdminLogin)
     {
         $resultArray = array();
@@ -637,8 +655,12 @@ class Database
                     $resultObject->Password = $obj->Password;
                 }
 
-                if (isset($obj->UserName)) {
-                    $resultObject->UserName = $obj->UserName;
+                if (isset($obj->FirstName)) {
+                    $resultObject->UserName = $obj->FirstName . " " . $obj->LastName;
+                }
+
+                if(isset($obj->DateOfBirth)){
+                    $resultObject->DateOfBirth = $obj->DateOfBirth;
                 }
 
                 if (isset($obj->Id)) {
@@ -683,6 +705,10 @@ class Database
 
                 if(isset($obj->Profession)){
                     $resultObject->Profession = $obj->Profession;
+                }
+
+                if(isset($obj->Gender)){
+                    $resultObject->Gender = $obj->Gender;
                 }
 
                 if(isset($obj->Bio)){

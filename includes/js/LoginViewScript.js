@@ -29,7 +29,7 @@ function loginRequested() {
               Swal.fire({
                 title: "Redirecting you to home page!",
                 html: "redirecting in <b></b> milliseconds.",
-                timer: 3000,
+                timer: 1000,
                 timerProgressBar: true,
                 allowOutsideClick: false,
                 onBeforeOpen: () => {

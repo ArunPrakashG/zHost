@@ -3,6 +3,7 @@ require_once '../Core/Config.php';
 require_once '../Core/UserModel.php';
 require_once '../Common/Functions.php';
 require_once '../Core/SessionCheck.php';
+require_once '../Core/DatabaseManager.php';
 
 if (Config::DEBUG) {
     ini_set('display_errors', 1);
@@ -14,7 +15,7 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
-$_SESSION['PageTitle'] = "Dashboard";
+$_SESSION['PageTitle'] = "Inbox";
 
 // these variables are no longer required or checked at
 unset($_SESSION["loginErrorMessage"]);
@@ -29,12 +30,31 @@ unset($_SESSION["rq"]);
 $User;
 
 if (!IsUserLoggedIn()) {
-    Functions::Alert("Session expired!\nYou will be required to login again.");
+    echo '<script>alert("Session expired!\nYou will be required to login again.");</script>';
     Functions::Redirect("../Views/LoginView.php");
     exit();
 }
 
 $User = unserialize($_SESSION["userDetails"]);
+$User->UserName = $User->FirstName . " " . $User->LastName;
+
+if (isset($_SESSION['updateStatus']) && $_SESSION['updateStatus'] == 0) {
+    unset($_SESSION['updateResult']);
+    unset($_SESSION['updateStatus']);
+
+    $Db = new Database();
+    $loginResult = $Db->LoginUser($User->Email, $User->Password, false);
+    if ($loginResult['isError']) {
+        unset($_SESSION["userDetails"]);
+
+        if (!IsUserLoggedIn()) {
+            Functions::Alert("Session expired!\nYou will be required to login again.");
+            Functions::Redirect("../Views/LoginView.php");
+            exit();
+        }
+    }
+}
+
 ?>
 
 <!doctype html>

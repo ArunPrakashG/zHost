@@ -37,12 +37,15 @@ if (!IsUserLoggedIn()) {
 $User = unserialize($_SESSION["userDetails"]);
 $time = strtotime($User->DateCreated);
 $AccountCreationDate = date("d/m/y g:i A", $time);
+$User->UserName = $User->FirstName . " " . $User->LastName;
 ?>
 
 <html>
-<header>
+<header>    
+    <?php include_once $_SERVER['ZHOST_ROOT'] . '/Common/Header.php'; ?>
     <link href="../includes/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <link href="../includes/css/EditProfile.css" rel="stylesheet">
+    <script src="../includes/js/EditProfileViewScript.js"></script>
     <script src="../includes/js/jquery.min.js"></script>
     <script src="../includes/js/bootstrap.bundle.min.js"></script>
 </header>
@@ -51,7 +54,7 @@ $AccountCreationDate = date("d/m/y g:i A", $time);
     <div class="container">
         <h1>Edit Your Profile</h1>
         <hr>
-        <form class="form-horizontal" action="../Controllers/EditProfileController.php" method="POST">
+        <form class="form-horizontal" method="POST" name="editForm" id="editForm" action="javascript:editRequested();">
             <div class="row">
                 <!-- left column -->
                 <div class="col-md-3">
@@ -66,60 +69,61 @@ $AccountCreationDate = date("d/m/y g:i A", $time);
 
                 <!-- edit form column -->
                 <div class="col-md-9 personal-info">
-                    <div class="alert alert-info alert-dismissable hidden">
-                        <a class="panel-close close" data-dismiss="alert">×</a>
-                        <i class="fa fa-coffee"></i>
-                        This is an <strong>.alert</strong>. Use this to show important messages to the user.
+                    <div class='alert alert-info alert-dismissable hidden'>
+                        <?php
+                        /*
+                        if (isset($_SESSION['updateResult']) && $_SESSION['updateStatus'] != 0) {
+
+                            echo "<a class='panel-close close' data-dismiss='alert'>×</a>";
+                            echo '<i class="fa fa-coffee"></i>' . $_SESSION['updateResult'];
+                            unset($_SESSION['updateResult']);
+                        }
+                        */
+                        ?>
                     </div>
                     <h3>Personal info</h3>
 
                     <div class="form-group">
                         <label class="col-lg-3 control-label">First name</label>
                         <div class="col-lg-8">
-                            <?php
-                            if (isset($User->FirstName)) {
-                                echo "<input class='form-control' type='text' name='firstName' value='" . $User->FirstName . "'>";
-                            } else {
-                                echo '<input class="form-control" type="text" name="firstName" value="First Name">';
-                            }
-                            ?>
+                            <input class="form-control" type="text" required name="firstName" placeholder="Your First Name" value="<?php echo $User->FirstName ?>">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-lg-3 control-label">Last name</label>
                         <div class="col-lg-8">
-                            <?php
-                            if (isset($User->LastName)) {
-                                echo "<input class='form-control' type='text' name='lastName' value='" . $User->LastName . "'>";
-                            } else {
-                                echo "<input class='form-control' type='text' name='lastName' value='Last Name'>";
-                            }
-                            ?>
+                            <input class='form-control' type='text' required name='lastName' placeholder="Your Last Name" value="<?php echo $User->LastName ?>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">Bio</label>
+                        <div class="col-lg-8">
+                            <input class="form-control" type="text" name="bio" placeholder="Your Personal Bio" value="<?php echo $User->Bio ?>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">Date of birth</label>
+                        <div class="col-lg-8">
+                            <input class="form-control" type="date" name="dateOfBirth" required placeholder="Your Date Of Birth" value="<?php echo $User->DateOfBirth ?>">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-lg-3 control-label">Address</label>
                         <div class="col-lg-8">
-                            <?php
-                            if (isset($User->Address)) {
-                                echo "<input class='form-control' type='text' name='address' value='" . $User->Address . "'>";
-                            } else {
-                                echo "<input class='form-control' type='text' name='address' value=''>";
-                            }
-                            ?>
+                            <input class='form-control' type='text' required name='address' placeholder="Your Address" value="<?php echo $User->Address ?>">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-lg-3 control-label">Email</label>
                         <div class="col-lg-8">
-                            <input class="form-control" type="text" name="email" disabled value="<?php echo $User->Email ?>">
+                            <input class="form-control" type="text" name="email" readonly value="<?php echo $User->Email ?>">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-lg-3 control-label">Phone Number</label>
                         <div class="col-lg-8">
-                            <input class="form-control" type="text" name="phoneNumber" value="<?php echo $User->PhoneNumber ?>">
+                            <input class="form-control" type="text" required maxlength="10" name="phoneNumber" placeholder="Your Phone Number" value="<?php echo $User->PhoneNumber ?>">
                         </div>
                     </div>
 
@@ -127,7 +131,7 @@ $AccountCreationDate = date("d/m/y g:i A", $time);
                         <label class="col-lg-3 control-label">Gender</label>
                         <div class="col-lg-8">
                             <div class="ui-select">
-                                <select class="form-control" name="gender">
+                                <select class="form-control" required name="gender">
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
                                     <option value="other">Other</option>
@@ -135,23 +139,16 @@ $AccountCreationDate = date("d/m/y g:i A", $time);
                             </div>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Username</label>
-                        <div class="col-md-8">
-                            <input class="form-control" type="text" name='userName' value="<?php echo $User->UserName ?>">
-                        </div>
-                    </div>
                     <div class="form-group">
                         <label class="col-md-3 control-label">Password</label>
                         <div class="col-md-8">
-                            <input class="form-control" type="password" name='passWord' value="">
+                            <input class="form-control" type="password" required placeholder="Your Password" required name='passWord' value="">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-3 control-label">Confirm password</label>
                         <div class="col-md-8">
-                            <input class="form-control" type="password" name='confirmPassword' value="">
+                            <input class="form-control" type="password" required placeholder="Retype your password" required name='confirmPassword' value="">
                         </div>
                     </div>
                     <div class="form-group">
@@ -159,7 +156,7 @@ $AccountCreationDate = date("d/m/y g:i A", $time);
                         <div class="col-md-8">
                             <input type="submit" class="btn btn-primary" name='submitButton' value="Save Changes">
                             <span></span>
-                            <input type="reset" class="btn btn-default" name='clearValueButton' value="Cancel">
+                            <input type="reset" class="btn btn-default" name='clearValueButton' value="Cancel" onclick="cancelForm();">
                         </div>
                     </div>
         </form>

@@ -99,7 +99,7 @@ function OnLoginRequestReceived()
         $loginResultObj = unserialize($loginResult['resultObj']);
         $_SESSION['userDetails'] = $loginResult['resultObj'];
         $_SESSION['ID'] = $loginResultObj->Id;
-        $_SESSION['USER_NAME'] = $loginResultObj->UserName;
+        $_SESSION['USER_NAME'] = $loginResultObj->FirstName . " " . $loginResultObj->LastName;
         SetResult("Welcome to zHost!", "You are successfully logged in!", "0", "success");
         return true;
     }

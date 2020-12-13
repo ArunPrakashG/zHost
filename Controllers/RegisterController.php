@@ -48,8 +48,21 @@ function ValidateRegisterForum()
 		return false;
 	}
 
-	if (!isset($_POST["username"])) {
+	if (!isset($_POST["firstName"])) {
 		SetResult("Username is empty!", "Recheck entered username.", "-1", "warning");
+		return false;
+	}
+
+	if (!isset($_POST["lastName"])) {
+		SetResult("Username is empty!", "Recheck entered username.", "-1", "warning");
+		return false;
+	}
+
+	if (
+		preg_match('~[0-9]+~', $_POST['firstName']) || preg_match('~[0-9]+~', $_POST['lastName']) ||
+		(preg_match('/\s/', $_POST['firstName']) || preg_match('/\s/', $_POST['lastName']))
+	) {
+		SetResult("Invalid Name!", "Name cannot contain digits! (or whitespaces)", "-1", "warning");
 		return false;
 	}
 
@@ -64,12 +77,12 @@ function ValidateRegisterForum()
 	}
 
 	if (mb_strlen($_POST['psw']) < 4) {
-		SetResult("Password is Invalid!", "Password must have atleast 4 chareceters, should not be whitespace", "-1", "warning");
+		SetResult("Password is Invalid!", "Password must have atleast 4 charecters, should not contain whitespace", "-1", "warning");
 		return false;
 	}
 
 	if (!isset($_POST['psw-repeat'])) {
-		SetResult("Re-enter password to confirm", "You havnt re entered password.", "-1", "warning");
+		SetResult("Re-enter password to confirm", "You havn't re entered password.", "-1", "warning");
 		return false;
 	}
 
@@ -168,7 +181,13 @@ switch ($_POST['requestType']) {
 		if ($Result['Status'] != "0") {
 			$_SESSION['form-data']['email'] = $_POST['email'];
 			$_SESSION['form-data']['pnumber'] = $_POST['pnumber'];
-			$_SESSION['form-data']['username'] = $_POST['username'];
+			$_SESSION['form-data']['firstName'] = $_POST['firstName'];
+			$_SESSION['form-data']['lastName'] = $_POST['lastName'];
+			$_SESSION['form-data']['address'] = $_POST['address'];
+			$_SESSION['form-data']['dateOfBirth'] = $_POST['dateOfBirth'];
+			$_SESSION['form-data']['gender'] = $_POST['gender'];
+			$_SESSION['form-data']['sec-questSelector'] = $_POST['sec-questSelector'];
+			$_SESSION['form-data']['secans'] = $_POST['secans'];
 			$_SESSION['form-data']['secquest'] = $_POST['secquest'];
 			$_SESSION['form-data']['secans'] = $_POST['secans'];
 			$_SESSION['form-data']['psw'] = $_POST['psw'];

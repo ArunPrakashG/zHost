@@ -11,7 +11,7 @@ function IsSessionActive($redirectToHomeIfActive, $redirectToLoginIfNotActive)
     if (IsUserLoggedIn()) {
         if ($redirectToHomeIfActive) {
             Functions::Alert("You are already logged in! (" . $_SESSION['ID'] . ")\nRedirecting you to Home page...");            
-            Functions::Redirect("../Views/DashboardView.php");
+            Functions::Redirect("../Views/InboxView.php");
         }
 
         return true;

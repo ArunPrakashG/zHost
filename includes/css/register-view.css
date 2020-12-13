@@ -3,6 +3,13 @@
   src: url("../webfonts/assistant-v4-latin-regular.ttf");
 }
 
+.centered-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+}
+
 * {
   box-sizing: border-box;
   font-family: "assistant-regular";
@@ -15,7 +22,7 @@
 body {
   color: rgb(0, 0, 0);
   padding: 0;
-  height: 100vh;
+  height: 100%;
   background-blend-mode: difference;
   background: url(../images/register-background.jpeg) no-repeat;
   background-size: auto;

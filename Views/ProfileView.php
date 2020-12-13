@@ -3,6 +3,7 @@ require_once '../Core/Config.php';
 require_once '../Core/UserModel.php';
 require_once '../Common/Functions.php';
 require_once '../Core/SessionCheck.php';
+require_once '../Core/DatabaseManager.php';
 
 if (Config::DEBUG) {
     ini_set('display_errors', 1);
@@ -14,7 +15,7 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
-$_SESSION['PageTitle'] = "Profile";
+$_SESSION['PageTitle'] = "Your Profile";
 
 // these variables are no longer required or checked at
 unset($_SESSION["loginErrorMessage"]);
@@ -36,15 +37,35 @@ if (!IsUserLoggedIn()) {
 
 $User = unserialize($_SESSION["userDetails"]);
 $time = strtotime($User->DateCreated);
+$User->UserName = $User->FirstName . " " . $User->LastName;
 $AccountCreationDate = date("d/m/y g:i A", $time);
+
+if (isset($_SESSION['updateStatus']) && $_SESSION['updateStatus'] == 0) {
+    unset($_SESSION['updateResult']);
+    unset($_SESSION['updateStatus']);
+
+    $Db = new Database();
+    $loginResult = $Db->LoginUser($User->Email, $User->Password, false);
+    if ($loginResult['isError']) {
+        unset($_SESSION["userDetails"]);
+
+        if (!IsUserLoggedIn()) {
+            Functions::Alert("Session expired!\nYou will be required to login again.");
+            Functions::Redirect("../Views/LoginView.php");
+            exit();
+        }
+    }
+}
+
 ?>
 
 <html>
 <header>
+    <?php include_once $_SERVER['ZHOST_ROOT'] . '/Common/Header.php'; ?>
     <link href="../includes/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <link href="../includes/css/ProfileView.css" rel="stylesheet" id="bootstrap-css">
     <script src="../includes/js/jquery.min.js"></script>
-    <script src="../includes/js/bootstrap.bundle.min.js"></script>    
+    <script src="../includes/js/bootstrap.bundle.min.js"></script>
 </header>
 
 <body>
@@ -91,6 +112,7 @@ $AccountCreationDate = date("d/m/y g:i A", $time);
                 <div class="col-md-8">
                     <div class="tab-content profile-tab" id="myTabContent">
                         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                            <!--
                             <div class="row">
                                 <div class="col-md-6">
                                     <label>User Id</label>
@@ -99,6 +121,7 @@ $AccountCreationDate = date("d/m/y g:i A", $time);
                                     <p><?php echo $User->Id ?></p>
                                 </div>
                             </div>
+                            -->
                             <div class="row">
                                 <div class="col-md-6">
                                     <label>Name</label>
@@ -113,6 +136,14 @@ $AccountCreationDate = date("d/m/y g:i A", $time);
                                 </div>
                                 <div class="col-md-6">
                                     <p><?php echo $User->Email ?></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Date of Birth</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><?php echo $User->DateOfBirth ?></p>
                                 </div>
                             </div>
                             <div class="row">
@@ -136,7 +167,7 @@ $AccountCreationDate = date("d/m/y g:i A", $time);
                                     <label>Phone</label>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><?php echo $User->PhoneNumber ?></p>
+                                    <p><?php echo $User->PhoneNumber <= 0 ? "-NA-" : $User->PhoneNumber ?></p>
                                 </div>
                             </div>
                             <div class="row">
