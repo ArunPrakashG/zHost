@@ -275,7 +275,7 @@ function generateRowHtml(indexer, mail) {
     mail.MailID +
     "</td>" +
     '<td class="table-row-field">' +
-    mail.From +
+    mail.To +
     "</td>" +
     '<td class="table-row-field">' +
     (mail.Subject.length > 18
@@ -586,7 +586,7 @@ function displayEmailUi(selectedIndex) {
 
           quickReplySendTo = result.Emails[0].From;
           Swal.fire({
-            title: "From: <u>" + result.Emails[0].From + "</u>",
+            title: "To: <u>" + result.Emails[0].To + "</u>",
             html:
               '<div style="text-align: left;" >' +
               "<b>" +
@@ -603,11 +603,6 @@ function displayEmailUi(selectedIndex) {
               attachmentHtml +
               "</div>",
             showCloseButton: true,
-            showCancelButton: true,
-            confirmButtonText: "Quick Reply",
-            cancelButtonText: "Trash",
-            showDenyButton: true,
-            denyButtonText: "Edit",
           }).then((iResult) => {
             if (iResult.isDismissed) {
               switch (iResult.dismiss) {
@@ -617,19 +612,19 @@ function displayEmailUi(selectedIndex) {
                   return;
                 case "cancel":
                   // handle delete mail
-                  trashMail(selectedIndex);
+                  //trashMail(selectedIndex);
                   break;
               }
             }
 
             if (iResult.isConfirmed) {
               // handle quick reply
-              quickReply(quickReplySendTo);
+              //quickReply(quickReplySendTo);
             }
 
             if (iResult.isDenied) {
               // handle mail edit
-              quickEdit(result.Emails[0]);
+              //quickEdit(result.Emails[0]);
             }
           });
 

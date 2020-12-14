@@ -1,8 +1,13 @@
 body {
   margin: 0;
   padding: 0;
-  height: 100vh;  
-  background: url(../images/login-background.jpg) no-repeat;
+  height: 100%;
+  background: url(../images/login-background.jpg) no-repeat center center
+  fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-blend-mode: lighten;
+  -o-background-size: cover;
   background-size: cover;
 }
 

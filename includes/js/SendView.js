@@ -581,9 +581,9 @@ function displayEmailUi(selectedIndex) {
               ? '<input type="checkbox" disabled="disabled"> Is Trashed <br/>'
               : '<input type="checkbox" checked="true" disabled="disabled"> Is Trashed <br/>';
 
-          quickReplySendTo = result.Emails[0].From;
+          quickReplySendTo = result.Emails[0].To;
           Swal.fire({
-            title: "From: <u>" + result.Emails[0].From + "</u>",
+            title: "To: <u>" + result.Emails[0].To + "</u>",
             html:
               '<div style="text-align: left;" >' +
               "<b>" +
@@ -703,7 +703,6 @@ function quickReply(sendTo) {
       formData.append("file", $("#mail-attachment")[0].files[0]);
     }
 
-    console.log(JSON.stringify(mailObject));
     formData.append("requestType", "compose");
     formData.append("mailObject", JSON.stringify(mailObject));
 

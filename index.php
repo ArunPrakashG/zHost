@@ -9,24 +9,7 @@ if (!isset($_SESSION)) {
 }
 
 $_SESSION['PageTitle'] = "Welcome!";
-
-if (isset($_SESSION['updateStatus']) && $_SESSION['updateStatus'] == 0) {
-    unset($_SESSION['updateResult']);
-    unset($_SESSION['updateStatus']);
-
-    $Db = new Database();
-    $loginResult = $Db->LoginUser($User->Email, $User->Password, false);
-    if ($loginResult['isError']) {
-        unset($_SESSION["userDetails"]);
-
-        if (!IsUserLoggedIn()) {
-            Functions::Alert("Session expired!\nYou will be required to login again.");
-            Functions::Redirect("../Views/LoginView.php");
-            exit();
-        }
-    }
-}
-
+unset($_SESSION['form-data']);
 ?>
 
 <!DOCTYPE html>

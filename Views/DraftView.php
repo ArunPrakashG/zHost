@@ -55,6 +55,10 @@ if (isset($_SESSION['updateStatus']) && $_SESSION['updateStatus'] == 0) {
     }
 }
 
+if (!isset($_SESSION['selectedMail']) || empty($_SESSION['selectedMail'])) {
+    echo '<script>onNoSelectedMail();</script>';
+}
+
 ?>
 
 <!doctype html>
@@ -84,7 +88,7 @@ if (isset($_SESSION['updateStatus']) && $_SESSION['updateStatus'] == 0) {
             </div>
             <div class="sidebar-menu-inner">
                 <ul class="nav nav-pills nav-stacked custom-nav" id="navItems">
-                    <li ><a href="../Views/InboxView.php"><span> Inbox</span></a></li>
+                    <li><a href="../Views/InboxView.php"><span> Inbox</span></a></li>
                     <li class=""><a href="#" onclick="onComposeButtonClicked();"><span> Compose</span></a></li>
                     <li class="active"><a href="../Views/DraftView.php"><span> Draft</span></a></li>
                     <li class=""><a href="../Views/SendView.php"><span> Send</span></a></li>

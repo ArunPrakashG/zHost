@@ -19,13 +19,15 @@
   text-decoration: underline;
 }
 
-body {
-  color: rgb(0, 0, 0);
-  padding: 0;
+.imageBg {
   height: 100%;
-  background-blend-mode: difference;
-  background: url(../images/register-background.jpeg) no-repeat;
-  background-size: auto;
+  background: url(../images/register-background.jpeg) no-repeat center center
+    fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-blend-mode: lighten;
+  -o-background-size: cover;
+  background-size: cover;
 }
 
 .login-form {
@@ -33,13 +35,18 @@ body {
 }
 
 form {
-  background: rgb(241, 241, 241);
+  background: #ffffff;
   z-index: 1;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-40%, -40%);
-  width: 500px;
+  /* top: 50%; */
+  /* left: 50%; */
+  top: 0;
+  /* bottom: 0; */
+  left: 0;
+  right: 0;
+  margin: auto;
+  /* transform: translate(-40%, -40%); */
+  width: 50%;
   padding: 25.2px 50px 50px 50px;
   border-radius: 10px;
   display: inline-flex;
@@ -73,7 +80,7 @@ input[type="upload"] {
   text-align: left;
 }
 
-input[type="upload"]{
+input[type="upload"] {
   align-items: flex-end;
 }
 

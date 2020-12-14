@@ -4,7 +4,8 @@ function registerRequested() {
 
   formData.append("file", file_data);
   formData.append("requestType", "register");
-
+  console.log(formData);
+  
   $.ajax({
     method: "POST",
     url: "../Controllers/RegisterController.php",

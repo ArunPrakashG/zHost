@@ -546,13 +546,13 @@ function displayEmailUi(selectedIndex) {
         case "-1":
           Swal.fire(result.ShortReason, result.Reason, result.Level).then(
             (value) => {
-              //document.location = "../Views/DraftView.php?previousError=true";
+              //document.location = "../Views/InboxView.php?previousError=true";
               return;
             }
           );
           return;
         case "0":
-          // draft fetch done
+          // mail fetch done
           if (result.Emails == null || result.Emails.length <= 0) {
             setTimeout(function () {
               Swal.fire({
@@ -567,6 +567,9 @@ function displayEmailUi(selectedIndex) {
             return;
           }
 
+          processSetMailRequest(result.Emails);
+          return;
+          /*
           var attachmentHtml =
             result.Emails[0].AttachmentPath != ""
               ? "<b>Attachment:</b></br>" +
@@ -632,7 +635,43 @@ function displayEmailUi(selectedIndex) {
               quickEdit(result.Emails[0]);
             }
           });
+          */
+          break;
+      }
+    },
+    error: function (e) {
+      Swal.fire(
+        "Request Exception!",
+        "Exception occured during AJAX Request. Check console for more info.",
+        "error"
+      );
+      console.log(e);
+    },
+  });
+}
 
+function processSetMailRequest(emails){
+  $.ajax({
+    url: "../Controllers/EmailViewController.php",
+    type: "POST",
+    data: {
+      requestType: "set_selected_row",
+      e: emails[0]
+    },
+    dataType: "json",
+    success: function (result) {      
+      switch (result.Status) {
+        case "0": 
+          window.location = "../Views/EmailView.php?refer=draft";         
+          break;
+        case "-1":
+          Swal.fire(
+            "Failed to set mail",
+            result.Reason,
+            result.Level
+          ).then((value) => {
+            document.location = "../Views/InboxView.php";
+          });
           break;
       }
     },

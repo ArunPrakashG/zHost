@@ -166,7 +166,6 @@ switch ($_POST['requestType']) {
         OnUserSessionClearRequestReceived();
         break;
     default:
-        error_log($_POST['requestType']);
         SetResult("Invalid!", "Unknown request type.", "-1", "error");
         break;
 }

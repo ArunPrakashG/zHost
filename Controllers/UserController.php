@@ -92,7 +92,7 @@ function OnLoginRequestReceived()
 
     if ($loginResult = $Db->LoginUser($_POST["email"], $_POST["password"], false)) {
         if (isset($loginResult['isError']) && $loginResult['isError']) {
-            SetResult("Error!", "Password is wrong.", "-1", "error");
+            SetResult("Error!", "Invalid login Details.", "-1", "error");
             return false;
         }
 

@@ -67,7 +67,10 @@ class Database
             }
         }
 
-        $sqlQuery = "INSERT INTO " . ($isAdmin ? Config::ADMIN_TABLE_NAME : Config::USER_TABLE_NAME) . "(`EmailID`, `FirstName`, `LastName`, `Password`, `Address`, `DateOfBirth`, `Gender` `SecurityQuestion`, `SecurityAnswer`, `AvatarPath`, `PhoneNumber`) VALUES ('" . $postArray['email'] . "','" . $postArray['firstName'] . "','" . $postArray['lastName'] . "','" . $postArray['gender'] . "','" . $postArray['address'] . "','" . $postArray['password'] . "','" . $postArray['sec-questSelector'] . "','" . $postArray['secans'] . "','" . $avatarPath . "','" . $postArray['pnumber'] . "');";
+        $sqlQuery = "INSERT INTO " . ($isAdmin ? Config::ADMIN_TABLE_NAME : Config::USER_TABLE_NAME) . 
+        "(`EmailID`, `FirstName`, `LastName`, `Password`,  `DateOfBirth`, `Gender`, `Address`, `SecurityQuestion`, `SecurityAnswer`, `AvatarPath`, `PhoneNumber`)" .  
+        "VALUES ('" . $postArray['email'] . "','" . $postArray['firstName'] . "','" . $postArray['lastName'] . "','" . $postArray['password'] . "','" . $postArray['dateOfBirth'] . 
+        "','" . $postArray['gender'] . "','" . $postArray['address'] . "','" . $postArray['sec-questSelector'] . "','" . $postArray['secans'] . "','" . $avatarPath . "','" . $postArray['pnumber'] . "');";
         return $this->ExecuteQuery($sqlQuery);
     }
 
@@ -144,7 +147,7 @@ class Database
             return false;
         }
 
-        $sqlQuery = "UPDATE mails SET IsDraft=1 WHERE MailID='$uuid';";
+        $sqlQuery = "UPDATE mails SET IsTrash=0, IsDraft=1 WHERE MailID='$uuid';";
         return $this->ExecuteQuery($sqlQuery);
     }
 
@@ -169,11 +172,11 @@ class Database
         }
 
         if (!$this->DoesMailWithUuidExist($uuid)) {
-            error_log("mail doesnt exist");
             return false;
         }
 
-        $sqlQuery1 = "UPDATE emails SET IsTrash=1 WHERE MailID='$uuid';";
+        $currentUser = GetCurrentUserEmail();
+        $sqlQuery1 = "UPDATE emails SET TrashedBy='$currentUser', IsTrash=1, IsDraft=0 WHERE MailID='$uuid';";
         return $this->ExecuteQuery($sqlQuery1);
     }
 
@@ -488,7 +491,7 @@ class Database
             return $response;
         }
 
-        $sqlQuery = "SELECT * FROM emails WHERE ReceivedFrom='$userEmail';";
+        $sqlQuery = "SELECT * FROM emails WHERE ReceivedFrom='$userEmail' AND IsTrash=0 AND IsDraft=0;";
 
         if ($exeResult = $this->ExecuteQuery($sqlQuery)) {
             $response['Count'] = mysqli_num_rows($exeResult);
@@ -545,11 +548,11 @@ class Database
         $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail';";
 
         if ($onlyDraft) {
-            $sqlQuery = "SELECT * FROM emails WHERE ReceivedFrom='$userEmail' AND IsDraft=1;";
+            $sqlQuery = "SELECT * FROM emails WHERE ReceivedFrom='$userEmail' AND IsDraft=1 AND IsTrash=0;";
         }
 
         if ($onlyTrash) {
-            $sqlQuery = "SELECT * FROM emails WHERE SendTo='$userEmail' AND IsTrash=1;";
+            $sqlQuery = "SELECT * FROM emails WHERE TrashedBy='$userEmail' AND IsTrash=1 AND IsDraft=0;";
         }
 
         if (!$onlyDraft && !$onlyTrash) {
@@ -648,7 +651,7 @@ class Database
                 if (isset($obj->Password)) {
                     if (!password_verify($password, $obj->Password)) {
                         $resultArray["isError"] = true;
-                        $resultArray["errorMessage"] = "Password is incorrect";
+                        $resultArray["errorMessage"] = "Invalid login details!";
                         return $resultArray;
                     }
 

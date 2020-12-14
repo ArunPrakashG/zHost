@@ -86,6 +86,11 @@ function ValidateRegisterForum()
 		return false;
 	}
 
+	if(!isset($_POST['secans']) || empty($_POST['secans']) || strlen($_POST['secans']) <= 1){
+		SetResult("Invalid Security Question Answer.", "Answer can't be empty and should not be less than or equal to a single charecter.", "-1", "warning");
+		return false;
+	}
+
 	if (strcmp($_POST["psw"], $_POST["psw-repeat"]) != 0) {
 		SetResult("Passwords don't match!", "Recheck your typed password.", "-1", "warning");
 		return false;
@@ -188,13 +193,14 @@ switch ($_POST['requestType']) {
 			$_SESSION['form-data']['gender'] = $_POST['gender'];
 			$_SESSION['form-data']['sec-questSelector'] = $_POST['sec-questSelector'];
 			$_SESSION['form-data']['secans'] = $_POST['secans'];
-			$_SESSION['form-data']['secquest'] = $_POST['secquest'];
-			$_SESSION['form-data']['secans'] = $_POST['secans'];
 			$_SESSION['form-data']['psw'] = $_POST['psw'];
 			$_SESSION['form-data']['psw-repeat'] = $_POST['psw-repeat'];
+			break;
 		}
-
-		echo json_encode($Result);
+		
+		unset($_SESSION['form-data']);
 		break;
 }
+
+echo json_encode($Result);
 ?>

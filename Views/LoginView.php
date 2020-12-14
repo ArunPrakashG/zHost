@@ -14,6 +14,7 @@ if (!isset($_SESSION)) {
 }
 
 $_SESSION['PageTitle'] = "Login";
+unset($_SESSION['form-data']);
 
 if (isset($_GET['refer']) && strcmp($_GET['refer'], "index")) {
     unset($_SESSION['userDetails']);
